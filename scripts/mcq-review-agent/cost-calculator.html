@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GPT-5.6 Luna Cost Calculator</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+      :root {
+        color-scheme: dark;
+        --bg: #050608;
+        --panel: #0a0c10;
+        --panel-soft: #101319;
+        --line: rgba(255, 255, 255, 0.12);
+        --muted: #8c96a6;
+        --text: #f5f7fb;
+        --blue: #5aa7ff;
+        --blue-soft: rgba(90, 167, 255, 0.12);
+        --green: #7cf0bd;
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        min-height: 100vh;
+        margin: 0;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 80% 0%, rgba(41, 105, 177, 0.12), transparent 34rem),
+          radial-gradient(circle at 0% 100%, rgba(49, 80, 131, 0.1), transparent 28rem),
+          var(--bg);
+        font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .shell {
+        width: min(100% - 32px, 920px);
+        margin: 0 auto;
+        padding: 64px 0 48px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        color: var(--blue);
+        font: 500 11px/1 "DM Mono", monospace;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .eyebrow::before {
+        width: 7px;
+        height: 7px;
+        content: "";
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 16px rgba(124, 240, 189, 0.8);
+      }
+
+      h1 {
+        max-width: 680px;
+        margin: 0;
+        font-size: clamp(38px, 7vw, 76px);
+        line-height: 0.96;
+        letter-spacing: -0.065em;
+      }
+
+      .intro {
+        max-width: 600px;
+        margin: 22px 0 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .calculator {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        gap: 16px;
+        margin-top: 46px;
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(21, 25, 32, 0.94), rgba(8, 10, 13, 0.96));
+        box-shadow: var(--shadow);
+      }
+
+      .inputs { padding: 26px; }
+
+      .card-title {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .card-title h2 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: -0.025em;
+      }
+
+      .model-pill {
+        padding: 7px 10px;
+        border: 1px solid rgba(90, 167, 255, 0.3);
+        border-radius: 8px;
+        color: #cce4ff;
+        background: var(--blue-soft);
+        font: 12px "DM Mono", monospace;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .field label {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 9px;
+        color: #c5cbd5;
+        font-size: 13px;
+      }
+
+      .hint {
+        color: var(--muted);
+        font: 11px "DM Mono", monospace;
+      }
+
+      input {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 10px;
+        outline: none;
+        padding: 14px 15px;
+        color: var(--text);
+        background: #07090c;
+        font: 600 18px "DM Mono", monospace;
+        transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      }
+
+      input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 4px rgba(90, 167, 255, 0.13);
+        transform: translateY(-1px);
+      }
+
+      .pricing {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 26px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+      }
+
+      .pricing .field label { font-size: 12px; }
+      .pricing input { padding: 11px 12px; font-size: 15px; }
+
+      .presets {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+      }
+
+      button {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #d7dde7;
+        background: rgba(255, 255, 255, 0.04);
+        font: 12px "DM Mono", monospace;
+        cursor: pointer;
+        transition: 160ms ease;
+      }
+
+      button:hover, button:focus-visible {
+        border-color: rgba(90, 167, 255, 0.7);
+        color: white;
+        background: var(--blue-soft);
+        transform: translateY(-1px);
+      }
+
+      .reset {
+        margin-top: 24px;
+        color: var(--muted);
+        background: transparent;
+      }
+
+      .result {
+        display: flex;
+        min-height: 100%;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 30px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .result::after {
+        position: absolute;
+        width: 230px;
+        height: 230px;
+        right: -95px;
+        bottom: -95px;
+        content: "";
+        border: 1px solid rgba(90, 167, 255, 0.22);
+        border-radius: 50%;
+        box-shadow: 0 0 0 26px rgba(90, 167, 255, 0.04), 0 0 0 52px rgba(90, 167, 255, 0.025);
+        pointer-events: none;
+      }
+
+      .result-label {
+        color: var(--muted);
+        font: 11px "DM Mono", monospace;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .total {
+        margin: 14px 0 8px;
+        color: white;
+        font-size: clamp(46px, 7vw, 72px);
+        font-weight: 600;
+        letter-spacing: -0.07em;
+        line-height: 1;
+      }
+
+      .total-sub {
+        color: var(--green);
+        font: 12px "DM Mono", monospace;
+      }
+
+      .breakdown {
+        position: relative;
+        z-index: 1;
+        margin-top: 42px;
+      }
+
+      .breakdown-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 0;
+        border-top: 1px solid var(--line);
+        color: #b4bdca;
+        font-size: 13px;
+      }
+
+      .breakdown-row strong {
+        color: var(--text);
+        font: 500 13px "DM Mono", monospace;
+      }
+
+      .formula {
+        position: relative;
+        z-index: 1;
+        margin-top: 26px;
+        color: #768193;
+        font: 11px/1.7 "DM Mono", monospace;
+      }
+
+      footer {
+        margin-top: 20px;
+        color: #626b79;
+        font: 11px "DM Mono", monospace;
+      }
+
+      @media (max-width: 720px) {
+        .shell { padding-top: 38px; }
+        .calculator, .field-grid { grid-template-columns: 1fr; }
+        .pricing { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (max-width: 420px) {
+        .shell { width: min(100% - 22px, 920px); }
+        .inputs, .result { padding: 21px; }
+        .pricing { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <div class="eyebrow">Token economics</div>
+      <h1>Know what the call costs.</h1>
+      <p class="intro">Add the input and output tokens from your review run. The calculator converts them into a clean cost estimate for GPT-5.6 Luna.</p>
+
+      <section class="calculator" aria-label="Token cost calculator">
+        <div class="card inputs">
+          <div class="card-title">
+            <h2>Usage &amp; pricing</h2>
+            <span class="model-pill">gpt-5.6-luna</span>
+          </div>
+
+          <div class="field-grid">
+            <div class="field">
+              <label for="inputTokens">Input tokens <span class="hint">prompt</span></label>
+              <input id="inputTokens" type="number" min="0" step="1" value="0" inputmode="numeric" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="outputTokens">Output tokens <span class="hint">answer</span></label>
+              <input id="outputTokens" type="number" min="0" step="1" value="0" inputmode="numeric" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="pricing">
+            <div class="field">
+              <label for="inputPrice">Input price <span class="hint">$/1M</span></label>
+              <input id="inputPrice" type="number" min="0" step="0.01" value="0.20" inputmode="decimal" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="outputPrice">Output price <span class="hint">$/1M</span></label>
+              <input id="outputPrice" type="number" min="0" step="0.01" value="1.20" inputmode="decimal" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="presets" aria-label="Token presets">
+            <button type="button" data-preset="1000">1K input</button>
+            <button type="button" data-preset="10000">10K input</button>
+            <button type="button" data-preset="50000">50K input</button>
+            <button type="button" data-preset="100000">100K input</button>
+          </div>
+          <button class="reset" id="reset" type="button">Reset values</button>
+        </div>
+
+        <div class="card result" aria-live="polite">
+          <div>
+            <div class="result-label">Estimated total</div>
+            <div class="total" id="totalCost">$0.00</div>
+            <div class="total-sub" id="tokenCount">0 total tokens</div>
+          </div>
+
+          <div class="breakdown">
+            <div class="breakdown-row"><span>Input cost</span><strong id="inputCost">$0.00</strong></div>
+            <div class="breakdown-row"><span>Output cost</span><strong id="outputCost">$0.00</strong></div>
+            <div class="breakdown-row"><span>Input tokens</span><strong id="inputCount">0</strong></div>
+            <div class="breakdown-row"><span>Output tokens</span><strong id="outputCount">0</strong></div>
+          </div>
+
+          <div class="formula">cost = (tokens ÷ 1,000,000) × price per MTok</div>
+        </div>
+      </section>
+
+      <footer>Prices are editable. The defaults match the reference pricing shown above.</footer>
+    </main>
+
+    <script>
+      const fields = {
+        inputTokens: document.querySelector("#inputTokens"),
+        outputTokens: document.querySelector("#outputTokens"),
+        inputPrice: document.querySelector("#inputPrice"),
+        outputPrice: document.querySelector("#outputPrice"),
+      };
+
+      const output = {
+        inputCost: document.querySelector("#inputCost"),
+        outputCost: document.querySelector("#outputCost"),
+        totalCost: document.querySelector("#totalCost"),
+        inputCount: document.querySelector("#inputCount"),
+        outputCount: document.querySelector("#outputCount"),
+        tokenCount: document.querySelector("#tokenCount"),
+      };
+
+      const numberFormat = new Intl.NumberFormat("en-US");
+      const moneyFormat = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2, maximumFractionDigits: 6 });
+
+      function valueOf(field) {
+        const value = Number(field.value);
+        return Number.isFinite(value) && value >= 0 ? value : 0;
+      }
+
+      function update() {
+        const inputTokens = valueOf(fields.inputTokens);
+        const outputTokens = valueOf(fields.outputTokens);
+        const inputPrice = valueOf(fields.inputPrice);
+        const outputPrice = valueOf(fields.outputPrice);
+        const inputCost = (inputTokens / 1_000_000) * inputPrice;
+        const outputCost = (outputTokens / 1_000_000) * outputPrice;
+        const totalCost = inputCost + outputCost;
+
+        output.inputCost.textContent = moneyFormat.format(inputCost);
+        output.outputCost.textContent = moneyFormat.format(outputCost);
+        output.totalCost.textContent = moneyFormat.format(totalCost);
+        output.inputCount.textContent = numberFormat.format(inputTokens);
+        output.outputCount.textContent = numberFormat.format(outputTokens);
+        output.tokenCount.textContent = `${numberFormat.format(inputTokens + outputTokens)} total tokens`;
+      }
+
+      Object.values(fields).forEach((field) => field.addEventListener("input", update));
+
+      document.querySelectorAll("[data-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          fields.inputTokens.value = button.dataset.preset;
+          update();
+          fields.inputTokens.focus();
+        });
+      });
+
+      document.querySelector("#reset").addEventListener("click", () => {
+        fields.inputTokens.value = 0;
+        fields.outputTokens.value = 0;
+        fields.inputPrice.value = 0.20;
+        fields.outputPrice.value = 1.20;
+        update();
+      });
+
+      update();
+    </script>
+  </body>
+</html>
