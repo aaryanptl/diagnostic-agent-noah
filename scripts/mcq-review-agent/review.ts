@@ -171,6 +171,8 @@ Options:
   --concurrency <number>  Concurrent agent calls. Default: ${DEFAULT_CONCURRENCY}
   --model <model>         Override the model. Default: ${DEFAULT_MODEL}
   --output-dir <path>     Report directory. Default: scripts/mcq-review-agent/out
+  --apply-report <path>   Apply an existing JSONL report; repeatable
+  --output <path>         Corrected CSV output path for --apply-report
   --include-visual        Include question_svg and option_svg rows
   --visual-only           Review only question_svg and option_svg rows
   --fix                   Apply safe agent corrections to a new CSV
@@ -196,6 +198,8 @@ function parseArgs(argv: string[]) {
     concurrency: DEFAULT_CONCURRENCY,
     model: DEFAULT_MODEL,
     outputDir: "scripts/mcq-review-agent/out",
+    applyReports: [] as string[],
+    outputPath: null as string | null,
     visualScope: "nonvisual" as VisualScope,
     fix: false,
   };
@@ -247,6 +251,8 @@ function parseArgs(argv: string[]) {
       args.concurrency = positiveInt(value, "concurrency");
     else if (key === "model") args.model = value;
     else if (key === "output-dir") args.outputDir = value;
+    else if (key === "apply-report") args.applyReports.push(value);
+    else if (key === "output") args.outputPath = value;
     else throw new Error(`Unknown option: ${arg}`);
   }
 
@@ -266,6 +272,11 @@ function parseArgs(argv: string[]) {
     throw new Error(
       "source-start/source-end cannot be combined with offset or pool-size",
     );
+  if (args.applyReports.length > 0 && !args.outputPath)
+    throw new Error("--output is required when using --apply-report");
+  if (args.applyReports.length === 0 && args.outputPath)
+    throw new Error("--output can only be used with --apply-report");
+  if (args.applyReports.length > 0) return args;
   if (!process.env.OPENAI_API_KEY?.trim())
     throw new Error(
       "OPENAI_API_KEY is required. Set it before running the reviewer.",
@@ -323,7 +334,7 @@ function parseOptions(
 }
 
 const VISUAL_REFERENCE_PATTERN =
-  /\b(?:look\s+at|look\s+closely|shown|shows|picture|image|figure|diagram|illustration|chart|graph|table|pictograph|number\s+line|sticker\s+trail|jumps?|jumped|jumping)\b/gi;
+  /\b(?:look\s+at|look\s+closely|shown|shows|picture|image|figure|diagram|illustration|chart|graph|table|pictograph|number\s+line|sticker\s+trail)\b/gi;
 
 const INLINE_TEXT_VISUAL_PATTERN = /[\u{1f000}-\u{1faff}\u{2600}-\u{27bf}]/u;
 
@@ -696,12 +707,127 @@ function toCsv(rows: CsvRow[], headers: string[]): string {
   const lines = rows.map((row) =>
     headers.map((header) => csvEscape(row[header] ?? "")).join(","),
   );
-  return `${headers.map(csvEscape).join(",")}\r\n${lines.join("\r\n")}\r\n`;
+  // Excel uses the UTF-8 BOM to detect UTF-8 CSV files instead of opening
+  // them as a legacy Windows code page.
+  return `\uFEFF${headers.map(csvEscape).join(",")}\r\n${lines.join("\r\n")}\r\n`;
+}
+
+type ReportEntry = {
+  review: ReviewOutput | null;
+  error: string | null;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+async function readReviewReports(
+  reportPaths: string[],
+): Promise<Map<string, ReportEntry>> {
+  const entries = new Map<string, ReportEntry>();
+  for (const reportPath of reportPaths) {
+    const resolvedPath = resolveFromCwd(reportPath);
+    const contents = await readFile(resolvedPath, "utf8");
+    const lines = contents.split(/\r?\n/);
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index].trim();
+      if (!line) continue;
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(line);
+      } catch (error) {
+        throw new Error(
+          `Invalid JSON in ${resolvedPath} at line ${index + 1}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+      if (!isRecord(parsed) || typeof parsed.id !== "string")
+        throw new Error(
+          `Invalid review item in ${resolvedPath} at line ${index + 1}: id is required`,
+        );
+      if (entries.has(parsed.id))
+        throw new Error(
+          `Duplicate review ID ${parsed.id} found in ${resolvedPath}; refuse to choose between reports`,
+        );
+
+      const errorMessage =
+        typeof parsed.error === "string" ? parsed.error : null;
+      let review: ReviewOutput | null = null;
+      if (parsed.review !== null && parsed.review !== undefined)
+        review = reviewOutputSchema.parse(parsed.review);
+      entries.set(parsed.id, { review, error: errorMessage });
+    }
+  }
+  return entries;
+}
+
+async function applyReviewReports(
+  inputPath: string,
+  reportPaths: string[],
+  outputPath: string,
+) {
+  const input = await readCsv(inputPath);
+  const reports = await readReviewReports(reportPaths);
+  const inputIds = new Set(input.rows.map((row) => row.id));
+  const unknownReportIds = [...reports.keys()].filter(
+    (id) => !inputIds.has(id),
+  );
+  if (unknownReportIds.length > 0)
+    throw new Error(
+      `${unknownReportIds.length} report IDs were not found in the input CSV; refuse to create a partial mismatch`,
+    );
+
+  let applied = 0;
+  let skippedFails = 0;
+  let pass = 0;
+  let needsReview = 0;
+  let requestErrors = 0;
+  const updatedColumn = "review_updated";
+  const fixedRows = input.rows.map((row) => {
+    const entry = reports.get(row.id);
+    if (!entry) return { ...row, [updatedColumn]: "false" };
+    if (!entry.review) {
+      if (entry.error) requestErrors += 1;
+      return { ...row, [updatedColumn]: "false" };
+    }
+    if (entry.review.verdict === "pass") pass += 1;
+    if (entry.review.verdict === "needs_review") needsReview += 1;
+    const corrected = safeCorrection(row, entry.review);
+    if (corrected) {
+      applied += 1;
+      return { ...corrected, [updatedColumn]: "true" };
+    }
+    if (entry.review.verdict === "fail") skippedFails += 1;
+    return { ...row, [updatedColumn]: "false" };
+  });
+
+  const resolvedOutputPath = resolveFromCwd(outputPath);
+  await mkdir(path.dirname(resolvedOutputPath), { recursive: true });
+  const outputHeaders = input.headers.includes(updatedColumn)
+    ? input.headers
+    : [...input.headers, updatedColumn];
+  await writeFile(resolvedOutputPath, toCsv(fixedRows, outputHeaders), "utf8");
+  console.log(`Applied reports: ${reportPaths.length}`);
+  console.log(`Report rows: ${reports.size}`);
+  console.log(`Applied corrections: ${applied}`);
+  console.log(`Skipped fail corrections: ${skippedFails}`);
+  console.log(
+    `Pass: ${pass}; needs review: ${needsReview}; request errors: ${requestErrors}`,
+  );
+  console.log(`Corrected CSV: ${resolvedOutputPath}`);
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const inputPath = resolveFromCwd(args.input);
+  if (args.applyReports.length > 0) {
+    await applyReviewReports(
+      inputPath,
+      args.applyReports,
+      args.outputPath as string,
+    );
+    return;
+  }
   const reasonPath = resolveFromCwd(args.reason);
   const outputDir = resolveFromCwd(args.outputDir);
 

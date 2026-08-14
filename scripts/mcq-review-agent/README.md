@@ -75,6 +75,25 @@ Reports are written to `scripts/mcq-review-agent/out/` as JSONL results and a JS
 
 Each selected row makes one model request. The reviewer uses the full semantic and language-quality rules in that single prompt; it does not retry correction or failed requests.
 
+## Apply existing JSONL reports to a new CSV
+
+After reviewing, apply the existing JSONL without making new AI calls:
+
+```powershell
+pnpm exec tsx scripts/mcq-review-agent/review.ts `
+  --input files/mcq_fixed_final_uk_20p.csv `
+  --apply-report scripts/mcq-review-agent/out/review-results-rows-0-1000-<timestamp>.jsonl `
+  --output files/mcq_import_ready_0_1000.csv
+```
+
+Repeat `--apply-report` for additional JSONL files. The applier matches by ID,
+applies only safe `fail` corrections, and leaves passes, unresolved failures,
+needs-review rows, and request errors unchanged. It refuses unknown or duplicate
+report IDs. The generated CSV includes `review_updated=true` only for rows where
+a correction was applied; all other rows are marked `false`. Remove this
+tracking column before importing if the AWS DB importer requires the original
+CSV schema.
+
 The reviewer checks all CSV fields for embedded `<svg>` markup and also recognizes inline emoji or repeated Unicode symbols used as text-based pictographs. It passes this visual context to the agent. If a non-visual question uses wording that depends on an unavailable visual, such as "look at the picture" or "in two jumps," the agent can rewrite the question using only facts already present in the text. Every applied correction is a complete question bundle: `question_text`, `options`, and `explanation` are updated together whenever one field depends on another.
 
 ## Review and create a corrected copy
