@@ -29,18 +29,35 @@ The Learning Plan Builder creates and continuously updates a class-by-class Grad
 - Medium topics are added after High topics when capacity remains.
 - Low topics are added last.
 - Evidence rules can recommend skipping only Medium or Low topics.
-- Prerequisites are placed before dependent topics.
+- Topics are sequenced High first, then Medium, then Low, using curriculum sequence inside each band.
+- Prerequisites are placed before dependent topics. This overrides the priority order — a Medium prerequisite still runs ahead of the High topic that needs it.
+- A prerequisite scoring 75% or more in front of a topic scored below 40% is kept but shortened to a refresher (half the ideal classes, rounded up), so the weak topic is reached sooner. The prerequisite is never skipped.
 - Checkpoints, revision classes, practice classes and PTMs count toward capacity.
 - Over-capacity plans remain editable but show a persistent warning.
+
+**Structural classes**
+
+The full-year workbook package is 66 teaching + 13 structural = 79 classes, where the structural 13 is 5 checkpoints + 5 RDP + 3 PTM.
+
+- **Checkpoints** produce the mastery evidence every later rule reads, so they are protected the longest.
+- **RDP (revision, doubts & practice)** is the optional part of the structure and is shed first when the plan is tight.
+- **PTMs are scheduled by ops on a fixed calendar.** The builder reserves their classes against the package (reported as `capacity.opsReserve`) but never generates or places them in the class sequence, and the fit ladder cannot shed them.
 
 **Fitting a plan into the package (Rules B2, F3, H1)**
 
 When the selected scope does not fit the remaining classes, the builder works in this order:
 
-1. **Compress toward Minimum Classes** — lowest priority first, latest sequence first. Every topic carries a minimum (the fewest classes in which it can still be taught soundly); no automatic rule may go below it. Prerequisite refreshers are never compressed.
-2. **Scale structural classes down** — PTMs first, then checkpoint + RDP pairs, keeping at least two checkpoints and one PTM.
-3. **Drop topics** — Low first, then Medium (latest sequence first). A topic another selected topic depends on is never dropped.
-4. **Warn** — if High-priority topics still do not fit, the plan shows a warning for manual decision instead of dropping anything silently.
+1. **Shed RDP classes** down to one. Revision, doubts and practice are optional when capacity is tight.
+2. **Shed checkpoint + RDP pairs**, keeping at least two checkpoints (one for a single-topic plan). The ops PTM reserve is left alone.
+3. **Compress toward Minimum Classes** — lowest priority first, latest sequence first. Every topic carries a minimum (the fewest classes in which it can still be taught soundly); no automatic rule may go below it. Prerequisite refreshers are never compressed.
+4. **Drop topics** — Low first, then Medium (latest sequence first). A topic another selected topic depends on is never dropped.
+5. **Warn** — if High-priority topics still do not fit, the plan shows a warning for manual decision instead of dropping anything silently.
+
+**Mastery resizes topics in both directions**
+
+- Two or more objectives not secure (or half the objectives on a small topic) **extends** the topic, capped at two classes above the ideal, with the split shifted toward practice.
+- Secure Master-level evidence **shortens** it, never below the class minimum.
+- For the in-progress topic, classes already taught are subtracted from the *evidence-adjusted* total, so early mastery genuinely reduces the classes that remain.
 
 A teacher override is the only way a topic can go below its minimum, and the plan flags it when that happens.
 

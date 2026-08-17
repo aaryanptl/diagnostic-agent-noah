@@ -7,6 +7,7 @@ import {
 import {
   buildLearningPlan,
   getAiAssistedTopicSuggestion,
+  getDefaultTopicOrder,
   getSuggestedTopicIds,
 } from "@/lib/learning-plan/engine"
 import type {
@@ -36,6 +37,7 @@ import {
   Clock3,
   Edit3,
   Eye,
+  FastForward,
   FileText,
   Gauge,
   GraduationCap,
@@ -271,12 +273,6 @@ function getPrerequisiteChainLocal(
     )
   }
   return [...new Set(chain)]
-}
-
-function getDefaultTopicOrder(topics: CurriculumTopic[]) {
-  return [...topics]
-    .sort((a, b) => a.sequence - b.sequence)
-    .map((topic) => topic.id)
 }
 
 function sortTopicsForDisplay(
@@ -712,6 +708,8 @@ export default function LearningPlanBuilderPage({
   )
   const [draggedTopicId, setDraggedTopicId] = useState<number | null>(null)
   const [scopeMode, setScopeMode] = useState<"manual" | "evidence">("manual")
+  /** Topic the mentor view is focused on. null = follow the active topic. */
+  const [mentorTopicId, setMentorTopicId] = useState<number | null>(null)
   const [manualAdjustments, setManualAdjustments] = useState<ManualAdjustments>(
     {}
   )
@@ -848,6 +846,18 @@ export default function LearningPlanBuilderPage({
     () => new Set(selectedTopicIds),
     [selectedTopicIds]
   )
+  const displayTopics = useMemo(
+    () => sortTopicsForDisplay(curriculumTopics, student, topicOrder),
+    [student, topicOrder]
+  )
+  // Rows are numbered by their place in the teaching sequence, not by
+  // curriculum sequence, so "Requires #03" points at the row above it.
+  const displayPositionById = useMemo(
+    () => new Map(displayTopics.map((topic, index) => [topic.id, index + 1])),
+    [displayTopics]
+  )
+  const positionLabel = (topicId: number) =>
+    String(displayPositionById.get(topicId) ?? 0).padStart(2, "0")
   const aiSuggestion = useMemo(
     () => getAiAssistedTopicSuggestion(curriculumTopics, student),
     [student]
@@ -991,7 +1001,15 @@ export default function LearningPlanBuilderPage({
   const structuralItems = plan
     ? plan.items.filter((item) => item.kind !== "teaching")
     : []
+  // Mentor-selected topic wins; otherwise fall back to the active topic, then
+  // to the first topic in the plan. Selecting a topic that later leaves the
+  // plan falls back rather than showing an empty panel.
   const mentorTopic =
+    (mentorTopicId !== null
+      ? plan?.allocations.find(
+          (allocation) => allocation.topicId === mentorTopicId
+        )
+      : undefined) ??
     plan?.allocations.find((allocation) => allocation.topicId === student.currentTopicId) ??
     plan?.allocations[0]
   const mentorAttempts = (student.questionAttemptEvidence ?? []).filter(
@@ -1023,11 +1041,98 @@ export default function LearningPlanBuilderPage({
     return `${focusText}${testText}`
   }, [mentorObjectiveLevels, mentorTopic])
 
+  /**
+   * Per-topic read of the student's evidence across the whole plan, not just
+   * the active topic: which objectives are stuck, and how Starter accuracy
+   * compares with Master accuracy.
+   */
+  const mentorDiagnostics = useMemo(() => {
+    if (!plan) return []
+    const allAttempts = student.questionAttemptEvidence ?? []
+    const accuracyFor = (
+      attempts: typeof allAttempts,
+      level: "starter" | "master"
+    ) => {
+      const scoped = attempts.filter((attempt) => attempt.level === level)
+      const attempted = scoped.reduce((total, a) => total + a.attempted, 0)
+      if (attempted === 0) return undefined
+      const correct = scoped.reduce((total, a) => total + a.correct, 0)
+      return { correct, attempted, ratio: correct / attempted }
+    }
+
+    return plan.allocations.map((allocation) => {
+      const attempts = allAttempts.filter(
+        (attempt) => attempt.topicId === allocation.topicId
+      )
+      const levels = new Map(
+        allocation.learningObjectives.map((objective) => [
+          objective.id,
+          getMentorObjectiveLevel(objective.id, student, attempts),
+        ])
+      )
+      return {
+        allocation,
+        levels,
+        stuck: allocation.learningObjectives.filter(
+          (objective) => levels.get(objective.id) === "stuck"
+        ),
+        mastered: allocation.learningObjectives.filter(
+          (objective) => levels.get(objective.id) === "master"
+        ),
+        starter: accuracyFor(attempts, "starter"),
+        master: accuracyFor(attempts, "master"),
+      }
+    })
+  }, [plan, student])
+
+  const mentorStuckTopics = useMemo(
+    () =>
+      mentorDiagnostics
+        .filter((diagnostic) => diagnostic.stuck.length > 0)
+        .sort((a, b) => b.stuck.length - a.stuck.length),
+    [mentorDiagnostics]
+  )
+
+  /**
+   * One instruction per stuck topic. The Starter/Master split decides the
+   * instruction: a weak Starter means the routine itself is broken, while a
+   * secure Starter with a weak Master means it is transfer that is missing.
+   */
+  const mentorActions = useMemo(
+    () =>
+      mentorStuckTopics.map((diagnostic) => {
+        const subtopics = [
+          ...new Set(diagnostic.stuck.map((objective) => objective.subtopic)),
+        ].join(", ")
+        const starterWeak = diagnostic.starter && diagnostic.starter.ratio < 0.5
+        const masterWeak = diagnostic.master && diagnostic.master.ratio < 0.5
+        let instruction: string
+        if (starterWeak && !masterWeak) {
+          instruction = `Repair the core routine in ${subtopics} before any Master-level work — the reasoning is ahead of the method.`
+        } else if (!starterWeak && masterWeak) {
+          instruction = `The method is secure in ${subtopics} but transfer is not. Teach unfamiliar, multi-step problems rather than more drill.`
+        } else if (starterWeak && masterWeak) {
+          instruction = `Reteach ${subtopics} from the Starter level up — neither the routine nor the application is holding.`
+        } else {
+          instruction = `Re-test ${subtopics} and close the gaps the evidence flagged before moving on.`
+        }
+        return {
+          topicId: diagnostic.allocation.topicId,
+          topicName: diagnostic.allocation.topicName,
+          extended:
+            diagnostic.allocation.classes > diagnostic.allocation.idealClasses,
+          instruction,
+        }
+      }),
+    [mentorStuckTopics]
+  )
+
   const chooseStudent = (nextStudent: DemoStudent) => {
     setStudent(nextStudent)
     setStudentSelected(true)
     setSelectedTopicIds(getSuggestedTopicIds(curriculumTopics, nextStudent))
     setTopicOrder(getDefaultTopicOrder(curriculumTopics))
+    setMentorTopicId(null)
     setScopeMode("manual")
     setManualAdjustments({})
     setManualOverrideActive(false)
@@ -1544,6 +1649,91 @@ export default function LearningPlanBuilderPage({
     setOutcome("on-track")
     setOutcomeNote("")
   }
+
+  /**
+   * Mark every class up to `targetCompleted` as taught on track, in one step.
+   * On track means "keep the approved allocation", so nothing is adjusted —
+   * this only moves the plan's position so the interesting class can be
+   * reached without clicking through every class before it.
+   */
+  const fastForwardTo = (targetCompleted: number) => {
+    if (!plan) return
+    const liveTotal = plan.items.filter(isLiveClass).length
+    const target = Math.min(Math.max(targetCompleted, 0), liveTotal)
+    const advanced = target - completedCount
+    if (advanced <= 0) return
+
+    const rebuilt = buildLearningPlan({
+      topics: curriculumTopics,
+      student,
+      selectedTopicIds,
+      topicOrder,
+      manualAdjustments,
+      version: plan.version,
+      lastModificationType: "class",
+    })
+    const nextPlan: GeneratedPlan = {
+      ...reconcilePlanVersion(plan, rebuilt, target),
+      changesFromPrevious: [
+        `Fast-forwarded to Class ${target}: ${advanced} ${advanced === 1 ? "class" : "classes"} marked as taught on track. Allocations are unchanged — on track never resizes a topic.`,
+      ],
+    }
+    setPlan(nextPlan)
+    setCompletedCount(target)
+    setClassDiff(null)
+    if (databasePlanId) {
+      void savePlanSnapshot(databasePlanId, nextPlan, target)
+    }
+  }
+
+  /**
+   * The allocation move behind a pending outcome, as slot counts the meeting
+   * can read off a bar: what has been taught, what is left, what the outcome
+   * added or released, and where the Rule H1 floor sits.
+   */
+  const outcomeImpact = useMemo(() => {
+    if (!pendingUpdate || !plan || !nextTeachingItem?.topicId) return null
+    const topicId = nextTeachingItem.topicId
+    const current = plan.allocations.find((a) => a.topicId === topicId)
+    const next = pendingUpdate.plan.allocations.find((a) => a.topicId === topicId)
+    if (!current || !next) return null
+
+    // Classes of this topic already taught, including the one being graded.
+    // `allocation.classes` is the topic's total in this plan, so the taught
+    // count is a slice of it, never added on top.
+    const taught = plan.items.filter(
+      (item) =>
+        item.topicId === topicId &&
+        item.kind === "teaching" &&
+        item.status !== "skipped" &&
+        item.classNumber <= nextTeachingItem.classNumber
+    ).length
+    const currentTotal = current.classes
+    const nextTotal = next.classes
+    const delta = next.classes - current.classes
+
+    const explanation =
+      delta < 0
+        ? `Completed faster, so one class returns to the pool. ${next.topicName} goes from ${current.classes} to ${next.classes} classes — the ${current.minimumClasses}-class floor is respected, and the freed class stays in the package.`
+        : delta > 0
+          ? `Needs more time, so one reinforcement class is added. ${next.topicName} goes from ${current.classes} to ${next.classes} classes, capped at two above the ideal of ${current.idealClasses}.`
+          : current.classes <= current.minimumClasses
+            ? `${next.topicName} is already at its ${current.minimumClasses}-class minimum, so no automatic rule can shorten it further. Only a teacher override can.`
+            : `On track keeps the approved allocation. ${next.topicName} stays at ${next.classes} classes, ${Math.max(0, next.classes - taught)} of them still to teach.`
+
+    return {
+      topicName: next.topicName,
+      taught,
+      currentTotal,
+      nextTotal,
+      nextRemaining: Math.max(0, nextTotal - taught),
+      delta,
+      minimum: current.minimumClasses,
+      ideal: current.idealClasses,
+      scaleMax: Math.max(currentTotal, nextTotal, current.idealClasses),
+      explanation,
+    }
+  }, [nextTeachingItem, pendingUpdate, plan])
 
   const resetPrototype = () => {
     chooseStudent(DEFAULT_EVIDENCE_STUDENT)
@@ -2131,77 +2321,6 @@ export default function LearningPlanBuilderPage({
                   </div>
                 ) : null}
 
-                <div className="lpb-planning-modes">
-                  <button
-                    type="button"
-                    className={`lpb-planning-mode${scopeMode === "manual" ? " active" : ""}`}
-                    onClick={() => setScopeMode("manual")}
-                  >
-                    <span className="lpb-mode-icon manual">
-                      <SlidersHorizontal size={20} />
-                    </span>
-                    <span>
-                      <strong>Manual scope</strong>
-                      <small>
-                        Select or unselect every topic yourself. Workbook
-                        recommendations remain visible.
-                      </small>
-                    </span>
-                    <span className="lpb-mode-choice">
-                      {scopeMode === "manual" ? <Check size={14} /> : null}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className={`lpb-planning-mode evidence${scopeMode === "evidence" ? " active" : ""}`}
-                    onClick={applyEvidencePlan}
-                    disabled={manualOverrideActive}
-                  >
-                    <span className="lpb-mode-icon evidence">
-                      <Lightbulb size={20} />
-                    </span>
-                    <span>
-                      <strong>Use evidence</strong>
-                      <small>
-                        Use placement, mastery, completed work and capacity.
-                        Start with evidence-based recommendations, then refine
-                        the scope and order yourself.
-                      </small>
-                    </span>
-                    <span className="lpb-mode-action">
-                      {scopeMode === "evidence" ? "Applied" : "Apply rules"}
-                    </span>
-                  </button>
-                </div>
-
-                {scopeMode === "evidence" ? (
-                  <section className="lpb-evidence-scope-summary">
-                    <div className="lpb-evidence-summary-head">
-                      <span>
-                        <Lightbulb size={16} />
-                        Evidence-based scope
-                      </span>
-                      <strong>
-                        All topics that fit are selected
-                      </strong>
-                    </div>
-                    <p>
-                      Scope was shaped from the student&apos;s placement,
-                      mastery and progress signals. You can include, remove or
-                      reorder every topic before building the plan. Strong
-                      scores shorten a topic; they do not remove it.
-                    </p>
-                    <div className="lpb-evidence-chips">
-                      {aiSuggestion.evidenceSummary.map((summary) => (
-                        <span key={summary}>
-                          <CheckCircle2 size={13} />
-                          {summary}
-                        </span>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
 
                 {manualOverrideActive ? (
                   <output className="lpb-manual-override-notice">
@@ -2264,12 +2383,14 @@ export default function LearningPlanBuilderPage({
 
                 <p className="lpb-topic-order-hint">
                   <GripVertical size={15} />
-                  Drag topics into the teaching sequence. For placement results,
-                  topics scoring below 40% start first.
+                  Drag topics into the teaching sequence. High priority runs
+                  first, then Medium and Low, except where a prerequisite has to
+                  come earlier. A prerequisite already scored 75% or more is
+                  kept but shortened to a refresher.
                 </p>
 
                 <div className="lpb-topic-list">
-                  {sortTopicsForDisplay(curriculumTopics, student, topicOrder).map((topic) => {
+                  {displayTopics.map((topic) => {
                       const completed = student.completedTopics.some(
                         (item) => item.topicId === topic.id
                       )
@@ -2306,8 +2427,8 @@ export default function LearningPlanBuilderPage({
                         (t) => selectedSet.has(t.id) && (t.prerequisiteIds || []).includes(topic.id)
                       )
 
-                      const prereqSeqList = directPrereqs.map((t) => `#${String(t.sequence).padStart(2, "0")}`).join(", ")
-                      const depSeqList = dependentTopics.map((t) => `#${String(t.sequence).padStart(2, "0")}`).join(", ")
+                      const prereqSeqList = directPrereqs.map((t) => `#${positionLabel(t.id)}`).join(", ")
+                      const depSeqList = dependentTopics.map((t) => `#${positionLabel(t.id)}`).join(", ")
 
                       const isClassCompressed =
                         selected &&
@@ -2375,7 +2496,7 @@ export default function LearningPlanBuilderPage({
                             {completed || selected ? <Check size={14} /> : null}
                           </span>
                           <span className="lpb-topic-sequence">
-                            {String(topic.sequence).padStart(2, "0")}
+                            {positionLabel(topic.id)}
                           </span>
                           <span className="lpb-topic-main">
                             <strong>{topic.name}</strong>
@@ -2486,8 +2607,10 @@ export default function LearningPlanBuilderPage({
                         <span className="lpb-kicker">Capacity check</span>
                         <h3>
                           {reviewPlan.capacity.difference > 0
-                            ? `${reviewPlan.capacity.difference} classes over`
-                            : `${Math.abs(reviewPlan.capacity.difference)} classes available`}
+                            ? `${reviewPlan.capacity.difference} classes over the package`
+                            : reviewPlan.capacity.difference === 0
+                              ? "Fits the package exactly"
+                              : `Reduced by ${Math.abs(reviewPlan.capacity.difference)} classes`}
                         </h3>
                       </div>
                       <span
@@ -2586,7 +2709,7 @@ export default function LearningPlanBuilderPage({
                     </div>
                     <div className="lpb-capacity-breakdown">
                       <div>
-                        <span>Available</span>
+                        <span>In package</span>
                         <b>{reviewPlan.capacity.available}</b>
                       </div>
                       <div>
@@ -2594,11 +2717,15 @@ export default function LearningPlanBuilderPage({
                         <b>{reviewPlan.capacity.teaching}</b>
                       </div>
                       <div>
-                        <span>Structural</span>
+                        <span>Checkpoint &amp; RDP</span>
                         <b>{reviewPlan.capacity.structural}</b>
                       </div>
+                      <div title="Parent–teacher meetings. Reserved against the package, scheduled by ops.">
+                        <span>Ops reserve</span>
+                        <b>{reviewPlan.capacity.opsReserve}</b>
+                      </div>
                       <div>
-                        <span>Total</span>
+                        <span>Planned</span>
                         <b>{reviewPlan.capacity.total}</b>
                       </div>
                     </div>
@@ -3077,6 +3204,20 @@ export default function LearningPlanBuilderPage({
                               <ChevronRight size={17} />
                             )}
                           </button>
+                          {displayStatus === "planned" &&
+                          item.status !== "skipped" ? (
+                            <button
+                              type="button"
+                              className="lpb-class-fastforward"
+                              onClick={() =>
+                                fastForwardTo(item.classNumber - 1)
+                              }
+                              title={`Mark Classes ${String(completedCount + 1).padStart(2, "0")}–${String(item.classNumber - 1).padStart(2, "0")} as taught on track, then stop here`}
+                            >
+                              <FastForward size={12} />
+                              Teach to here
+                            </button>
+                          ) : null}
                           {expanded ? (
                             <div className="lpb-class-detail">
                               {item.kind === "teaching" ? (
@@ -3168,8 +3309,16 @@ export default function LearningPlanBuilderPage({
                   <div className="lpb-structural-view">
                     <header>
                       <span className="lpb-detail-label">Structural classes</span>
-                      <h3>{plan.capacity.structural} of 13 full-package structural classes</h3>
-                      <p>Checkpoints assess the preceding block; each is followed by revision, doubts and practice. PTMs keep families aligned.</p>
+                      <h3>{plan.capacity.structural} checkpoint &amp; RDP classes</h3>
+                      <p>
+                        Checkpoints assess the preceding block and produce the
+                        evidence that resizes the rest of the plan. Each is
+                        followed by revision, doubts and practice where capacity
+                        allows — RDP is dropped first when the plan is tight.
+                        {plan.capacity.opsReserve > 0
+                          ? ` A further ${plan.capacity.opsReserve} ${plan.capacity.opsReserve === 1 ? "class is" : "classes are"} reserved for parent–teacher meetings, which ops schedules on its own calendar.`
+                          : ""}
+                      </p>
                     </header>
                     <div className="lpb-structural-list">
                       {structuralItems.map((item) => (
@@ -3264,12 +3413,16 @@ export default function LearningPlanBuilderPage({
                           </span>
                         ))}
                         {plan.allocations.map((allocation) => (
-                          <span
+                          <button
+                            type="button"
                             className={allocation.topicId === mentorTopic?.topicId ? "current" : ""}
                             key={allocation.topicId}
+                            onClick={() => setMentorTopicId(allocation.topicId)}
+                            aria-pressed={allocation.topicId === mentorTopic?.topicId}
+                            title={`Show the mentor plan for ${allocation.topicName}`}
                           >
                             {allocation.topicName} ({allocation.classes})
-                          </span>
+                          </button>
                         ))}
                         {structuralItems.filter((item) => item.kind === "checkpoint").map((item) => (
                           <span className="checkpoint" key={item.id}>{item.title}</span>
@@ -3280,14 +3433,29 @@ export default function LearningPlanBuilderPage({
                     <section className="lpb-mentor-diagnosis">
                       <div className="lpb-mentor-section-head">
                         <div>
-                          <span className="lpb-detail-label">Question-level diagnosis</span>
+                          <span className="lpb-detail-label">
+                            Question-level diagnosis ·{" "}
+                            {mentorTopicId !== null
+                              ? "selected topic"
+                              : "active topic"}
+                          </span>
                           <h3>{mentorTopic?.topicName ?? "Selected topic"}</h3>
                         </div>
-                        {mentorTopic ? (
-                          <button type="button" onClick={() => startEdit(mentorTopic.topicId)}>
-                            <SlidersHorizontal size={14} /> Adjust classes
-                          </button>
-                        ) : null}
+                        <div className="lpb-mentor-head-actions">
+                          {mentorTopicId !== null ? (
+                            <button
+                              type="button"
+                              onClick={() => setMentorTopicId(null)}
+                            >
+                              <RotateCcw size={14} /> Active topic
+                            </button>
+                          ) : null}
+                          {mentorTopic ? (
+                            <button type="button" onClick={() => startEdit(mentorTopic.topicId)}>
+                              <SlidersHorizontal size={14} /> Adjust classes
+                            </button>
+                          ) : null}
+                        </div>
                       </div>
                       {mentorTopic ? (
                         <div className="lpb-mentor-table-wrap">
@@ -3313,12 +3481,119 @@ export default function LearningPlanBuilderPage({
                       ) : null}
                     </section>
 
-                    {mentorTopic ? (
-                      <section className="lpb-mentor-next">
-                        <Lightbulb size={18} />
-                        <div><span className="lpb-detail-label">What to fix in upcoming classes</span><p>{mentorFixText}</p></div>
-                      </section>
-                    ) : null}
+                    <section className="lpb-mentor-stuck">
+                      <div className="lpb-mentor-section-head">
+                        <div>
+                          <span className="lpb-detail-label">
+                            Where the student is stuck
+                          </span>
+                          <h3>
+                            {mentorStuckTopics.length > 0
+                              ? `${mentorStuckTopics.length} ${mentorStuckTopics.length === 1 ? "topic" : "topics"} across the plan`
+                              : "No stuck objectives in the evidence"}
+                          </h3>
+                        </div>
+                      </div>
+                      {mentorStuckTopics.length > 0 ? (
+                        <div className="lpb-mentor-stuck-list">
+                          {mentorStuckTopics.map((diagnostic) => (
+                            <article
+                              key={diagnostic.allocation.topicId}
+                              className={
+                                diagnostic.allocation.topicId ===
+                                mentorTopic?.topicId
+                                  ? "focused"
+                                  : undefined
+                              }
+                            >
+                              <header>
+                                <button
+                                  type="button"
+                                  className="lpb-stuck-focus"
+                                  onClick={() =>
+                                    setMentorTopicId(
+                                      diagnostic.allocation.topicId
+                                    )
+                                  }
+                                  title={`Show the mentor plan for ${diagnostic.allocation.topicName}`}
+                                >
+                                  <Eye size={12} />
+                                  Open
+                                </button>
+                                <strong>
+                                  {diagnostic.allocation.topicName}
+                                </strong>
+                                <span className="lpb-diagnosis-pill support">
+                                  {diagnostic.stuck.length} of{" "}
+                                  {
+                                    diagnostic.allocation.learningObjectives
+                                      .length
+                                  }{" "}
+                                  not secure
+                                </span>
+                                {diagnostic.allocation.classes >
+                                diagnostic.allocation.idealClasses ? (
+                                  <span className="lpb-diagnosis-pill neutral">
+                                    Extended to{" "}
+                                    {diagnostic.allocation.classes} classes
+                                  </span>
+                                ) : null}
+                              </header>
+                              <div className="lpb-mentor-accuracy">
+                                <span>
+                                  Starter{" "}
+                                  <b>
+                                    {diagnostic.starter
+                                      ? `${diagnostic.starter.correct}/${diagnostic.starter.attempted}`
+                                      : "—"}
+                                  </b>
+                                </span>
+                                <span>
+                                  Master{" "}
+                                  <b>
+                                    {diagnostic.master
+                                      ? `${diagnostic.master.correct}/${diagnostic.master.attempted}`
+                                      : "—"}
+                                  </b>
+                                </span>
+                              </div>
+                              <p>
+                                {diagnostic.stuck
+                                  .map((objective) => objective.text)
+                                  .join(" · ")}
+                              </p>
+                            </article>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="lpb-mentor-guidance">
+                          No objective has come back not-secure yet. Keep
+                          checkpoint results up to date — the plan resizes
+                          topics from them.
+                        </p>
+                      )}
+                    </section>
+
+                    <section className="lpb-mentor-next">
+                      <Lightbulb size={18} />
+                      <div>
+                        <span className="lpb-detail-label">
+                          What to fix in upcoming classes
+                        </span>
+                        {mentorActions.length > 0 ? (
+                          <ul className="lpb-mentor-actions">
+                            {mentorActions.map((action) => (
+                              <li key={action.topicId}>
+                                <strong>{action.topicName}</strong>
+                                <span>{action.instruction}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>{mentorFixText}</p>
+                        )}
+                      </div>
+                    </section>
                   </div>
                 )}
               </section>
@@ -3748,6 +4023,72 @@ export default function LearningPlanBuilderPage({
                     <small>Version {pendingUpdate.plan.version}</small>
                   </div>
                 </div>
+                {outcomeImpact ? (
+                  <div className="lpb-alloc-impact">
+                    <div className="lpb-alloc-impact-head">
+                      <span className="lpb-detail-label">
+                        {outcomeImpact.topicName} · allocation
+                      </span>
+                      <b
+                        className={
+                          outcomeImpact.delta > 0
+                            ? "up"
+                            : outcomeImpact.delta < 0
+                              ? "down"
+                              : "flat"
+                        }
+                      >
+                        {outcomeImpact.delta > 0
+                          ? `+${outcomeImpact.delta} class`
+                          : outcomeImpact.delta < 0
+                            ? `${outcomeImpact.delta} class`
+                            : "No change"}
+                      </b>
+                    </div>
+                    <div className="lpb-alloc-scale">
+                      {Array.from(
+                        { length: outcomeImpact.scaleMax },
+                        (_, index) => {
+                          const slot = index + 1
+                          const state =
+                            slot <= outcomeImpact.taught
+                              ? "taught"
+                              : slot <= outcomeImpact.nextTotal
+                                ? slot > outcomeImpact.currentTotal
+                                  ? "gained"
+                                  : "remaining"
+                                : slot <= outcomeImpact.currentTotal
+                                  ? "released"
+                                  : "empty"
+                          return (
+                            <i
+                              key={`alloc-slot-${slot}`}
+                              className={state}
+                              data-minimum={
+                                slot === outcomeImpact.minimum ? "true" : undefined
+                              }
+                            />
+                          )
+                        }
+                      )}
+                    </div>
+                    <div className="lpb-alloc-legend">
+                      <span className="taught">
+                        Taught {outcomeImpact.taught}
+                      </span>
+                      <span className="remaining">
+                        Remaining {outcomeImpact.nextRemaining}
+                      </span>
+                      <span className="floor">
+                        Minimum {outcomeImpact.minimum}
+                      </span>
+                      <span className="ideal">
+                        Ideal {outcomeImpact.ideal}
+                      </span>
+                    </div>
+                    <p>{outcomeImpact.explanation}</p>
+                  </div>
+                ) : null}
                 <div className="lpb-update-list">
                   {pendingUpdate.changes.map((change) => (
                     <div key={change}>

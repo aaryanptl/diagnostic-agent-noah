@@ -19,6 +19,14 @@ const PRIORITY_RANK: Record<Priority, number> = {
   low: 2,
 }
 
+/** Placement score at or above which a topic counts as already secure. */
+const STRONG_PLACEMENT_SCORE = 75
+/** Placement score below which a topic counts as needing full support. */
+const WEAK_PLACEMENT_SCORE = 40
+
+/** Why a prerequisite is being taught as a shortened refresher. */
+type RefresherReason = "parent-request" | "placement"
+
 const CHECKPOINT_LABELS = [
   "Foundation checkpoint",
   "Progress checkpoint",
@@ -43,11 +51,14 @@ function getCompletedTopicIds(student: DemoStudent) {
   return new Set(student.completedTopics.map((topic) => topic.topicId))
 }
 
+/** Placement score for this exact topic, ignoring the student-level default. */
+function getExactPlacementScore(student: DemoStudent, topicId: number) {
+  return student.placementResults.find((result) => result.topicId === topicId)
+    ?.score
+}
+
 function getPlacementScore(student: DemoStudent, topicId: number) {
-  const exact = student.placementResults.find(
-    (result) => result.topicId === topicId
-  )
-  return exact?.score ?? student.defaultPlacementScore
+  return getExactPlacementScore(student, topicId) ?? student.defaultPlacementScore
 }
 
 function getPrerequisiteChain(
@@ -71,20 +82,75 @@ function getPrerequisiteChain(
 }
 
 /**
+ * Prerequisites that are taught as shortened refreshers instead of in full.
+ * A refresher is never dropped — the prerequisite still runs before the topic
+ * that depends on it — it just takes half the ideal classes (Rule H2).
+ *
+ * Two sources:
+ *  - Parent request: the unmet prerequisite chain in front of the requested
+ *    topic, so the requested topic is reached sooner.
+ *  - Placement led: a prerequisite the student has already proven
+ *    (score >= 75%) sitting in front of a topic they are weak in (< 40%).
+ *    The exact score is required; the student-level default is not evidence
+ *    that a specific topic is secure.
+ */
+function getRefresherPrerequisites(
+  student: DemoStudent,
+  topicMap: Map<number, CurriculumTopic>,
+  isAvailable: (topicId: number) => boolean
+) {
+  const refreshers = new Map<number, RefresherReason>()
+
+  if (student.parentRequestedTopicId) {
+    for (const prerequisiteId of getPrerequisiteChain(
+      student.parentRequestedTopicId,
+      topicMap
+    )) {
+      if (isAvailable(prerequisiteId)) {
+        refreshers.set(prerequisiteId, "parent-request")
+      }
+    }
+  }
+
+  if (student.placementStatus === "completed") {
+    const weakTopicIds = student.placementResults
+      .filter((result) => result.score < WEAK_PLACEMENT_SCORE)
+      .map((result) => result.topicId)
+
+    for (const weakTopicId of weakTopicIds) {
+      for (const prerequisiteId of getPrerequisiteChain(weakTopicId, topicMap)) {
+        if (refreshers.has(prerequisiteId)) continue
+        if (!isAvailable(prerequisiteId)) continue
+        const score = getExactPlacementScore(student, prerequisiteId)
+        if (score !== undefined && score >= STRONG_PLACEMENT_SCORE) {
+          refreshers.set(prerequisiteId, "placement")
+        }
+      }
+    }
+  }
+
+  return refreshers
+}
+
+/**
  * Structural (non-teaching) classes from the Grade 5 workbook:
  *   Full year = 66 teaching + 13 structural = 79 classes
  *   Structural breakdown: 5 checkpoints + 5 RDP + 3 PTM
  *
- * Scales with selected topic count / package size; never exceeds the full-year
- * structural budget. When classes are tight, structural scales down before
- * High-priority teaching is cut (minimum 2 checkpoints when >1 topic).
+ * PTMs are scheduled by ops on a fixed calendar, so the builder reserves their
+ * classes against the package but never places or generates them. They are
+ * reported separately as `opsReserve` and the fit ladder cannot shed them —
+ * ops runs those meetings whether or not the teaching plan is tight.
+ *
+ * Checkpoints and RDP scale with the selected topic count. When classes are
+ * tight, structural scales down before High-priority teaching is cut.
  */
 function estimateStructuralCounts(
   topicCount: number,
   classesRemaining: number
 ) {
   if (topicCount === 0) {
-    return { checkpoints: 0, rdps: 0, ptms: 0, total: 0 }
+    return { checkpoints: 0, rdps: 0, opsReserve: 0, total: 0 }
   }
 
   // Workbook full-year anchors: 13 topics → 5 CP, 79-class package → 3 PTM
@@ -96,13 +162,13 @@ function estimateStructuralCounts(
   )
   const rdps = checkpoints
   const proportionalPtms = Math.ceil((classesRemaining / 79) * 3)
-  const ptms = clamp(proportionalPtms, 1, 3)
+  const opsReserve = clamp(proportionalPtms, 1, 3)
 
   return {
     checkpoints,
     rdps,
-    ptms,
-    total: checkpoints + rdps + ptms,
+    opsReserve,
+    total: checkpoints + rdps + opsReserve,
   }
 }
 
@@ -110,7 +176,7 @@ function adjustTopic(
   topic: CurriculumTopic,
   student: DemoStudent,
   manualAdjustments: ManualAdjustments,
-  compressedPrerequisiteIds: Set<number>
+  refresherPrerequisites: Map<number, RefresherReason>
 ): PlanTopicAllocation {
   let classes = topic.idealClasses
   let easyPercent = topic.easyPercent
@@ -189,6 +255,58 @@ function adjustTopic(
     )
   }
 
+  // Mastery moves the allocation in both directions. Secure Master evidence
+  // shortens a topic (above); objectives the student is stuck on lengthen it,
+  // capped two classes over the ideal so one weak topic cannot eat the package.
+  const secureMasterObjectiveIds = new Set(
+    student.objectiveEvidence
+      .filter(
+        (evidence) =>
+          evidence.level === "master" && evidence.result === "secure"
+      )
+      .map((evidence) => evidence.learningObjectiveId)
+  )
+  const stuckObjectiveIds = new Set<string>()
+  for (const evidence of student.objectiveEvidence) {
+    if (
+      topicObjectiveIds.has(evidence.learningObjectiveId) &&
+      evidence.result === "not-secure" &&
+      !secureMasterObjectiveIds.has(evidence.learningObjectiveId)
+    ) {
+      stuckObjectiveIds.add(evidence.learningObjectiveId)
+    }
+  }
+  for (const attempt of topicAttempts) {
+    if (
+      attempt.attempted > 0 &&
+      attempt.correct / attempt.attempted < 0.5 &&
+      !secureMasterObjectiveIds.has(attempt.learningObjectiveId)
+    ) {
+      stuckObjectiveIds.add(attempt.learningObjectiveId)
+    }
+  }
+  const stuckCount = stuckObjectiveIds.size
+  const stuckRatio =
+    topic.learningObjectives.length === 0
+      ? 0
+      : stuckCount / topic.learningObjectives.length
+
+  // Two unsecure objectives is a real signal on any topic size, and half the
+  // objectives is a real signal on a small one — either triggers an extension.
+  if (stuckCount >= 2 || (stuckCount > 0 && stuckRatio >= 0.5)) {
+    const extended = Math.min(
+      topic.idealClasses + 2,
+      Math.max(classes, topic.idealClasses) + Math.ceil(stuckCount / 2)
+    )
+    if (extended > classes) {
+      classes = extended
+      easyPercent = clamp(topic.easyPercent - 10, 40, 80)
+      reasons.push(
+        `${stuckCount} of ${topic.learningObjectives.length} objectives are not secure, so the topic is extended to ${classes} classes (ideal ${topic.idealClasses}, capped at ideal + 2) with more practice weight.`
+      )
+    }
+  }
+
   if (starterAccuracy !== undefined && masterAccuracy !== undefined) {
     if (starterAccuracy >= 0.75 && masterAccuracy < 0.5) {
       classes = Math.max(classes, topic.idealClasses)
@@ -207,24 +325,33 @@ function adjustTopic(
   let allocationFloor = topic.minimumClasses
 
   if (student.currentTopicId === topic.id && student.currentTopicClassesUsed) {
-    classes = Math.max(1, topic.idealClasses - student.currentTopicClassesUsed)
+    // Subtract taught classes from the mastery-adjusted total, not from the
+    // ideal. Early mastery has already shortened `classes` above, so this is
+    // what makes it reduce the classes that are actually left.
+    const adjustedTotal = classes
+    classes = Math.max(1, adjustedTotal - student.currentTopicClassesUsed)
     allocationFloor = Math.max(
       1,
       topic.minimumClasses - student.currentTopicClassesUsed
     )
     reasons.push(
-      `${student.currentTopicClassesUsed} ${student.currentTopicClassesUsed === 1 ? "class has" : "classes have"} already been taught in this active topic, so the remaining allocation is calculated from the ideal plan.`
+      adjustedTotal === topic.idealClasses
+        ? `${student.currentTopicClassesUsed} ${student.currentTopicClassesUsed === 1 ? "class has" : "classes have"} already been taught in this active topic, so ${classes} of the ideal ${topic.idealClasses} remain.`
+        : `${student.currentTopicClassesUsed} ${student.currentTopicClassesUsed === 1 ? "class has" : "classes have"} already been taught and evidence resized this topic from ${topic.idealClasses} to ${adjustedTotal} classes, so ${classes} remain.`
     )
   }
 
   // Rule H2: refreshers are half the ideal classes, rounded up, minimum 1.
   // Rule B2 exempts them from any further capacity compression.
-  const isCompressedRefresher = compressedPrerequisiteIds.has(topic.id)
+  const refresherReason = refresherPrerequisites.get(topic.id)
+  const isCompressedRefresher = refresherReason !== undefined
   if (isCompressedRefresher) {
     classes = Math.max(1, Math.ceil(topic.idealClasses / 2))
     allocationFloor = classes
     reasons.push(
-      "This prerequisite is scheduled as a compressed refresher before the parent-requested topic (half the ideal classes, rounded up)."
+      refresherReason === "parent-request"
+        ? "This prerequisite is scheduled as a compressed refresher before the parent-requested topic (half the ideal classes, rounded up)."
+        : `Placement score ${placementScore}% is already secure, so this prerequisite runs as a compressed refresher (half the ideal classes, rounded up) before the weaker topic that depends on it.`
     )
   }
 
@@ -364,9 +491,16 @@ function compressAllocationsToFit(
 
 /**
  * Rule F3: when classes are tight, structural classes scale down before
- * High-priority teaching classes are reduced further. A checkpoint always
- * takes its RDP class with it, and a plan keeps at least two checkpoints
- * (one when there is a single topic) and one PTM.
+ * High-priority teaching classes are reduced further.
+ *
+ * Order, tightest last:
+ *  1. Shed RDP classes down to one. Revision, doubts and practice are the
+ *     optional part of the structure — valuable, but not what the plan needs
+ *     in order to keep working.
+ *  2. Shed checkpoint + RDP pairs, keeping at least two checkpoints (one for
+ *     a single-topic plan). Checkpoints are protected this far because they
+ *     produce the mastery evidence every later rule reads.
+ *  3. Leave the ops PTM reserve alone — ops schedules those regardless.
  */
 function shrinkStructuralToFit(
   structural: ReturnType<typeof estimateStructuralCounts>,
@@ -375,21 +509,30 @@ function shrinkStructuralToFit(
 ) {
   if (overBy <= 0 || topicCount === 0) return structural
 
-  let { checkpoints, rdps, ptms } = structural
+  let { checkpoints, rdps } = structural
+  const { opsReserve } = structural
   let remaining = overBy
   const minCheckpoints = topicCount > 1 ? 2 : 1
 
-  while (remaining > 0 && ptms > 1) {
-    ptms -= 1
+  while (remaining > 0 && rdps > 1) {
+    rdps -= 1
     remaining -= 1
   }
   while (remaining > 0 && checkpoints > minCheckpoints) {
     checkpoints -= 1
-    rdps -= 1
-    remaining -= 2
+    remaining -= 1
+    if (rdps > 0) {
+      rdps -= 1
+      remaining -= 1
+    }
   }
 
-  return { checkpoints, rdps, ptms, total: checkpoints + rdps + ptms }
+  return {
+    checkpoints,
+    rdps,
+    opsReserve,
+    total: checkpoints + rdps + opsReserve,
+  }
 }
 
 /** Teaching + structural classes for a candidate set of allocations. */
@@ -518,7 +661,7 @@ function distributeCount(total: number, slots: number) {
   )
 }
 
-function buildTopicItems(allocation: PlanTopicAllocation) {
+function buildTopicItems(allocation: PlanTopicAllocation, hasRdp: boolean) {
   const objectiveGroups = distributeObjectives(
     allocation.learningObjectives,
     allocation.classes
@@ -536,6 +679,9 @@ function buildTopicItems(allocation: PlanTopicAllocation) {
     const repeatedObjective =
       allocation.classes > allocation.learningObjectives.length &&
       index >= allocation.learningObjectives.length
+    // The last class of a topic block closes it, so the mentor gets the
+    // topic-test instructions alongside the teaching reason.
+    const isTopicClose = index === objectiveGroups.length - 1
     const title =
       objectives.length > 1
         ? objectives
@@ -563,11 +709,49 @@ function buildTopicItems(allocation: PlanTopicAllocation) {
       learningObjectives: objectives,
       easyActivities: easyByClass[index] ?? 0,
       practiceActivities: practiceByClass[index] ?? 0,
-      reason: repeatedObjective
-        ? "This additional class moves the objective from guided work toward independent application."
-        : allocation.reasons[allocation.reasons.length - 1],
+      reason: [
+        repeatedObjective
+          ? "This additional class moves the objective from guided work toward independent application."
+          : allocation.reasons[allocation.reasons.length - 1],
+        isTopicClose ? buildTopicTestInstructions(allocation.topicName, hasRdp) : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
     }
   })
+}
+
+/**
+ * Default teaching order before the mentor drags anything: High priority
+ * first, then Medium, then Low, using curriculum sequence inside each band,
+ * with every prerequisite pulled in front of the topic that depends on it.
+ *
+ * The scope screen and the generated plan both run on this, so what a mentor
+ * sees in the topic list is the order the plan is actually built in.
+ */
+export function getDefaultTopicOrder(topics: CurriculumTopic[]) {
+  const topicMap = getTopicMap(topics)
+  const byPriority = [...topics].sort(
+    (a, b) =>
+      PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] ||
+      a.sequence - b.sequence
+  )
+
+  const ordered: number[] = []
+  const visited = new Set<number>()
+  const addWithPrerequisites = (topicId: number) => {
+    if (visited.has(topicId)) return
+    const topic = topicMap.get(topicId)
+    if (!topic) return
+    visited.add(topicId)
+    for (const prerequisiteId of topic.prerequisiteIds) {
+      addWithPrerequisites(prerequisiteId)
+    }
+    ordered.push(topicId)
+  }
+
+  for (const topic of byPriority) addWithPrerequisites(topic.id)
+  return ordered
 }
 
 function orderAllocations(
@@ -583,7 +767,14 @@ function orderAllocations(
     if (aOrder !== undefined || bOrder !== undefined) {
       return (aOrder ?? Number.MAX_SAFE_INTEGER) - (bOrder ?? Number.MAX_SAFE_INTEGER)
     }
-    return a.sequence - b.sequence
+    // High priority topics run before Medium, then Low. Curriculum sequence
+    // breaks ties inside a priority band. The prerequisite walk below still
+    // overrides this: a prerequisite is always placed before its dependant,
+    // whatever its priority.
+    return (
+      PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] ||
+      a.sequence - b.sequence
+    )
   })
   const allocationById = new Map(
     allocations.map((allocation) => [allocation.topicId, allocation])
@@ -616,12 +807,53 @@ function orderAllocations(
   return ordered
 }
 
+/**
+ * Mentor instructions for a checkpoint class. A checkpoint is where the plan
+ * collects its evidence, so the instruction has to say what to run, how to
+ * read it, and what the result changes.
+ */
+function buildCheckpointInstructions(coveredTopics: string[]) {
+  const scope =
+    coveredTopics.length > 0 ? coveredTopics.join(", ") : "the topics just taught"
+  return [
+    `Assess ${scope}. Run the Starter set first, then the Master set for every objective taught since the last checkpoint.`,
+    "Score each objective separately — a topic total hides which objective is the problem.",
+    "Starter secure but Master weak means the routine is there and transfer is not; reteach through unfamiliar problems, not more drill.",
+    "Starter weak means the core routine needs repair before any Master work.",
+    "Record the result per objective — the plan resizes the remaining topics from it.",
+  ].join(" ")
+}
+
+/** Mentor instructions for an RDP (revision, doubts & practice) class. */
+function buildRdpInstructions(coveredTopics: string[]) {
+  const scope =
+    coveredTopics.length > 0 ? coveredTopics.join(", ") : "the recent topics"
+  return [
+    `Close the gaps the checkpoint exposed in ${scope} — this class is led by the checkpoint result, not by a fresh lesson plan.`,
+    "Open with the student's own doubts, then work the objectives scored weakest.",
+    "Re-test the two or three objectives you reteach before the class ends; an unverified fix is not a fix.",
+    "Leave secure objectives alone. If nothing came back weak, use the class to push Master-level application instead.",
+  ].join(" ")
+}
+
+/** Mentor instructions for the topic test that closes a teaching block. */
+function buildTopicTestInstructions(topicName: string, hasRdp: boolean) {
+  return [
+    `Test ${topicName} end to end before moving on: Starter and Master items across every objective in the topic.`,
+    "Mark against the objectives, not a single percentage.",
+    hasRdp
+      ? "Any objective below half correct goes into the next RDP class rather than being carried forward silently."
+      : "This plan has no RDP class to absorb a gap, so any objective below half correct has to be flagged for a plan revision instead of carried forward silently.",
+  ].join(" ")
+}
+
 function buildClassSequence(
   allocations: PlanTopicAllocation[],
   structural: ReturnType<typeof estimateStructuralCounts>
 ) {
   const items: PlanItem[] = []
   const checkpointAfter = new Set<number>()
+  let lastCheckpointTopicIndex = 0
 
   for (
     let checkpoint = 1;
@@ -640,82 +872,53 @@ function buildClassSequence(
   }
 
   let checkpointIndex = 0
-  let ptmsPlaced = 0
+  let rdpsPlaced = 0
 
   allocations.forEach((allocation, topicIndex) => {
-    items.push(...buildTopicItems(allocation))
+    items.push(...buildTopicItems(allocation, structural.rdps > 0))
 
     if (checkpointAfter.has(topicIndex + 1)) {
       const checkpointTitle =
         CHECKPOINT_LABELS[checkpointIndex] ??
         `Checkpoint ${checkpointIndex + 1}`
+      // Topics this checkpoint is assessing: everything since the last one.
+      const coveredTopics = allocations
+        .slice(lastCheckpointTopicIndex, topicIndex + 1)
+        .map((covered) => covered.topicName)
       items.push({
         id: `checkpoint-${checkpointIndex + 1}`,
         classNumber: 0,
         kind: "checkpoint",
         status: "planned",
         title: checkpointTitle,
-        subtitle: "Checkpoint assessment",
+        subtitle: `Checkpoint assessment · ${coveredTopics.join(", ")}`,
         learningObjectives: [],
         easyActivities: 0,
         practiceActivities: 0,
-        reason:
-          "Checkpoint assessments are placed after every two to three topic blocks.",
-      })
-      items.push({
-        id: `rdp-${checkpointIndex + 1}`,
-        classNumber: 0,
-        kind: "rdp",
-        status: "planned",
-        title: "Revision, doubts & practice",
-        subtitle: `RDP after ${checkpointTitle.toLowerCase()}`,
-        learningObjectives: [],
-        easyActivities: 0,
-        practiceActivities: 0,
-        reason:
-          "Every checkpoint is followed by an RDP class to close the gaps it reveals.",
+        reason: buildCheckpointInstructions(coveredTopics),
       })
       checkpointIndex += 1
+      lastCheckpointTopicIndex = topicIndex + 1
 
-      const shouldPlacePtm =
-        ptmsPlaced < structural.ptms &&
-        checkpointIndex >=
-          Math.round(
-            ((ptmsPlaced + 1) * structural.checkpoints) / structural.ptms
-          )
-      if (shouldPlacePtm) {
+      // RDP is the optional part of the structure (Rule F3), so a tight plan
+      // can have fewer RDP classes than checkpoints. Place what survives.
+      if (rdpsPlaced < structural.rdps) {
         items.push({
-          id: `ptm-${ptmsPlaced + 1}`,
+          id: `rdp-${rdpsPlaced + 1}`,
           classNumber: 0,
-          kind: "ptm",
+          kind: "rdp",
           status: "planned",
-          title: "Parent–teacher meeting",
-          subtitle: "Progress review and next-term alignment",
+          title: "Revision, doubts & practice",
+          subtitle: `RDP after ${checkpointTitle.toLowerCase()}`,
           learningObjectives: [],
           easyActivities: 0,
           practiceActivities: 0,
-          reason: "PTMs are included as structural classes in the plan.",
+          reason: buildRdpInstructions(coveredTopics),
         })
-        ptmsPlaced += 1
+        rdpsPlaced += 1
       }
     }
   })
-
-  while (ptmsPlaced < structural.ptms) {
-    items.push({
-      id: `ptm-${ptmsPlaced + 1}`,
-      classNumber: 0,
-      kind: "ptm",
-      status: "planned",
-      title: "Parent–teacher meeting",
-      subtitle: "Progress review and next-term alignment",
-      learningObjectives: [],
-      easyActivities: 0,
-      practiceActivities: 0,
-      reason: "PTMs are included as structural classes in the plan.",
-    })
-    ptmsPlaced += 1
-  }
 
   return items.map((item, index) => ({
     ...item,
@@ -749,15 +952,13 @@ export function getSuggestedTopicIds(
   // Rule A1: start from every topic in the curriculum, then let Rules B2/H1
   // compress toward the minimums and drop Low before Medium if it still
   // does not fit.
-  const requestedRefresherIds = student.parentRequestedTopicId
-    ? new Set(
-        getPrerequisiteChain(student.parentRequestedTopicId, topicMap).filter(
-          (id) => !completedIds.has(id)
-        )
-      )
-    : new Set<number>()
+  const refresherPrerequisites = getRefresherPrerequisites(
+    student,
+    topicMap,
+    (id) => !completedIds.has(id)
+  )
   const candidateAllocations = availableTopics.map((topic) =>
-    adjustTopic(topic, student, {}, requestedRefresherIds)
+    adjustTopic(topic, student, {}, refresherPrerequisites)
   )
   const fitted = fitAllocationsToCapacity(
     candidateAllocations,
@@ -780,17 +981,15 @@ export function getAiAssistedTopicSuggestion(
   const recommendations = new Map<number, AiTopicRecommendation>()
   const skippableTopicIds = new Set<number>()
   const mustIncludeIds = new Set<number>()
-  const refresherIds = student.parentRequestedTopicId
-    ? new Set(
-        getPrerequisiteChain(student.parentRequestedTopicId, topicMap).filter(
-          (id) => !completedIds.has(id)
-        )
-      )
-    : new Set<number>()
+  const refresherPrerequisites = getRefresherPrerequisites(
+    student,
+    topicMap,
+    (id) => !completedIds.has(id)
+  )
   const baseAllocations = new Map(
     availableTopics.map((topic) => [
       topic.id,
-      adjustTopic(topic, student, {}, refresherIds),
+      adjustTopic(topic, student, {}, refresherPrerequisites),
     ])
   )
 
@@ -1011,18 +1210,22 @@ export function buildLearningPlan({
   const topicMap = getTopicMap(topics)
   const completedIds = getCompletedTopicIds(student)
   const effectiveSelectedSet = new Set(selectedTopicIds)
-  const requestedPrerequisites = student.parentRequestedTopicId
-    ? getPrerequisiteChain(student.parentRequestedTopicId, topicMap)
-    : []
-  const compressedPrerequisiteIds = new Set(
-    requestedPrerequisites.filter((id) => effectiveSelectedSet.has(id))
+  const refresherPrerequisites = getRefresherPrerequisites(
+    student,
+    topicMap,
+    (id) => effectiveSelectedSet.has(id) && !completedIds.has(id)
+  )
+  const requestedPrerequisiteIds = new Set(
+    student.parentRequestedTopicId
+      ? getPrerequisiteChain(student.parentRequestedTopicId, topicMap)
+      : []
   )
   const allocations = topics
     .filter(
       (topic) => effectiveSelectedSet.has(topic.id) && !completedIds.has(topic.id)
     )
     .map((topic) =>
-      adjustTopic(topic, student, manualAdjustments, compressedPrerequisiteIds)
+      adjustTopic(topic, student, manualAdjustments, refresherPrerequisites)
     )
 
   const selectedAllocations = orderAllocations(
@@ -1129,16 +1332,49 @@ export function buildLearningPlan({
   }
 
   const explanations = [
-    "Topics are sequenced by curriculum order, with every selected prerequisite placed before the topic that depends on it.",
+    "High priority topics are sequenced first, then Medium and Low, using curriculum order inside each band. Every selected prerequisite is still placed before the topic that depends on it, whatever its priority.",
   ]
   if (student.placementStatus === "completed") {
     explanations.push(
       "Placement scores below 40% keep the full allocation; scores of 75% or more shorten the topic and increase easy consolidation."
     )
   }
+  const placementRefreshers = orderedAllocations.filter(
+    (allocation) =>
+      allocation.isCompressedRefresher &&
+      allocation.topicId !== student.parentRequestedTopicId &&
+      !requestedPrerequisiteIds.has(allocation.topicId)
+  )
+  if (placementRefreshers.length > 0) {
+    explanations.push(
+      `${placementRefreshers.map((allocation) => allocation.topicName).join(", ")} scored 75% or more but sits before a topic the student is weak in, so it is kept as a shortened refresher rather than a full teaching block.`
+    )
+  }
   if (student.parentRequestedTopicId) {
     explanations.push(
       "The parent-requested topic is moved forward after its unmet prerequisite refreshers."
+    )
+  }
+  const extendedTopics = orderedAllocations.filter(
+    (allocation) => allocation.classes > allocation.idealClasses
+  )
+  if (extendedTopics.length > 0) {
+    explanations.push(
+      `${extendedTopics.map((allocation) => `${allocation.topicName} (${allocation.idealClasses} → ${allocation.classes})`).join(", ")} gained classes because half or more of the objectives are not secure. Extensions stop two classes above the ideal.`
+    )
+  }
+  if (structural.opsReserve > 0) {
+    explanations.push(
+      `${structural.opsReserve} ${structural.opsReserve === 1 ? "class is" : "classes are"} reserved for parent–teacher meetings. Ops schedules those on a fixed calendar, so the builder holds the capacity but does not place them in the sequence.`
+    )
+  }
+  const fullStructural = estimateStructuralCounts(
+    orderedAllocations.length,
+    student.classesRemaining
+  )
+  if (structural.rdps < fullStructural.rdps) {
+    explanations.push(
+      `The plan is tight, so ${fullStructural.rdps - structural.rdps} revision, doubts & practice ${fullStructural.rdps - structural.rdps === 1 ? "class was" : "classes were"} dropped first. RDP is the optional part of the structure; checkpoints are kept because the plan resizes itself from what they measure.`
     )
   }
   if (compression.compressed > 0) {
@@ -1171,7 +1407,8 @@ export function buildLearningPlan({
     capacity: {
       available: student.classesRemaining,
       teaching,
-      structural: structural.total,
+      structural: structural.checkpoints + structural.rdps,
+      opsReserve: structural.opsReserve,
       total,
       difference,
       compressedClasses: compression.compressed,

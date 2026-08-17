@@ -200,7 +200,14 @@ export interface PlanWarning {
 export interface PlanCapacity {
   available: number
   teaching: number
+  /** Checkpoint + RDP classes the builder places in the sequence. */
   structural: number
+  /**
+   * PTM classes reserved against the package but never placed by the builder —
+   * ops schedules them on a fixed calendar. Counted in `total`, and the Rule F3
+   * fit ladder cannot shed them.
+   */
+  opsReserve: number
   total: number
   difference: number
   /** Teaching classes removed by the Rule B2 compression pass. */
