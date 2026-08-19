@@ -103,7 +103,7 @@ Return ONLY a valid JSON object in this exact format:
   "evidenceSummary": ["Point 1", "Point 2"],
   "recommendations": [],
   "classAdjustments": {
-    "313": {
+    "<topicId>": {
       "classes": 3,
       "activities": 10,
       "reason": "Compressed by AI from 5 to 3 classes based on 85% placement score to fit package limit."

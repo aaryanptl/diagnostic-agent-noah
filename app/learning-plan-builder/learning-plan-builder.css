@@ -31,6 +31,20 @@
     ), var(--paper);
   font-family: var(--font-sans, "DM Sans", sans-serif);
   font-size: 15px;
+  /* The "Why this" rail is docked, not floated over the app: when it opens the
+     page reserves its width and the content reflows beside it. */
+  transition: padding-right 0.22s ease;
+}
+
+.lpb.why-open {
+  padding-right: 420px;
+}
+
+/* Too narrow to give up 420px, so the rail goes back to covering the content. */
+@media (max-width: 1080px) {
+  .lpb.why-open {
+    padding-right: 0;
+  }
 }
 
 .lpb-mentor-focus-box {
@@ -53,7 +67,7 @@
 
 .lpb-mentor-focus-box strong {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #92400e;
   margin-bottom: 2px;
@@ -114,7 +128,7 @@
   overflow: hidden;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--blue), var(--purple));
-  box-shadow: 0 5px 18px rgba(58, 92, 204, 0.22);
+  box-shadow: 0 5px 18px rgba(31, 88, 85, 0.22);
 }
 
 .lpb-logo::before,
@@ -188,10 +202,10 @@
   gap: 6px;
   padding: 7px 11px;
   color: #4d3d9a;
-  background: rgba(124, 92, 252, 0.08);
-  border: 1px solid rgba(124, 92, 252, 0.12);
+  background: rgba(37, 135, 124, 0.08);
+  border: 1px solid rgba(37, 135, 124, 0.12);
   border-radius: 50px;
-  font-size: 0.73rem;
+  font-size: 0.86rem;
   font-weight: 700;
 }
 
@@ -281,7 +295,7 @@
 .lpb-kicker,
 .lpb-detail-label {
   color: var(--blue);
-  font-size: 0.7rem;
+  font-size: 0.83rem;
   font-weight: 800;
   letter-spacing: 0.075em;
   text-transform: uppercase;
@@ -399,7 +413,7 @@
 .lpb-building-steps small {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.4;
 }
 
@@ -493,7 +507,7 @@
 .lpb-rule-stamp span {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.71rem;
+  font-size: 0.84rem;
   line-height: 1.35;
 }
 
@@ -529,7 +543,7 @@
   color: var(--ink-muted);
   background: transparent;
   border: 0;
-  font-size: 0.74rem;
+  font-size: 0.87rem;
   font-weight: 700;
   cursor: default;
 }
@@ -547,7 +561,7 @@
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   font-family: "Space Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   box-shadow: 0 0 0 6px var(--paper);
 }
 
@@ -559,7 +573,7 @@
   color: white;
   background: linear-gradient(135deg, var(--blue), var(--purple));
   border-color: transparent;
-  box-shadow: 0 0 0 6px var(--paper), 0 5px 16px rgba(58, 92, 204, 0.25);
+  box-shadow: 0 0 0 6px var(--paper), 0 5px 16px rgba(31, 88, 85, 0.25);
 }
 
 .lpb-stepper button.complete > span {
@@ -594,7 +608,7 @@
   position: absolute;
   top: 2px;
   left: 0;
-  color: rgba(58, 92, 204, 0.28);
+  color: rgba(31, 88, 85, 0.28);
   font-family: "Space Mono", monospace;
   font-size: 1.45rem;
   font-weight: 700;
@@ -643,17 +657,17 @@
 
 .lpb-topic-scope-head p {
   margin-top: 2px;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-count-chip {
   padding: 7px 12px;
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.07);
-  border: 1px solid rgba(58, 92, 204, 0.1);
+  background: rgba(31, 88, 85, 0.07);
+  border: 1px solid rgba(31, 88, 85, 0.1);
   border-radius: 50px;
   font-family: "Space Mono", monospace;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -688,33 +702,33 @@
   bottom: -34px;
   width: 90px;
   height: 90px;
-  border: 16px solid rgba(58, 92, 204, 0.035);
+  border: 16px solid rgba(31, 88, 85, 0.035);
   border-radius: 50%;
 }
 
 .lpb-student-card:hover {
   z-index: 1;
   transform: translateY(-3px);
-  border-color: rgba(58, 92, 204, 0.22);
+  border-color: rgba(31, 88, 85, 0.22);
   box-shadow: 0 12px 34px rgba(26, 26, 46, 0.09);
 }
 
 .lpb-student-card.selected {
-  background: linear-gradient(145deg, rgba(58, 92, 204, 0.055), transparent 62%),
+  background: linear-gradient(145deg, rgba(31, 88, 85, 0.055), transparent 62%),
     white;
-  border-color: rgba(58, 92, 204, 0.45);
-  box-shadow: inset 0 0 0 1px rgba(58, 92, 204, 0.08), 0 9px 28px
-    rgba(58, 92, 204, 0.1);
+  border-color: rgba(31, 88, 85, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(31, 88, 85, 0.08), 0 9px 28px
+    rgba(31, 88, 85, 0.1);
 }
 
 .lpb-scenario-tag {
   margin-bottom: 8px;
   padding: 4px 8px;
-  color: #5d44bc;
-  background: rgba(124, 92, 252, 0.09);
+  color: #1f7169;
+  background: rgba(37, 135, 124, 0.09);
   border-radius: 50px;
   font-family: "Space Mono", monospace;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
@@ -735,9 +749,9 @@
   background: linear-gradient(135deg, var(--blue), var(--purple));
   border-radius: 50%;
   font-family: "Bricolage Grotesque", sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   font-weight: 800;
-  box-shadow: 0 5px 15px rgba(58, 92, 204, 0.17);
+  box-shadow: 0 5px 15px rgba(31, 88, 85, 0.17);
 }
 
 .lpb-avatar-large {
@@ -767,7 +781,7 @@
 .lpb-card-eyebrow {
   margin-bottom: 3px;
   color: var(--blue);
-  font-size: 0.67rem;
+  font-size: 0.79rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -779,7 +793,7 @@
 .lpb-student-card > p {
   margin: 6px 0 0;
   color: var(--ink-muted);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   line-height: 1.45;
 }
 
@@ -812,7 +826,7 @@
 .lpb-profile-strip span {
   margin-bottom: 4px;
   color: var(--ink-muted);
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -831,7 +845,7 @@
   background: #fff8e6;
   border: 1px solid #e7c98d;
   border-radius: 10px;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   font-weight: 700;
 }
 
@@ -862,7 +876,7 @@
   align-items: center;
   gap: 7px;
   color: var(--ink-muted);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-evidence-layout,
@@ -905,7 +919,7 @@
 .lpb-panel-title p {
   margin: 2px 0 0;
   color: var(--ink-muted);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-score-list {
@@ -932,13 +946,13 @@
 }
 
 .lpb-score-row > div:first-child strong {
-  font-size: 0.79rem;
+  font-size: 0.92rem;
 }
 
 .lpb-score-row > div:first-child span {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-score-track {
@@ -968,7 +982,7 @@
 
 .lpb-score-row > b {
   font-family: "Space Mono", monospace;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-score-row > b.strong {
@@ -987,7 +1001,7 @@
   padding: 5px 8px;
   text-align: center;
   border-radius: 50px;
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   font-weight: 800;
 }
 
@@ -998,7 +1012,7 @@
 
 .lpb-evidence-status.steady {
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.08);
+  background: rgba(31, 88, 85, 0.08);
 }
 
 .lpb-evidence-status.support {
@@ -1012,7 +1026,7 @@
   color: var(--ink-soft);
   background: var(--surface-muted);
   border-radius: 10px;
-  font-size: 0.7rem;
+  font-size: 0.83rem;
 }
 
 .lpb-rule-preview {
@@ -1023,7 +1037,7 @@
   position: relative;
   background:
     radial-gradient(circle at 100% 0, rgba(58, 204, 179, 0.22), transparent 35%),
-    radial-gradient(circle at 0% 100%, rgba(58, 92, 204, 0.25), transparent 44%),
+    radial-gradient(circle at 0% 100%, rgba(31, 88, 85, 0.25), transparent 44%),
     #102f32;
   border: 1px solid rgba(87, 224, 194, 0.25);
   border-radius: 18px;
@@ -1064,7 +1078,7 @@
 
 .lpb-rule-preview-topline > span:last-child {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 0.69rem;
+  font-size: 0.81rem;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -1110,7 +1124,7 @@
 
 .lpb-rule-preview li span {
   color: rgba(255, 255, 255, 0.78);
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   line-height: 1.38;
 }
 
@@ -1124,7 +1138,7 @@
   gap: 22px;
   background: radial-gradient(
       circle at 82% 18%,
-      rgba(124, 92, 252, 0.08),
+      rgba(37, 135, 124, 0.08),
       transparent 28%
     ), var(--surface-warm);
   border: 1px solid rgba(255, 154, 60, 0.18);
@@ -1202,7 +1216,7 @@
   border: 1px solid rgba(31, 88, 85, 0.16);
   border-left: 3px solid #1f5855;
   border-radius: 6px;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
   color: #1c3c39;
   line-height: 1.45;
 }
@@ -1238,7 +1252,7 @@
   background: white;
   border: 1px solid var(--line);
   border-radius: 50px;
-  font-size: 0.7rem;
+  font-size: 0.83rem;
   font-weight: 700;
 }
 
@@ -1277,18 +1291,18 @@
 }
 
 .lpb-completed-list strong {
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-completed-list div > div > span {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.67rem;
+  font-size: 0.79rem;
 }
 
 .lpb-completed-list div > b {
   color: #13895a;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-signal-list > div {
@@ -1298,7 +1312,7 @@
   align-items: flex-start;
   gap: 9px;
   border-radius: 11px;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   line-height: 1.45;
 }
 
@@ -1336,7 +1350,7 @@
 .lpb-attempt-evidence > div > p {
   margin: 0;
   color: #d0e7e3;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   line-height: 1.5;
 }
 
@@ -1356,7 +1370,7 @@
 .lpb-attempt-profile-list strong {
   display: block;
   min-height: 30px;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   line-height: 1.3;
 }
 
@@ -1370,7 +1384,7 @@
 .lpb-attempt-scores span {
   padding: 3px 6px;
   border-radius: 999px;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -1380,7 +1394,7 @@
 .lpb-attempt-profile-list p {
   margin: 0;
   color: #d4e9e7;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   line-height: 1.42;
 }
 
@@ -1390,11 +1404,11 @@
 
 .lpb-request-pill {
   padding: 7px 12px;
-  color: #5d44bc;
+  color: #1f7169;
   background: white;
-  border: 1px solid rgba(124, 92, 252, 0.16);
+  border: 1px solid rgba(37, 135, 124, 0.16);
   border-radius: 50px;
-  font-size: 0.7rem;
+  font-size: 0.83rem;
   font-weight: 800;
 }
 
@@ -1447,7 +1461,7 @@
 }
 
 .lpb-planning-mode > span:nth-child(2) strong {
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-planning-mode > span:nth-child(2) small {
@@ -1460,13 +1474,13 @@
   display: grid;
   place-items: center;
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.08);
+  background: rgba(31, 88, 85, 0.08);
   border-radius: 8px;
 }
 
 .lpb-mode-icon.evidence {
   color: var(--purple);
-  background: rgba(124, 92, 252, 0.1);
+  background: rgba(37, 135, 124, 0.1);
 }
 
 .lpb-planning-mode.active .lpb-mode-icon,
@@ -1488,9 +1502,9 @@
 .lpb-mode-action {
   padding: 6px 9px;
   color: var(--purple);
-  background: rgba(124, 92, 252, 0.09);
+  background: rgba(37, 135, 124, 0.09);
   border-radius: 50px;
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -1500,10 +1514,10 @@
   padding: 14px 16px;
   background: linear-gradient(
     115deg,
-    rgba(124, 92, 252, 0.075),
-    rgba(58, 92, 204, 0.035)
+    rgba(37, 135, 124, 0.075),
+    rgba(31, 88, 85, 0.035)
   );
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  border: 1px solid rgba(37, 135, 124, 0.14);
   border-radius: 13px;
 }
 
@@ -1519,18 +1533,18 @@
   align-items: center;
   gap: 7px;
   color: var(--purple);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 800;
 }
 
 .lpb-evidence-summary-head > strong {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-evidence-scope-summary > p {
   margin: 7px 0 10px;
   color: var(--ink-soft);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-evidence-chips {
@@ -1546,9 +1560,9 @@
   gap: 5px;
   color: #4c4089;
   background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(124, 92, 252, 0.1);
+  border: 1px solid rgba(37, 135, 124, 0.1);
   border-radius: 50px;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
@@ -1572,7 +1586,7 @@
   align-items: center;
   gap: 5px;
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -1605,7 +1619,7 @@
   background: white;
   border: 1px solid var(--line);
   border-radius: 7px;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 700;
   cursor: pointer;
   transition: border-color 0.18s ease, background 0.18s ease;
@@ -1629,7 +1643,7 @@
   align-items: center;
   gap: 6px;
   color: var(--ink-muted);
-  font-size: 0.69rem;
+  font-size: 0.81rem;
 }
 
 .lpb-topic-order-hint svg {
@@ -1661,12 +1675,12 @@
 }
 
 .lpb-topic-option.selected {
-  background: rgba(58, 92, 204, 0.042);
+  background: rgba(31, 88, 85, 0.042);
 }
 
 .lpb-topic-option.dragging {
   opacity: 0.46;
-  background: rgba(58, 92, 204, 0.1);
+  background: rgba(31, 88, 85, 0.1);
 }
 
 .lpb-topic-option.completed {
@@ -1709,7 +1723,7 @@
 .lpb-topic-sequence {
   color: var(--ink-muted);
   font-family: "Space Mono", monospace;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
 }
 
 .lpb-topic-main strong,
@@ -1724,7 +1738,7 @@
 .lpb-topic-main small {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-priority-pill {
@@ -1734,7 +1748,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50px;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -1764,12 +1778,12 @@
 
 .lpb-topic-metrics b {
   font-family: "Space Mono", monospace;
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-topic-metrics small {
   color: var(--ink-muted);
-  font-size: 0.59rem;
+  font-size: 0.72rem;
 }
 
 .lpb-topic-state {
@@ -1779,7 +1793,7 @@
   align-items: flex-end;
   gap: 3px;
   text-align: right;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 700;
   color: var(--ink-muted);
 }
@@ -1790,7 +1804,7 @@
   gap: 4px;
   padding: 3px 9px;
   border-radius: 50px;
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: -0.01em;
@@ -1832,16 +1846,16 @@
   gap: 3px;
   padding: 2px 8px;
   border-radius: 50px;
-  font-size: 0.59rem;
+  font-size: 0.72rem;
   font-weight: 700;
   white-space: nowrap;
   letter-spacing: -0.01em;
 }
 
 .lpb-prereq-badge.requested {
-  background: rgba(124, 92, 252, 0.12);
+  background: rgba(37, 135, 124, 0.12);
   color: #633bb9;
-  border: 1px solid rgba(124, 92, 252, 0.25);
+  border: 1px solid rgba(37, 135, 124, 0.25);
 }
 
 .lpb-prereq-badge.refresher {
@@ -1867,7 +1881,7 @@
   padding: 20px;
   background: radial-gradient(
       circle at 90% 0,
-      rgba(124, 92, 252, 0.06),
+      rgba(37, 135, 124, 0.06),
       transparent 34%
     ), white;
 }
@@ -1893,8 +1907,8 @@
   align-items: center;
   justify-content: center;
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.07);
-  border: 1px solid rgba(58, 92, 204, 0.13);
+  background: rgba(31, 88, 85, 0.07);
+  border: 1px solid rgba(31, 88, 85, 0.13);
   border-radius: 50%;
   font-family: "Space Mono", monospace;
   font-size: 1.4rem;
@@ -1910,7 +1924,7 @@
 .lpb-capacity-orb small {
   margin-top: 2px;
   font-family: "DM Sans", sans-serif;
-  font-size: 0.58rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
 }
 
@@ -1960,7 +1974,7 @@
 .lpb-capacity-breakdown span {
   margin-bottom: 4px;
   color: var(--ink-muted);
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -1992,7 +2006,7 @@
   align-items: center;
   gap: 7px;
   color: #176b49;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2004,7 +2018,7 @@
   background: rgba(46, 204, 135, 0.18);
   border-radius: 50px;
   font-family: "Space Mono", monospace;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
 }
 
 .lpb-placement-capacity-note > strong {
@@ -2018,7 +2032,7 @@
 .lpb-placement-capacity-note p {
   margin: 4px 0 0;
   color: #36745b;
-  font-size: 0.67rem;
+  font-size: 0.79rem;
   line-height: 1.45;
 }
 
@@ -2045,12 +2059,12 @@
 }
 
 .lpb-inline-warning strong {
-  font-size: 0.73rem;
+  font-size: 0.86rem;
 }
 
 .lpb-inline-warning span {
   margin-top: 2px;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   line-height: 1.45;
 }
 
@@ -2067,10 +2081,10 @@
   gap: 12px;
   background: linear-gradient(
     110deg,
-    rgba(124, 92, 252, 0.07),
-    rgba(58, 92, 204, 0.025)
+    rgba(37, 135, 124, 0.07),
+    rgba(31, 88, 85, 0.025)
   );
-  border: 1px solid rgba(124, 92, 252, 0.14);
+  border: 1px solid rgba(37, 135, 124, 0.14);
   border-radius: 13px;
 }
 
@@ -2091,13 +2105,13 @@
 }
 
 .lpb-review-ai strong {
-  font-size: 0.75rem;
+  font-size: 0.89rem;
 }
 
 .lpb-review-ai div > span {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-review-ai button {
@@ -2109,7 +2123,7 @@
   background: var(--purple);
   border: 0;
   border-radius: 50px;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -2142,7 +2156,7 @@
 .lpb-review-topic-list > div > span:first-child {
   color: var(--ink-muted);
   font-family: "Space Mono", monospace;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
 }
 
 .lpb-review-topic-list strong,
@@ -2151,20 +2165,20 @@
 }
 
 .lpb-review-topic-list strong {
-  font-size: 0.74rem;
+  font-size: 0.87rem;
 }
 
 .lpb-review-topic-list small {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.63rem;
+  font-size: 0.74rem;
 }
 
 .lpb-review-topic-list em {
   margin-top: 4px;
   display: block;
   color: #5c4ca2;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-style: normal;
   line-height: 1.35;
 }
@@ -2184,7 +2198,7 @@
   background: rgba(244, 104, 83, 0.07);
   border: 1px solid rgba(244, 104, 83, 0.12);
   border-radius: 7px;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -2199,10 +2213,10 @@
   align-items: center;
   gap: 4px;
   color: #4c5792;
-  background: rgba(58, 92, 204, 0.07);
-  border: 1px solid rgba(58, 92, 204, 0.11);
+  background: rgba(31, 88, 85, 0.07);
+  border: 1px solid rgba(31, 88, 85, 0.11);
   border-radius: 7px;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -2213,8 +2227,8 @@
   align-items: center;
   gap: 11px;
   color: #4d3d9a;
-  background: rgba(124, 92, 252, 0.06);
-  border: 1px solid rgba(124, 92, 252, 0.11);
+  background: rgba(37, 135, 124, 0.06);
+  border: 1px solid rgba(37, 135, 124, 0.11);
   border-radius: 12px;
 }
 
@@ -2224,13 +2238,13 @@
 }
 
 .lpb-build-note strong {
-  font-size: 0.74rem;
+  font-size: 0.87rem;
 }
 
 .lpb-build-note span {
   margin-top: 1px;
   color: var(--ink-soft);
-  font-size: 0.67rem;
+  font-size: 0.79rem;
 }
 
 /* Generated plan */
@@ -2252,7 +2266,7 @@
 .lpb-plan-hero-minimal .lpb-avatar {
   width: 40px;
   height: 40px;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
 }
 
 .lpb-plan-hero-minimal h1 {
@@ -2264,13 +2278,13 @@
 
 .lpb-plan-hero-minimal p {
   margin-top: 3px !important;
-  font-size: 0.72rem !important;
+  font-size: 0.85rem !important;
   color: var(--ink-muted) !important;
 }
 
 .lpb-plan-hero-minimal .lpb-button {
   padding: 7px 12px;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 /* Headline numbers at the top of the generated plan. */
@@ -2301,7 +2315,7 @@
 
 .lpb-plan-stats span {
   color: var(--ink-muted);
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2317,7 +2331,7 @@
 
 .lpb-plan-stats small {
   color: var(--ink-muted);
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   line-height: 1.35;
 }
 
@@ -2337,7 +2351,7 @@
   border: 1px solid var(--line);
   background: white;
   color: var(--ink-soft);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 650;
   line-height: 1.2;
 }
@@ -2348,9 +2362,9 @@ button.lpb-status-chip {
 }
 
 .lpb-status-chip.generating {
-  color: #5b45b5;
-  background: rgba(124, 92, 252, 0.08);
-  border-color: rgba(124, 92, 252, 0.16);
+  color: #1f7169;
+  background: rgba(37, 135, 124, 0.08);
+  border-color: rgba(37, 135, 124, 0.16);
 }
 
 .lpb-status-chip.warning {
@@ -2380,7 +2394,7 @@ a.lpb-status-chip.link:hover {
   margin: 8px auto 16px !important;
   color: var(--ink-muted) !important;
   font-family: "Space Mono", monospace;
-  font-size: 0.7rem !important;
+  font-size: 0.83rem !important;
   word-break: break-all;
 }
 
@@ -2415,7 +2429,7 @@ a.lpb-status-chip.link:hover {
 .lpb-board-meta {
   margin: 3px 0 0 !important;
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-plan-board-minimal .lpb-view-tabs {
@@ -2431,7 +2445,7 @@ a.lpb-status-chip.link:hover {
   border: 0;
   background: transparent;
   box-shadow: none;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-plan-board-minimal .lpb-view-tabs button.active {
@@ -2461,7 +2475,7 @@ a.lpb-status-chip.link:hover {
   height: 28px;
   padding: 0 8px;
   white-space: nowrap;
-  font-size: 0.62rem;
+  font-size: 0.73rem;
 }
 
 .lpb-plan-board-minimal .lpb-class-activity-badge {
@@ -2471,7 +2485,7 @@ a.lpb-status-chip.link:hover {
   border: 1px solid rgba(20, 184, 166, 0.16);
   border-radius: 999px;
   font-family: "Space Mono", monospace;
-  font-size: 0.57rem;
+  font-size: 0.72rem;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
@@ -2482,11 +2496,11 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-plan-board-minimal .lpb-class-title small {
-  font-size: 0.64rem;
+  font-size: 0.76rem;
 }
 
 .lpb-plan-board-minimal .lpb-status-badge {
-  font-size: 0.58rem;
+  font-size: 0.72rem;
   padding: 3px 7px;
 }
 
@@ -2535,7 +2549,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-class-attempt-score strong {
   color: #174d4b;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-class-attempt-badges {
@@ -2547,18 +2561,18 @@ a.lpb-status-chip.link:hover {
 .lpb-class-attempt-badges span {
   padding: 5px 8px;
   border-radius: 7px;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
-.lpb-class-attempt-badges span b { margin-left: 3px; font-size: 0.77rem; }
+.lpb-class-attempt-badges span b { margin-left: 3px; font-size: 0.91rem; }
 .lpb-class-attempt-badges .secure { color: #0f6d4b; background: #d9f5e8; }
 .lpb-class-attempt-badges .not-secure { color: #a54034; background: #ffe4df; }
 
 .lpb-class-attempt-score p {
   margin: 0;
   color: #4e6c69;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 
@@ -2569,7 +2583,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-lesson-minimal .lpb-detail-label {
   margin: 0;
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink-muted);
@@ -2585,7 +2599,7 @@ a.lpb-status-chip.link:hover {
 .lpb-lesson-minimal .lpb-muted-text {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   line-height: 1.45;
 }
 
@@ -2602,7 +2616,7 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-lesson-minimal .lpb-question-item p {
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-lesson-why {
@@ -2610,7 +2624,7 @@ a.lpb-status-chip.link:hover {
   padding-top: 8px;
   border-top: 1px dashed var(--line);
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.4;
 }
 
@@ -2619,9 +2633,9 @@ a.lpb-status-chip.link:hover {
   padding: 13px 15px;
   display: flex;
   gap: 10px;
-  border: 1px solid rgba(58, 92, 204, 0.16);
+  border: 1px solid rgba(31, 88, 85, 0.16);
   border-radius: 12px;
-  background: rgba(58, 92, 204, 0.045);
+  background: rgba(31, 88, 85, 0.045);
 }
 
 .lpb-plan-changes-head > svg {
@@ -2631,7 +2645,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-plan-changes h2 {
   color: var(--ink);
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-plan-changes {
@@ -2658,7 +2672,7 @@ a.lpb-status-chip.link:hover {
   margin: 10px 0 0 25px;
   padding: 0;
   color: var(--ink-soft);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.55;
 }
 
@@ -2689,18 +2703,18 @@ a.lpb-status-chip.link:hover {
 
 .lpb-dropped-list strong {
   color: var(--ink);
-  font-size: 0.7rem;
+  font-size: 0.83rem;
 }
 
 .lpb-dropped-list .lpb-priority-pill {
   padding: 3px 6px;
-  font-size: 0.55rem;
+  font-size: 0.72rem;
 }
 
 .lpb-dropped-list p {
   margin: 4px 0 0;
   color: var(--ink-muted);
-  font-size: 0.64rem;
+  font-size: 0.76rem;
   line-height: 1.4;
 }
 
@@ -2807,7 +2821,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-plan-warning p {
   margin: 2px 0 0;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
 }
 
 .lpb-plan-warning button {
@@ -2819,7 +2833,7 @@ a.lpb-status-chip.link:hover {
   color: #8d4612;
   background: transparent;
   border: 0;
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -2827,8 +2841,8 @@ a.lpb-status-chip.link:hover {
 .lpb-change-banner {
   align-items: flex-start;
   color: #4d3d9a;
-  background: rgba(124, 92, 252, 0.065);
-  border: 1px solid rgba(124, 92, 252, 0.12);
+  background: rgba(37, 135, 124, 0.065);
+  border: 1px solid rgba(37, 135, 124, 0.12);
 }
 
 .lpb-change-icon {
@@ -2837,14 +2851,14 @@ a.lpb-status-chip.link:hover {
 
 .lpb-change-banner strong {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
 }
 
 .lpb-change-banner ul {
   margin: 4px 0 0;
   padding-left: 17px;
   color: var(--ink-soft);
-  font-size: 0.69rem;
+  font-size: 0.81rem;
   line-height: 1.5;
 }
 
@@ -2883,7 +2897,7 @@ a.lpb-status-chip.link:hover {
   position: relative;
   background: radial-gradient(
       circle at 93% 10%,
-      rgba(124, 92, 252, 0.08),
+      rgba(37, 135, 124, 0.08),
       transparent 28%
     ), white;
 }
@@ -2909,7 +2923,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 7px;
   color: var(--blue);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2926,7 +2940,7 @@ a.lpb-status-chip.link:hover {
 .lpb-mono {
   color: var(--ink-muted);
   font-family: "Space Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-next-body {
@@ -2947,7 +2961,7 @@ a.lpb-status-chip.link:hover {
 .lpb-next-body p {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-next-metrics {
@@ -2977,13 +2991,13 @@ a.lpb-status-chip.link:hover {
 
 .lpb-next-metrics span {
   color: var(--ink-muted);
-  font-size: 0.59rem;
+  font-size: 0.72rem;
 }
 
 .lpb-next-metrics b {
   color: var(--ink);
   font-family: "Space Mono", monospace;
-  font-size: 0.75rem;
+  font-size: 0.89rem;
 }
 
 .lpb-next-reason {
@@ -3007,8 +3021,8 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-next-reason span {
-  color: #5d44bc;
-  font-size: 0.62rem;
+  color: #1f7169;
+  font-size: 0.73rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -3016,7 +3030,7 @@ a.lpb-status-chip.link:hover {
 .lpb-next-reason p {
   margin: 3px 0 0;
   color: var(--ink-soft);
-  font-size: 0.7rem;
+  font-size: 0.83rem;
   line-height: 1.45;
 }
 
@@ -3030,8 +3044,18 @@ a.lpb-status-chip.link:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* The board clips its overflow, so the head has to wrap rather than push the
+     tab strip past the right edge — the last tab would just disappear. */
+  flex-wrap: wrap;
   gap: 16px;
   border-bottom: 1px solid var(--line);
+}
+
+/* Title block gives way first, so the tabs only drop to a second line when the
+   head genuinely runs out of width. */
+.lpb-plan-board-head > div:first-child {
+  flex: 1 1 240px;
+  min-width: 0;
 }
 
 .lpb-plan-board-head h2 {
@@ -3042,6 +3066,8 @@ a.lpb-status-chip.link:hover {
 .lpb-view-tabs {
   padding: 3px;
   display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
   gap: 3px;
   background: var(--surface-muted);
   border-radius: 50px;
@@ -3056,7 +3082,7 @@ a.lpb-status-chip.link:hover {
   background: transparent;
   border: 0;
   border-radius: 50px;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3064,7 +3090,7 @@ a.lpb-status-chip.link:hover {
 .lpb-view-tabs button.active {
   color: white;
   background: var(--blue);
-  box-shadow: 0 4px 12px rgba(58, 92, 204, 0.2);
+  box-shadow: 0 4px 12px rgba(31, 88, 85, 0.2);
 }
 
 .lpb-class-list {
@@ -3101,7 +3127,7 @@ a.lpb-status-chip.link:hover {
   background: white;
   border: 1px solid #b9d3ca;
   border-radius: 999px;
-  font-size: .62rem;
+  font-size: 0.73rem;
   font-weight: 800;
   /* Visible but quiet: a demo driver has to be able to find it without
      hunting, while 70 rows of it must not shout. */
@@ -3131,7 +3157,7 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-row.checkpoint {
-  background: rgba(124, 92, 252, 0.05);
+  background: rgba(37, 135, 124, 0.05);
   border-left-color: var(--purple);
 }
 
@@ -3155,7 +3181,7 @@ a.lpb-status-chip.link:hover {
 .lpb-diff-badge {
   padding: 3px 8px;
   border-radius: 999px;
-  font-size: 0.57rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1.25;
@@ -3175,7 +3201,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-diff-badge.updated {
   color: #4c4089;
-  background: rgba(124, 92, 252, 0.14);
+  background: rgba(37, 135, 124, 0.14);
 }
 
 .lpb-diff-badge.skipped {
@@ -3229,7 +3255,7 @@ a.lpb-status-chip.link:hover {
 .lpb-class-diff-chips span {
   padding: 4px 9px;
   border-radius: 999px;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 800;
 }
 
@@ -3250,13 +3276,13 @@ a.lpb-status-chip.link:hover {
 
 .lpb-class-diff-chips .updated {
   color: #4c4089;
-  background: rgba(124, 92, 252, 0.14);
+  background: rgba(37, 135, 124, 0.14);
 }
 
 .lpb-class-diff-removed {
   margin: 8px 0 0;
   color: var(--ink-soft);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 
@@ -3266,7 +3292,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 5px;
   border-radius: 999px;
-  font-size: 0.58rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -3275,9 +3301,9 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-kind-badge.checkpoint {
-  color: #5d44bc;
-  background: rgba(124, 92, 252, 0.13);
-  border: 1px solid rgba(124, 92, 252, 0.22);
+  color: #1f7169;
+  background: rgba(37, 135, 124, 0.13);
+  border: 1px solid rgba(37, 135, 124, 0.22);
 }
 
 .lpb-class-kind-badge.rdp {
@@ -3293,8 +3319,8 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-row.checkpoint .lpb-class-number {
-  color: #5d44bc;
-  background: rgba(124, 92, 252, 0.13);
+  color: #1f7169;
+  background: rgba(37, 135, 124, 0.13);
 }
 
 .lpb-class-row.rdp .lpb-class-number {
@@ -3308,7 +3334,7 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-row.next {
-  background: rgba(58, 92, 204, 0.035);
+  background: rgba(31, 88, 85, 0.035);
 }
 
 .lpb-class-row.completed {
@@ -3330,7 +3356,7 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-summary:hover {
-  background: rgba(58, 92, 204, 0.027);
+  background: rgba(31, 88, 85, 0.027);
 }
 
 .lpb-class-number {
@@ -3342,14 +3368,14 @@ a.lpb-status-chip.link:hover {
   background: var(--surface-muted);
   border-radius: 8px;
   font-family: "Space Mono", monospace;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .lpb-class-row.next .lpb-class-number {
   color: white;
   background: var(--blue);
-  box-shadow: 0 4px 12px rgba(58, 92, 204, 0.19);
+  box-shadow: 0 4px 12px rgba(31, 88, 85, 0.19);
 }
 
 .lpb-class-row.completed .lpb-class-number {
@@ -3359,7 +3385,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-class-kind {
   color: var(--ink-muted);
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   font-weight: 800;
   text-transform: uppercase;
 }
@@ -3383,44 +3409,44 @@ a.lpb-status-chip.link:hover {
 
 .lpb-structural-view > header h3,
 .lpb-mentor-section-head h3 {
-  margin: 5px 0;
+  margin: 6px 0;
   color: var(--ink);
-  font-size: 1rem;
+  font-size: 1.15rem;
 }
 
 .lpb-structural-view > header p {
   margin: 0;
-  color: var(--ink-muted);
-  font-size: 0.73rem;
-  line-height: 1.45;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.55;
 }
 
 .lpb-structural-list { margin-top: 16px; display: grid; gap: 8px; }
 .lpb-structural-list article {
-  padding: 11px 12px;
+  padding: 13px 14px;
   display: grid;
-  grid-template-columns: 66px 1fr;
-  gap: 11px;
+  grid-template-columns: 74px 1fr;
+  gap: 12px;
   border: 1px dashed var(--line);
   border-radius: 10px;
   background: #fcfbff;
 }
-.lpb-structural-list article > span { color: var(--ink-muted); font-size: 0.68rem; font-weight: 800; }
-.lpb-structural-list strong { color: #5d4695; font-size: 0.77rem; }
-.lpb-structural-list p { margin: 3px 0 0; color: var(--ink-soft); font-size: 0.69rem; line-height: 1.4; }
+.lpb-structural-list article > span { color: var(--ink-muted); font-size: 0.82rem; font-weight: 800; }
+.lpb-structural-list strong { color: #5d4695; font-size: 0.94rem; }
+.lpb-structural-list p { margin: 4px 0 0; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.5; }
 .lpb-structural-list article.rdp strong { color: #167d70; }
 .lpb-structural-list article.ptm strong { color: #a55e1c; }
 
 .lpb-mentor-view { display: grid; gap: 14px; background: #fbfcfb; }
 .lpb-mentor-snapshot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.lpb-mentor-snapshot > div { padding: 11px; border: 1px solid var(--line); border-radius: 9px; background: white; }
-.lpb-mentor-snapshot span { display: block; color: var(--ink-muted); font-size: 0.61rem; text-transform: uppercase; letter-spacing: .04em; }
-.lpb-mentor-snapshot b { display: block; margin-top: 5px; color: var(--ink); font-size: 0.78rem; line-height: 1.3; }
+.lpb-mentor-snapshot > div { padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: white; }
+.lpb-mentor-snapshot span { display: block; color: var(--ink-muted); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.lpb-mentor-snapshot b { display: block; margin-top: 6px; color: var(--ink); font-size: 0.95rem; line-height: 1.35; }
 
 .lpb-mentor-timeline { padding: 13px; border-radius: 10px; border: 1px solid var(--line); background: white; }
 .lpb-mentor-timeline > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
 .lpb-mentor-timeline span:not(.lpb-detail-label),
-.lpb-mentor-timeline button { padding: 5px 7px; color: #49605a; background: #eef2f0; border: 1px solid #dde5e1; border-radius: 6px; font-size: 0.64rem; }
+.lpb-mentor-timeline button { padding: 6px 9px; color: #49605a; background: #eef2f0; border: 1px solid #dde5e1; border-radius: 6px; font-size: 0.79rem; }
 /* Topic chips select which topic the diagnosis panel below is showing. */
 .lpb-mentor-timeline button { cursor: pointer; font-weight: 700; transition: background .12s ease, border-color .12s ease; }
 .lpb-mentor-timeline button:hover { background: #dfe9e4; border-color: #b9d3ca; }
@@ -3430,38 +3456,38 @@ a.lpb-status-chip.link:hover {
 
 .lpb-mentor-diagnosis { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: white; }
 .lpb-mentor-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.lpb-mentor-section-head button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; color: var(--green); background: white; border: 1px solid #b9d3ca; border-radius: 7px; font-size: .69rem; font-weight: 800; cursor: pointer; }
+.lpb-mentor-section-head button { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; color: var(--green); background: white; border: 1px solid #b9d3ca; border-radius: 7px; font-size: .82rem; font-weight: 800; cursor: pointer; }
 .lpb-mentor-head-actions { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; }
 .lpb-mentor-table-wrap { margin-top: 11px; overflow-x: auto; }
-.lpb-mentor-guidance { margin: 11px 0 0; color: var(--ink-muted); font-size: .72rem; line-height: 1.45; }
+.lpb-mentor-guidance { margin: 11px 0 0; color: var(--ink-soft); font-size: .86rem; line-height: 1.55; }
 .lpb-mentor-table-wrap table { width: 100%; min-width: 720px; border-collapse: collapse; }
-.lpb-mentor-table-wrap th { padding: 8px; color: white; background: #1e5d59; text-align: left; font-size: .67rem; }
-.lpb-mentor-table-wrap td { padding: 9px 8px; border: 1px solid var(--line); color: var(--ink-soft); font-size: .68rem; line-height: 1.4; vertical-align: top; }
+.lpb-mentor-table-wrap th { padding: 10px; color: white; background: #1e5d59; text-align: left; font-size: .82rem; }
+.lpb-mentor-table-wrap td { padding: 11px 10px; border: 1px solid var(--line); color: var(--ink-soft); font-size: .85rem; line-height: 1.55; vertical-align: top; }
 .lpb-mentor-table-wrap td:first-child { color: var(--ink); font-weight: 700; }
-.lpb-diagnosis-pill { display: inline-block; padding: 4px 6px; border-radius: 999px; font-size: .6rem; font-weight: 800; white-space: nowrap; }
+.lpb-diagnosis-pill { display: inline-block; padding: 4px 6px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
 .lpb-diagnosis-pill.secure { color: #116a48; background: #def5e7; }
 .lpb-diagnosis-pill.support { color: #a53e34; background: #ffe5df; }
 .lpb-diagnosis-pill.neutral { color: #677775; background: #eef1f0; }
 .lpb-mentor-next { padding: 13px; display: flex; gap: 10px; border: 1px solid #e7c98d; border-radius: 10px; background: #fff8e6; }
 .lpb-mentor-next svg { color: #b57a16; flex: 0 0 auto; }
-.lpb-mentor-next p { margin: 4px 0 0; color: #72551c; font-size: .72rem; line-height: 1.45; }
+.lpb-mentor-next p { margin: 5px 0 0; color: #72551c; font-size: .86rem; line-height: 1.55; }
 .lpb-mentor-actions { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 7px; }
 .lpb-mentor-actions li { display: grid; gap: 2px; }
-.lpb-mentor-actions strong { color: #5c4413; font-size: .69rem; font-weight: 800; }
-.lpb-mentor-actions span { color: #72551c; font-size: .72rem; line-height: 1.45; }
+.lpb-mentor-actions strong { color: #5c4413; font-size: .84rem; font-weight: 800; }
+.lpb-mentor-actions span { color: #72551c; font-size: .86rem; line-height: 1.55; }
 
 .lpb-mentor-stuck { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: white; }
 .lpb-mentor-stuck-list { margin-top: 11px; display: grid; gap: 9px; }
 .lpb-mentor-stuck-list article { padding: 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-muted); }
 .lpb-mentor-stuck-list header { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
-.lpb-mentor-stuck-list header strong { color: var(--ink); font-size: .75rem; font-weight: 800; }
+.lpb-mentor-stuck-list header strong { color: var(--ink); font-size: .92rem; font-weight: 800; }
 .lpb-mentor-stuck-list article.focused { border-color: var(--green); background: #f2f8f5; }
-.lpb-stuck-focus { order: 9; margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; color: var(--green); background: white; border: 1px solid #b9d3ca; border-radius: 999px; font-size: .6rem; font-weight: 800; cursor: pointer; }
+.lpb-stuck-focus { order: 9; margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; color: var(--green); background: white; border: 1px solid #b9d3ca; border-radius: 999px; font-size: 0.72rem; font-weight: 800; cursor: pointer; }
 .lpb-stuck-focus:hover { background: #eaf5f0; }
-.lpb-mentor-stuck-list p { margin: 7px 0 0; color: var(--ink-soft); font-size: .69rem; line-height: 1.45; }
+.lpb-mentor-stuck-list p { margin: 8px 0 0; color: var(--ink-soft); font-size: .86rem; line-height: 1.55; }
 .lpb-mentor-accuracy { margin-top: 7px; display: flex; flex-wrap: wrap; gap: 14px; }
-.lpb-mentor-accuracy span { color: var(--ink-muted); font-size: .66rem; font-weight: 700; }
-.lpb-mentor-accuracy b { color: var(--ink); font-size: .72rem; }
+.lpb-mentor-accuracy span { color: var(--ink-muted); font-size: .8rem; font-weight: 700; }
+.lpb-mentor-accuracy b { color: var(--ink); font-size: .88rem; }
 
 @media (max-width: 760px) {
   .lpb-mentor-snapshot { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -3473,26 +3499,26 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-class-title strong {
-  font-size: 0.75rem;
+  font-size: 0.89rem;
 }
 
 .lpb-class-title small {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.63rem;
+  font-size: 0.74rem;
 }
 
 .lpb-class-activity {
   color: var(--ink-muted);
   font-family: "Space Mono", monospace;
-  font-size: 0.59rem;
+  font-size: 0.72rem;
 }
 
 .lpb-status-badge {
   padding: 4px 7px;
   text-align: center;
   border-radius: 50px;
-  font-size: 0.59rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -3503,7 +3529,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-status-badge.next {
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.09);
+  background: rgba(31, 88, 85, 0.09);
 }
 
 .lpb-status-badge.completed {
@@ -3551,7 +3577,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-lesson-header p {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   color: #e8f7f5;
 }
 
@@ -3620,13 +3646,13 @@ a.lpb-status-chip.link:hover {
   margin-top: 6px;
   padding: 3px 8px;
   border-radius: 50px;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .lpb-content-source.ai {
   color: #4c4089;
-  background: rgba(124, 92, 252, 0.12);
+  background: rgba(37, 135, 124, 0.12);
 }
 
 .lpb-content-source.fallback {
@@ -3640,8 +3666,8 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-content-generating-banner {
-  border-color: rgba(124, 92, 252, 0.22) !important;
-  background: rgba(124, 92, 252, 0.06) !important;
+  border-color: rgba(37, 135, 124, 0.22) !important;
+  background: rgba(37, 135, 124, 0.06) !important;
 }
 
 .lpb-content-generating-banner span {
@@ -3660,14 +3686,14 @@ a.lpb-status-chip.link:hover {
   color: var(--ink-soft);
   background: var(--surface-muted);
   border-radius: 50px;
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .lpb-activity-round {
   color: var(--ink-muted);
   font-style: normal;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
 }
 
 .lpb-assigned-questions-box {
@@ -3704,7 +3730,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-question-objective {
   display: block;
-  font-size: 0.78rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #1f5855;
   margin-bottom: 6px;
@@ -3732,7 +3758,7 @@ a.lpb-status-chip.link:hover {
 .lpb-q-badge {
   padding: 2px 7px;
   border-radius: 6px;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
@@ -3823,7 +3849,7 @@ a.lpb-status-chip.link:hover {
   background: #1f5855;
   color: #ffffff;
   border-radius: 8px;
-  font-size: 0.75rem;
+  font-size: 0.89rem;
   font-weight: 800;
   white-space: nowrap;
 }
@@ -3854,7 +3880,7 @@ a.lpb-status-chip.link:hover {
   color: #1f5855;
   border: 1px solid #2ec4b6;
   border-radius: 50px;
-  font-size: 0.75rem;
+  font-size: 0.89rem;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -3867,9 +3893,9 @@ a.lpb-status-chip.link:hover {
   gap: 6px;
   color: var(--blue);
   background: white;
-  border: 1px solid rgba(58, 92, 204, 0.14);
+  border: 1px solid rgba(31, 88, 85, 0.14);
   border-radius: 50px;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
   font-weight: 700;
   cursor: pointer;
 }
@@ -3898,7 +3924,7 @@ a.lpb-status-chip.link:hover {
   margin-right: auto;
   color: var(--ink-muted);
   font-family: "Space Mono", monospace;
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-lock-chip {
@@ -3906,10 +3932,10 @@ a.lpb-status-chip.link:hover {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #5d44bc;
-  background: rgba(124, 92, 252, 0.09);
+  color: #1f7169;
+  background: rgba(37, 135, 124, 0.09);
   border-radius: 50px;
-  font-size: 0.57rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -3923,7 +3949,7 @@ a.lpb-status-chip.link:hover {
   min-height: 42px;
   margin: 0;
   color: var(--ink-muted);
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   line-height: 1.45;
 }
 
@@ -3947,13 +3973,13 @@ a.lpb-status-chip.link:hover {
 
 .lpb-allocation-stats b {
   font-family: "Space Mono", monospace;
-  font-size: 0.69rem;
+  font-size: 0.81rem;
 }
 
 .lpb-allocation-stats span {
   margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.56rem;
+  font-size: 0.72rem;
 }
 
 .lpb-allocation-actions {
@@ -3993,7 +4019,7 @@ a.lpb-status-chip.link:hover {
   color: var(--ink-muted);
   background: var(--surface-muted);
   border-radius: 8px;
-  font-size: 0.61rem;
+  font-size: 0.72rem;
 }
 
 .lpb-side-capacity-grid b {
@@ -4027,14 +4053,14 @@ a.lpb-status-chip.link:hover {
 
 .lpb-dropped-list strong {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.83rem;
 }
 
 .lpb-dropped-list p,
 .lpb-side-empty {
   margin: 3px 0 0;
   color: var(--ink-muted);
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   line-height: 1.45;
 }
 
@@ -4060,17 +4086,17 @@ a.lpb-status-chip.link:hover {
   display: grid;
   place-items: center;
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.08);
+  background: rgba(31, 88, 85, 0.08);
   border-radius: 50%;
   font-family: "Space Mono", monospace;
-  font-size: 0.56rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .lpb-logic-list p {
   margin: 1px 0 0;
   color: var(--ink-soft);
-  font-size: 0.64rem;
+  font-size: 0.76rem;
   line-height: 1.45;
 }
 
@@ -4127,7 +4153,7 @@ a.lpb-status-chip.link:hover {
 .lpb-outcome-modal header p {
   margin: 5px 0 0;
   color: var(--ink-soft);
-  font-size: 0.75rem;
+  font-size: 0.89rem;
   line-height: 1.5;
 }
 
@@ -4162,7 +4188,7 @@ a.lpb-status-chip.link:hover {
 .lpb-edit-form label > span,
 .lpb-edit-form .lpb-edit-field > span,
 .lpb-note-field > span {
-  font-size: 0.75rem;
+  font-size: 0.89rem;
   font-weight: 800;
 }
 
@@ -4171,7 +4197,7 @@ a.lpb-status-chip.link:hover {
   margin-top: 3px;
   display: block;
   color: var(--ink-muted);
-  font-size: 0.63rem;
+  font-size: 0.74rem;
   font-weight: 500;
 }
 
@@ -4224,7 +4250,7 @@ a.lpb-status-chip.link:hover {
   display: flex;
   justify-content: space-between;
   color: var(--ink-muted);
-  font-size: 0.61rem;
+  font-size: 0.72rem;
 }
 
 .lpb-edit-impact {
@@ -4244,7 +4270,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-edit-impact > div > span {
   color: var(--ink-muted);
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-edit-impact > div b {
@@ -4263,7 +4289,7 @@ a.lpb-status-chip.link:hover {
   gap: 6px;
   color: #a45419;
   border-top: 1px solid var(--line-strong);
-  font-size: 0.64rem;
+  font-size: 0.76rem;
 }
 
 .lpb-edit-impact > p.fits {
@@ -4295,7 +4321,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 6px;
   color: var(--ink-muted);
-  font-size: 0.74rem;
+  font-size: 0.87rem;
   line-height: 1;
 }
 
@@ -4333,7 +4359,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 6px;
   color: var(--ink-soft);
-  font-size: 0.64rem;
+  font-size: 0.76rem;
   font-weight: 700;
 }
 
@@ -4382,16 +4408,16 @@ a.lpb-status-chip.link:hover {
   display: grid;
   place-items: center;
   color: var(--blue);
-  background: rgba(58, 92, 204, 0.08);
+  background: rgba(31, 88, 85, 0.08);
   border-radius: 8px;
   font-family: "Space Mono", monospace;
-  font-size: 0.59rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
 .lpb-objective-head small {
   color: var(--ink-muted);
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -4405,7 +4431,7 @@ a.lpb-status-chip.link:hover {
 .lpb-current-level {
   padding: 5px 8px;
   border-radius: 50px;
-  font-size: 0.59rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
@@ -4439,16 +4465,16 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-question-pair > div:first-child {
-  background: rgba(58, 92, 204, 0.035);
+  background: rgba(31, 88, 85, 0.035);
 }
 
 .lpb-question-pair > div:last-child {
-  background: rgba(124, 92, 252, 0.035);
+  background: rgba(37, 135, 124, 0.035);
 }
 
 .lpb-question-pair > div > span {
   color: var(--blue);
-  font-size: 0.6rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.045em;
   text-transform: uppercase;
@@ -4461,7 +4487,7 @@ a.lpb-status-chip.link:hover {
 .lpb-question-pair p {
   margin: 6px 0 0;
   color: var(--ink-soft);
-  font-size: 0.7rem;
+  font-size: 0.83rem;
   line-height: 1.5;
 }
 
@@ -4482,7 +4508,7 @@ a.lpb-status-chip.link:hover {
   color: var(--ink-muted);
   background: var(--surface-muted);
   border-radius: 10px;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-evidence-callout {
@@ -4505,14 +4531,14 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-evidence-callout span {
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .lpb-evidence-callout p {
   margin: 2px 0 0;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
 }
 
 .lpb-detail-modal > footer > span {
@@ -4521,7 +4547,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 6px;
   color: var(--ink-muted);
-  font-size: 0.65rem;
+  font-size: 0.77rem;
 }
 
 .lpb-outcome-modal {
@@ -4558,13 +4584,13 @@ a.lpb-status-chip.link:hover {
 
 .lpb-outcome-options button:hover {
   transform: translateY(-2px);
-  border-color: rgba(58, 92, 204, 0.32);
+  border-color: rgba(31, 88, 85, 0.32);
 }
 
 .lpb-outcome-options button.selected {
-  background: rgba(58, 92, 204, 0.05);
+  background: rgba(31, 88, 85, 0.05);
   border-color: var(--blue);
-  box-shadow: inset 0 0 0 1px rgba(58, 92, 204, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(31, 88, 85, 0.07);
 }
 
 .lpb-outcome-options svg {
@@ -4573,13 +4599,13 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-outcome-options strong {
-  font-size: 0.76rem;
+  font-size: 0.9rem;
 }
 
 .lpb-outcome-options span {
   margin-top: 3px;
   color: var(--ink-muted);
-  font-size: 0.64rem;
+  font-size: 0.76rem;
   line-height: 1.4;
 }
 
@@ -4598,13 +4624,13 @@ a.lpb-status-chip.link:hover {
   border: 1px solid var(--line-strong);
   border-radius: 11px;
   outline: none;
-  font-size: 0.75rem;
+  font-size: 0.89rem;
   line-height: 1.5;
 }
 
 .lpb-note-field textarea:focus {
   border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(58, 92, 204, 0.09);
+  box-shadow: 0 0 0 3px rgba(31, 88, 85, 0.09);
 }
 
 /* Allocation impact bar: one slot per class of the topic, so the outcome's
@@ -4627,7 +4653,7 @@ a.lpb-status-chip.link:hover {
 .lpb-alloc-impact-head b {
   padding: 4px 9px;
   border-radius: 999px;
-  font-size: .68rem;
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
@@ -4681,7 +4707,7 @@ a.lpb-status-chip.link:hover {
   align-items: center;
   gap: 5px;
   color: var(--ink-muted);
-  font-size: .65rem;
+  font-size: 0.77rem;
   font-weight: 700;
 }
 
@@ -4701,7 +4727,7 @@ a.lpb-status-chip.link:hover {
 .lpb-alloc-impact p {
   margin: 11px 0 0;
   color: var(--ink-soft);
-  font-size: .71rem;
+  font-size: 0.84rem;
   line-height: 1.5;
 }
 
@@ -4732,7 +4758,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-update-comparison span {
   color: var(--ink-muted);
-  font-size: 0.62rem;
+  font-size: 0.73rem;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -4745,7 +4771,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-update-comparison small {
   color: var(--blue);
-  font-size: 0.61rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
@@ -4764,7 +4790,7 @@ a.lpb-status-chip.link:hover {
   color: var(--ink-soft);
   background: #faf9f7;
   border-radius: 9px;
-  font-size: 0.7rem;
+  font-size: 0.83rem;
 }
 
 .lpb-update-list svg {
@@ -4949,7 +4975,7 @@ a.lpb-status-chip.link:hover {
   }
 
   .lpb-stepper button {
-    font-size: 0.61rem;
+    font-size: 0.72rem;
   }
 
   .lpb-stepper button > span {
@@ -5114,12 +5140,12 @@ a.lpb-status-chip.link:hover {
   .lpb-plan-board-minimal .lpb-class-number {
     min-width: 52px;
     padding-inline: 6px;
-    font-size: 0.55rem;
+    font-size: 0.72rem;
   }
 
   .lpb-plan-board-minimal .lpb-class-activity-badge {
     padding: 4px 6px;
-    font-size: 0.52rem;
+    font-size: 0.72rem;
   }
 
   .lpb-class-kind {
@@ -5188,4 +5214,1592 @@ a.lpb-status-chip.link:hover {
   .lpb-outcome-options button {
     min-height: 95px;
   }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Final plan view — professional layout pass
+   One masthead card carries identity, actions, headline numbers and
+   package progress; everything below it is a quiet document column.
+   ══════════════════════════════════════════════════════════════ */
+
+.lpb-plan-minimal {
+  max-width: 1020px;
+}
+
+/* ── Masthead ────────────────────────────────────────────────── */
+.lpb-plan-masthead {
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(28, 60, 57, 0.04);
+  overflow: hidden;
+}
+
+.lpb-masthead-top {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-plan-masthead .lpb-plan-student {
+  gap: 13px;
+  min-width: 0;
+}
+
+.lpb-plan-masthead .lpb-avatar {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+}
+
+.lpb-plan-masthead h1 {
+  margin: 0;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.028em;
+  line-height: 1.15;
+}
+
+/* Facts about the plan read as a labelled meta row, not a run-on sentence. */
+.lpb-identity-meta {
+  margin: 5px 0 0 !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 9px;
+  color: var(--ink-muted) !important;
+  font-size: 0.85rem !important;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.lpb-identity-meta > span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lpb-identity-meta > span + span::before {
+  content: "";
+  width: 3px;
+  height: 3px;
+  margin-right: 9px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.lpb-identity-meta > span.over {
+  color: var(--orange);
+  font-weight: 750;
+}
+
+/* Action group: one height, one radius, three clear weights. */
+.lpb-masthead-top .lpb-hero-actions {
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
+.lpb-masthead-top .lpb-button {
+  min-height: 36px;
+  padding: 8px 14px;
+  gap: 7px;
+  border-radius: 10px;
+  font-size: 0.89rem;
+  font-weight: 700;
+  box-shadow: none !important;
+}
+
+.lpb-masthead-top .lpb-button:hover:not(:disabled) {
+  transform: none;
+}
+
+.lpb-masthead-top .lpb-button-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(31, 88, 85, 0.24) !important;
+}
+
+/* ── Headline numbers ────────────────────────────────────────── */
+.lpb-plan-masthead .lpb-plan-stats {
+  margin: 0;
+  padding: 16px 4px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.lpb-plan-masthead .lpb-plan-stats > div {
+  padding: 0 20px;
+}
+
+.lpb-plan-masthead .lpb-plan-stats span {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.lpb-plan-masthead .lpb-plan-stats b {
+  margin: 6px 0 3px;
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.lpb-plan-masthead .lpb-plan-stats small {
+  font-size: 0.73rem;
+}
+
+/* ── Package progress ────────────────────────────────────────── */
+.lpb-plan-progress {
+  padding: 0 24px 16px;
+}
+
+.lpb-plan-progress-track {
+  height: 6px;
+  display: flex;
+  gap: 2px;
+  background: var(--surface-muted);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lpb-plan-progress-track > span {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lpb-plan-progress-track > span.taught {
+  background: var(--teal);
+}
+
+.lpb-plan-progress-track > span.scheduled {
+  background: rgba(31, 113, 105, 0.28);
+}
+
+.lpb-plan-progress-legend {
+  margin: 8px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.lpb-plan-progress-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lpb-plan-progress-legend > span::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--line-strong);
+}
+
+.lpb-plan-progress-legend > span.taught::before {
+  background: var(--teal);
+}
+
+.lpb-plan-progress-legend > span.scheduled::before {
+  background: rgba(31, 113, 105, 0.28);
+}
+
+/* ── Status chips ────────────────────────────────────────────── */
+.lpb-status-strip {
+  margin-bottom: 14px;
+  gap: 6px;
+}
+
+.lpb-status-chip {
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+a.lpb-status-chip.link {
+  font-size: 0.76rem;
+}
+
+/* ── What changed ────────────────────────────────────────────── */
+.lpb-plan-changes {
+  margin: 0 0 14px;
+  padding: 15px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  border-radius: 12px;
+}
+
+.lpb-plan-changes-head {
+  gap: 10px;
+}
+
+.lpb-plan-changes-head > svg {
+  color: var(--teal);
+}
+
+.lpb-plan-changes .lpb-kicker {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+}
+
+.lpb-plan-changes h2 {
+  margin: 2px 0 0;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 0.88rem;
+  letter-spacing: -0.02em;
+}
+
+.lpb-plan-changes ul {
+  margin: 11px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.lpb-plan-changes ul li {
+  padding-left: 16px;
+  position: relative;
+}
+
+.lpb-plan-changes ul li::before {
+  content: "";
+  position: absolute;
+  top: 0.52em;
+  left: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+/* ── Sequence board ──────────────────────────────────────────── */
+.lpb-plan-board-minimal {
+  border-radius: 16px !important;
+  box-shadow: 0 1px 2px rgba(28, 60, 57, 0.04) !important;
+}
+
+.lpb-plan-board-minimal .lpb-plan-board-head {
+  padding: 15px 18px;
+  align-items: center;
+  background: var(--surface);
+}
+
+.lpb-plan-board-minimal .lpb-plan-board-head h2 {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 800;
+}
+
+.lpb-board-meta {
+  color: var(--ink-muted) !important;
+  font-size: 0.81rem !important;
+}
+
+.lpb-plan-board-minimal .lpb-view-tabs {
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.lpb-plan-board-minimal .lpb-view-tabs button {
+  padding: 5px 11px;
+  color: var(--ink-muted);
+  border-radius: 7px;
+  font-weight: 700;
+  transition: color 0.14s ease, background 0.14s ease;
+}
+
+.lpb-plan-board-minimal .lpb-view-tabs button:hover {
+  color: var(--ink);
+}
+
+.lpb-plan-board-minimal .lpb-view-tabs button.active {
+  box-shadow: 0 1px 2px rgba(20, 30, 40, 0.08);
+}
+
+/* The list scrolls inside the card; a hairline scrollbar keeps the chrome
+   from competing with the rows. */
+.lpb-plan-board-minimal .lpb-class-list {
+  max-height: 620px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.lpb-plan-board-minimal .lpb-class-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lpb-plan-board-minimal .lpb-class-list::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border: 2px solid var(--surface);
+  border-radius: 999px;
+}
+
+.lpb-plan-board-minimal .lpb-class-summary {
+  min-height: 56px;
+  padding: 9px 16px;
+  gap: 12px;
+  transition: background 0.14s ease;
+}
+
+.lpb-plan-board-minimal .lpb-class-number {
+  min-width: 62px;
+  height: 26px;
+  border-radius: 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.lpb-plan-board-minimal .lpb-class-title strong {
+  font-size: 0.83rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+
+.lpb-plan-board-minimal .lpb-class-title small {
+  margin-top: 3px;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+/* The next class is the one row on this page that should catch the eye. */
+.lpb-plan-board-minimal .lpb-class-row.next {
+  background: rgba(31, 113, 105, 0.045);
+  box-shadow: inset 3px 0 0 var(--teal);
+}
+
+.lpb-plan-board-minimal .lpb-class-row.next .lpb-class-number {
+  box-shadow: none;
+}
+
+.lpb-plan-board-minimal .lpb-status-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.lpb-plan-board-minimal .lpb-status-badge.next {
+  color: white;
+  background: var(--teal);
+}
+
+.lpb-plan-board-minimal .lpb-class-activity-badge {
+  border-radius: 6px;
+  font-family: var(--font-sans, "DM Sans", sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.01em;
+}
+
+/* Teach-to-here is a demo shortcut, not part of the plan: it stays out of the
+   reading path until the row is actually hovered or focused. */
+.lpb-plan-board-minimal .lpb-class-fastforward {
+  right: 40px;
+  padding: 5px 10px;
+  color: var(--teal);
+  border-color: var(--line-strong);
+  border-radius: 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease;
+}
+
+.lpb-plan-board-minimal .lpb-class-row:hover .lpb-class-fastforward,
+.lpb-plan-board-minimal .lpb-class-fastforward:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.lpb-plan-board-minimal
+  .lpb-class-row:has(.lpb-class-fastforward)
+  .lpb-class-summary {
+  padding-right: 16px;
+}
+
+.lpb-plan-board-minimal
+  .lpb-class-row:hover:has(.lpb-class-fastforward)
+  .lpb-class-summary {
+  padding-right: 150px;
+}
+
+@media (max-width: 900px) {
+  .lpb-masthead-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .lpb-masthead-top .lpb-hero-actions {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .lpb-plan-masthead .lpb-plan-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 0;
+  }
+
+  .lpb-plan-masthead .lpb-plan-stats > div:nth-child(odd) {
+    border-left: 0;
+  }
+
+  .lpb-plan-board-minimal .lpb-class-fastforward {
+    display: none;
+  }
+
+  .lpb-plan-board-minimal
+    .lpb-class-row:hover:has(.lpb-class-fastforward)
+    .lpb-class-summary {
+    padding-right: 16px;
+  }
+}
+
+/* ── What changed: collapsed by default ──────────────────────────
+   The version log is reference material, not the thing the mentor
+   opens the page for. Kept as a one-line disclosure so the sequence
+   card stays above the fold. */
+.lpb-plan-changes {
+  margin: 0 0 14px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.lpb-plan-changes > summary {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  cursor: pointer;
+  transition: background 0.14s ease;
+}
+
+.lpb-plan-changes > summary::-webkit-details-marker {
+  display: none;
+}
+
+.lpb-plan-changes > summary:hover {
+  background: var(--surface-muted);
+}
+
+.lpb-plan-changes > summary b {
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+}
+
+.lpb-changes-count {
+  margin-left: auto;
+  padding: 3px 8px;
+  color: var(--ink-muted);
+  background: var(--surface-muted);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.lpb-changes-caret {
+  flex: 0 0 auto;
+  color: var(--ink-muted);
+  transition: transform 0.16s ease;
+}
+
+.lpb-plan-changes[open] > summary {
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-plan-changes[open] .lpb-changes-caret {
+  transform: rotate(180deg);
+}
+
+.lpb-plan-changes-body {
+  padding: 12px 16px 14px 39px;
+  animation: lpb-detail 0.18s ease both;
+}
+
+.lpb-plan-changes-body ul {
+  margin-top: 0;
+}
+
+.lpb-plan-changes-body .lpb-class-diff {
+  margin-bottom: 10px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Setup flow — professional layout pass
+   ══════════════════════════════════════════════════════════════ */
+
+.lpb-setup-heading h1 {
+  margin: 4px 0 6px;
+  letter-spacing: -0.038em;
+}
+
+.lpb-setup-heading .lpb-kicker {
+  font-size: 0.76rem;
+  letter-spacing: 0.11em;
+}
+
+/* ── Stepper ─────────────────────────────────────────────────────
+   The rail now carries progress: segments behind completed steps are
+   filled, so the eye reads how far the setup has come. */
+.lpb-stepper button::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 15px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: transparent;
+}
+
+.lpb-stepper button.complete::after {
+  background: var(--teal);
+}
+
+.lpb-stepper button:last-child::after {
+  display: none;
+}
+
+.lpb-stepper button > span {
+  position: relative;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.lpb-stepper button.active > span {
+  background: var(--blue);
+  box-shadow: 0 0 0 6px var(--paper), 0 0 0 8px rgba(31, 88, 85, 0.14);
+}
+
+.lpb-stepper button.complete > span {
+  color: white;
+  background: var(--teal);
+  border-color: transparent;
+}
+
+.lpb-stepper button {
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.lpb-stepper button.active {
+  font-weight: 750;
+}
+
+/* ── Setup card + section head ───────────────────────────────── */
+.lpb-setup-card {
+  padding: 22px 24px;
+  border-radius: 18px;
+  box-shadow: 0 1px 2px rgba(28, 60, 57, 0.04);
+}
+
+.lpb-section-head {
+  margin-bottom: 18px;
+  align-items: center;
+}
+
+.lpb-section-no {
+  top: 1px;
+  color: rgba(31, 88, 85, 0.32);
+  font-size: 1.2rem;
+}
+
+.lpb-section-head > div {
+  padding-left: 44px;
+}
+
+.lpb-section-head h2 {
+  font-size: 1.28rem;
+}
+
+.lpb-section-head p {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+.lpb-count-chip {
+  padding: 5px 11px;
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--font-sans, "DM Sans", sans-serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ── Student cards ───────────────────────────────────────────── */
+.lpb-student-grid {
+  gap: 12px;
+}
+
+.lpb-student-card {
+  min-height: 172px;
+  padding: 14px 15px;
+  border-radius: 14px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+/* The decorative ring competed with the copy at small card sizes. */
+.lpb-student-card::after {
+  display: none;
+}
+
+.lpb-student-card:hover {
+  transform: none;
+  border-color: var(--line-strong);
+  box-shadow: 0 4px 14px rgba(28, 60, 57, 0.07);
+}
+
+.lpb-student-card.selected {
+  background: rgba(31, 88, 85, 0.035);
+  border-color: var(--blue);
+  box-shadow: inset 0 0 0 1px var(--blue);
+}
+
+/* "Demo A" is an index label, not a status — it stays neutral so the
+   scenario eyebrow below it keeps the only accent on the card. */
+.lpb-scenario-tag {
+  margin-bottom: 10px;
+  padding: 3px 7px;
+  color: var(--ink-muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lpb-student-card .lpb-avatar {
+  width: 36px;
+  height: 36px;
+  box-shadow: none;
+}
+
+.lpb-selected-check {
+  width: 22px;
+  height: 22px;
+  background: var(--blue);
+}
+
+.lpb-student-card > strong {
+  margin-bottom: 6px;
+  font-size: 0.98rem;
+  letter-spacing: -0.022em;
+}
+
+.lpb-card-eyebrow {
+  margin-bottom: 4px;
+  color: var(--teal);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+.lpb-student-card > b {
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.lpb-student-card > p {
+  margin-top: 7px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+/* ── Selected profile strip ──────────────────────────────────────
+   Seven facts, seven columns. The old six-column track pushed
+   Placement onto a second row underneath Student. */
+.lpb-profile-strip {
+  margin-top: 14px;
+  padding: 14px 18px;
+  grid-template-columns: 1.35fr repeat(6, minmax(0, 1fr));
+  row-gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.lpb-profile-strip > div {
+  padding: 0 14px;
+  border-left: 1px solid var(--line);
+}
+
+.lpb-profile-strip span {
+  margin-bottom: 5px;
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+}
+
+.lpb-profile-strip strong {
+  font-size: 0.81rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* ── Footer action ───────────────────────────────────────────── */
+.lpb-setup-footer {
+  padding: 13px 24px;
+}
+
+.lpb-setup-footer .lpb-button {
+  min-height: 38px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  box-shadow: none !important;
+}
+
+.lpb-setup-footer .lpb-button:hover:not(:disabled) {
+  transform: none;
+}
+
+.lpb-setup-footer .lpb-button-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(31, 88, 85, 0.24) !important;
+}
+
+@media (max-width: 1120px) {
+  .lpb-profile-strip {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lpb-profile-strip > div:nth-child(4n + 1) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .lpb-profile-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lpb-profile-strip > div:nth-child(4n + 1) {
+    padding-left: 14px;
+    border-left: 1px solid var(--line);
+  }
+
+  .lpb-profile-strip > div:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+}
+
+/* ── Methodology tab ─────────────────────────────────────────────────────── */
+/* Explains the planning rules the engine actually runs. Reads like a short
+   reference sheet, so it stays denser and calmer than the plan views. */
+
+.lpb-methodology {
+  padding: 22px;
+  display: grid;
+  gap: 18px;
+  background: #fbfcfb;
+}
+
+.lpb-methodology-intro h3 {
+  margin: 6px 0 8px;
+  color: var(--ink);
+  font-size: 1.25rem;
+}
+
+.lpb-methodology-intro p {
+  margin: 0;
+  max-width: 74ch;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.lpb-methodology-pipeline {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lpb-methodology-pipeline article {
+  position: relative;
+  padding: 13px 14px;
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+
+.lpb-methodology-pipeline article > span {
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.lpb-methodology-pipeline strong {
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.lpb-methodology-pipeline p {
+  margin: 4px 0 0;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.lpb-methodology-arrow {
+  position: absolute;
+  top: 50%;
+  right: -9px;
+  transform: translateY(-50%);
+  color: var(--line-strong);
+}
+
+/* The arrow between steps only reads correctly inside a row, so hide it on the
+   last card of each row and at narrow widths where the grid wraps. */
+.lpb-methodology-pipeline article:nth-child(3n) .lpb-methodology-arrow {
+  display: none;
+}
+
+.lpb-methodology-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lpb-methodology-card {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-card > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-card > header svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.lpb-methodology-card > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.lpb-methodology-card > header span {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lpb-methodology-card ul,
+.lpb-methodology-card ol {
+  margin: 13px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 9px;
+}
+
+.lpb-methodology-card li {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.lpb-methodology-card li::marker {
+  color: var(--ink-muted);
+}
+
+.lpb-methodology-card b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lpb-methodology-ladder li::marker {
+  color: var(--teal);
+  font-weight: 800;
+}
+
+/* Numbers read off the plan currently on screen, so the rule is visible in
+   effect rather than only described. */
+.lpb-methodology-live {
+  margin-top: 3px;
+  padding: 9px 11px;
+  color: #1f5855 !important;
+  background: #eef6f3;
+  border: 1px solid #cfe4dc;
+  border-radius: 8px;
+  font-size: 0.84rem !important;
+  font-weight: 700;
+  list-style: none;
+}
+
+p.lpb-methodology-live {
+  margin: 11px 0 0;
+}
+
+.lpb-methodology-foot {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  background: var(--surface-warm);
+}
+
+.lpb-methodology-foot svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--yellow);
+}
+
+.lpb-methodology-foot p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 1100px) {
+  .lpb-methodology-pipeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .lpb-methodology-pipeline article:nth-child(3n) .lpb-methodology-arrow,
+  .lpb-methodology-arrow {
+    display: none;
+  }
+  .lpb-methodology-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .lpb-methodology-pipeline {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── "Why this" side panel ───────────────────────────────────────────────── */
+/* Docked to the right on every screen, toggled from the topbar. Deliberately
+   narrow and short-form: a structured read of the student on the first screen,
+   then one or two lines per rule naming this student's own topics, scores and
+   class counts. The long-form concept lives in the Methodology tab. */
+
+.lpb-why-panel {
+  position: fixed;
+  z-index: 70;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(420px, 100vw);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-left: 1px solid var(--line-strong);
+  box-shadow: -6px 0 24px rgba(28, 60, 57, 0.06);
+  /* Closed state slides out and stops taking pointer events, so the panel can
+     stay mounted and animate rather than popping in. */
+  transform: translateX(100%);
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform 0.22s ease, visibility 0.22s ease;
+}
+
+.lpb-why-panel.open {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.lpb-why-panel > header {
+  flex: 0 0 auto;
+  padding: 14px 14px 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-warm);
+}
+
+.lpb-why-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.lpb-why-avatar {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: var(--blue);
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.lpb-why-id strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+
+.lpb-why-id > div span {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+}
+
+.lpb-why-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 12px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+/* The structured student read: label, value, and what that value causes. */
+.lpb-why-facts {
+  display: grid;
+  gap: 1px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.lpb-why-facts > div {
+  padding: 11px 13px;
+  background: white;
+}
+
+.lpb-why-facts span {
+  display: block;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lpb-why-facts strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.lpb-why-facts small {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.lpb-why-notes {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.lpb-why-notes > .lpb-detail-label {
+  margin-bottom: 2px;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+
+.lpb-why-notes article {
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: white;
+}
+
+/* The rules that most explain the screen currently on show. */
+.lpb-why-notes article.key {
+  border-color: #b9ddd3;
+  background: #f5fbf9;
+}
+
+.lpb-why-notes article > span {
+  display: block;
+  color: var(--teal);
+  font-size: 0.79rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.lpb-why-notes article > p b,
+.lpb-why-facts small b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lpb-why-notes article > p {
+  margin: 5px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.lpb-why-empty {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.lpb-why-panel > footer {
+  flex: 0 0 auto;
+  padding: 11px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-warm);
+}
+
+.lpb-why-panel > footer button {
+  width: 100%;
+  padding: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--blue);
+  background: white;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lpb-why-panel > footer button:hover {
+  background: var(--surface-muted);
+}
+
+/* Pressed state for the topbar toggle that opens the panel. */
+.lpb-button-ghost.active {
+  color: var(--blue);
+  background: #e4f1ed;
+  border-color: #b9ddd3;
+}
+
+@media (max-width: 640px) {
+  .lpb-why-panel {
+    width: 100vw;
+  }
+}
+
+/* ── "Why this" note figures ─────────────────────────────────────────────── */
+/* Small diagrams under a note. Each one draws the numbers the rule branches on
+   — score against its thresholds, classes before and after, the class budget —
+   so the decision reads at a glance instead of being counted out of a
+   sentence. */
+
+.lpb-viz-classes,
+.lpb-viz-bar {
+  margin-top: 9px;
+}
+
+/* Extra room above: the score marker carries its value in a chip over the
+   track, which has to sit outside the bar to stay legible. */
+.lpb-viz-score {
+  margin-top: 26px;
+}
+
+/* Placement score against the 40% / 75% thresholds. */
+.lpb-viz-score-track {
+  position: relative;
+  height: 8px;
+  display: flex;
+}
+
+/* Rounded per zone rather than by clipping the track — the marker has to be
+   free to overflow it. */
+.lpb-viz-score-track .zone:first-child {
+  border-radius: 20px 0 0 20px;
+}
+
+.lpb-viz-score-track .zone:nth-child(3) {
+  border-radius: 0 20px 20px 0;
+}
+
+.lpb-viz-score-track .zone {
+  height: 100%;
+}
+
+.lpb-viz-score-track .zone.weak {
+  background: #f6d9d0;
+}
+
+.lpb-viz-score-track .zone.mid {
+  background: #e8e5de;
+}
+
+.lpb-viz-score-track .zone.strong {
+  background: #bfe6da;
+}
+
+.lpb-viz-score-track .marker {
+  position: absolute;
+  top: -3px;
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+  background: var(--ink);
+  transform: translateX(-50%);
+}
+
+.lpb-viz-score-track .marker b {
+  position: absolute;
+  top: -19px;
+  left: 50%;
+  padding: 1px 5px;
+  color: white;
+  background: var(--ink);
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.lpb-viz-score.weak .marker,
+.lpb-viz-score.weak .marker b {
+  background: var(--orange);
+}
+
+.lpb-viz-score.strong .marker,
+.lpb-viz-score.strong .marker b {
+  background: var(--teal);
+}
+
+/* The two thresholds are labelled where they sit, not in a legend. */
+.lpb-viz-score-scale {
+  position: relative;
+  height: 13px;
+  margin-top: 3px;
+}
+
+.lpb-viz-score-scale span {
+  position: absolute;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  transform: translateX(-50%);
+}
+
+/* One cell per class: kept, removed by a rule, or added by one. */
+.lpb-viz-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.lpb-viz-cells > span {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: var(--green);
+}
+
+.lpb-viz-cells > span.removed {
+  background: repeating-linear-gradient(
+    -45deg,
+    #e4e1da,
+    #e4e1da 2px,
+    #f3f1ec 2px,
+    #f3f1ec 4px
+  );
+}
+
+.lpb-viz-cells > span.added {
+  background: #fdeacd;
+  border: 1px solid var(--yellow);
+}
+
+.lpb-viz-cells > span.gap {
+  background: var(--coral);
+}
+
+.lpb-viz-cells > span.untested {
+  background: var(--surface-muted);
+  border: 1px solid var(--line-strong);
+}
+
+/* The minimum-class floor, marked on the cell it falls on. */
+.lpb-viz-cells > span.floor {
+  box-shadow: inset 0 0 0 2px var(--blue);
+}
+
+.lpb-viz-caption {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-muted);
+  font-size: 0.76rem;
+}
+
+.lpb-viz-caption b {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+/* Stacked class budget. */
+.lpb-viz-bar-track {
+  height: 12px;
+  display: flex;
+  gap: 2px;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface-muted);
+}
+
+.lpb-viz-bar-track .seg.high {
+  background: var(--teal);
+}
+
+.lpb-viz-bar-track .seg.medium {
+  background: var(--purple);
+}
+
+.lpb-viz-bar-track .seg.low {
+  background: #9fd4c8;
+}
+
+.lpb-viz-bar-track .seg.ops {
+  background: var(--orange);
+}
+
+.lpb-viz-bar-track .seg.spare {
+  background: #e4e1da;
+}
+
+.lpb-viz-legend {
+  margin-top: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.lpb-viz-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-soft);
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.lpb-viz-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--teal);
+}
+
+.lpb-viz-legend .medium i {
+  background: var(--purple);
+}
+
+.lpb-viz-legend .low i {
+  background: #9fd4c8;
+}
+
+.lpb-viz-legend .ops i {
+  background: var(--orange);
+}
+
+.lpb-viz-legend .spare i {
+  background: #e4e1da;
+}
+
+/* Prerequisite chain: what runs before what, drawn top to bottom. */
+.lpb-viz-chain {
+  margin-top: 10px;
+  display: grid;
+  gap: 16px;
+}
+
+.lpb-viz-chain .step {
+  position: relative;
+  padding: 8px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 9px;
+  background: white;
+}
+
+.lpb-viz-chain .step.prereq {
+  border-color: #b9ddd3;
+  background: #eef6f3;
+}
+
+.lpb-viz-chain .step.target {
+  border-style: dashed;
+}
+
+.lpb-viz-chain .step strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.lpb-viz-chain .step span {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.74rem;
+}
+
+/* Connector into the step below. */
+.lpb-viz-chain .step .arrow {
+  position: absolute;
+  left: 22px;
+  bottom: -14px;
+  width: 2px;
+  height: 12px;
+  background: var(--line-strong);
+}
+
+.lpb-viz-chain .step .arrow::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--line-strong);
+  border-bottom: 2px solid var(--line-strong);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* Class arithmetic as a receipt: label, scaled bar, figure. */
+.lpb-viz-calc {
+  margin-top: 10px;
+  display: grid;
+  gap: 5px;
+}
+
+.lpb-viz-calc .row {
+  display: grid;
+  grid-template-columns: 1fr 52px 34px;
+  align-items: center;
+  gap: 8px;
+}
+
+.lpb-viz-calc .label {
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+}
+
+.lpb-viz-calc .value {
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lpb-viz-calc .track {
+  height: 7px;
+  border-radius: 20px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.lpb-viz-calc .track i {
+  display: block;
+  height: 100%;
+  border-radius: 20px;
+  background: var(--green);
+}
+
+.lpb-viz-calc .row.base .track i {
+  background: #b6ddd3;
+}
+
+.lpb-viz-calc .row.cut .track i {
+  background: var(--orange);
+}
+
+.lpb-viz-calc .row.cut .value {
+  color: var(--orange);
+}
+
+.lpb-viz-calc .row.add .track i {
+  background: var(--purple);
+}
+
+/* Subtotal and package rows are the ones a teacher reads out loud. */
+.lpb-viz-calc .row.total .label,
+.lpb-viz-calc .row.cap .label {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lpb-viz-calc .row.total .track i {
+  background: var(--teal);
+}
+
+.lpb-viz-calc .row.cap {
+  margin-top: 2px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.lpb-viz-calc .row.cap .track i {
+  background: var(--ink-muted);
 }

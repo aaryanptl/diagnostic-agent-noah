@@ -14,24 +14,12 @@ const PROTOTYPE_STUDENT_IDS: Record<string, string> = {
   "student-d": "5a500001-2d5f-4b7a-8fb0-000000000004",
 };
 
-// Prototype curriculum IDs are intentionally separate from the source DB IDs.
-// The adapter preserves the prototype's curriculum and prerequisite logic while
-// satisfying the database foreign key with the matching Grade 5 Maths record.
-const DATABASE_TOPIC_IDS: Record<number, string> = {
-  313: "57",
-  314: "58",
-  315: "59",
-  316: "60",
-  317: "61",
-  319: "63",
-  320: "64",
-  321: "65",
-  582: "127",
-  589: "134",
-  585: "130",
-  404: "115",
-  403: "114",
-};
+// Curriculum topic IDs in app/learning-plan-builder/curriculum.generated.ts are
+// the live `topics.id` values, so no translation is needed to satisfy the
+// learning_plan_topics foreign key.
+function databaseTopicId(topicId: number): string {
+  return String(topicId);
+}
 
 const PRIORITY_VALUE = { high: 1, medium: 2, low: 3 } as const;
 const FOCUS_BY_ITEM_KIND: Record<PlanItem["kind"], "teach" | "review" | "assess"> = {
@@ -111,8 +99,7 @@ async function syncTopics(
   kind: Exclude<ModificationType, "initial"> | "initial",
 ) {
   for (const allocation of plan.allocations) {
-    const topicId = DATABASE_TOPIC_IDS[allocation.topicId];
-    if (!topicId) throw new Error(`No database topic mapping for ${allocation.topicName}`);
+    const topicId = databaseTopicId(allocation.topicId);
     await client.query(
       `INSERT INTO learning_plan_topics
          (plan_id, topic_id, topic_name, sequence, planned_classes,
@@ -145,8 +132,7 @@ async function syncTopics(
   }
 
   for (const dropped of plan.droppedTopics) {
-    const topicId = DATABASE_TOPIC_IDS[dropped.topicId];
-    if (!topicId) continue;
+    const topicId = databaseTopicId(dropped.topicId);
     await client.query(
       `UPDATE learning_plan_topics
        SET status = 'dropped', reason = $3, source = $4
@@ -297,16 +283,13 @@ export async function updatePrototypePlan(
 
     await syncTopics(client, planId, update.plan, update.kind);
     if (update.kind === "class" && update.taughtPrototypeTopicId) {
-      const topicId = DATABASE_TOPIC_IDS[update.taughtPrototypeTopicId];
-      if (topicId) {
-        await client.query(
-          `UPDATE learning_plan_topics
+      await client.query(
+        `UPDATE learning_plan_topics
            SET classes_done = LEAST(classes_done + 1, planned_classes),
                status = CASE WHEN status = 'planned' THEN 'in_progress' ELSE status END
            WHERE plan_id = $1 AND topic_id = $2`,
-          [planId, topicId],
-        );
-      }
+        [planId, databaseTopicId(update.taughtPrototypeTopicId)],
+      );
     }
     await client.query(
       `UPDATE learning_plans

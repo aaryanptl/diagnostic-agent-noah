@@ -1,6 +1,12 @@
 "use client"
 
 import {
+  MethodologyView,
+  methodologyContextForSetupStep,
+} from "./methodology"
+import type { MethodologyContext } from "./methodology"
+import { MethodologySidebar } from "./methodology-sidebar"
+import {
   buildClassActivities,
   groupActivitiesByObjective,
 } from "@/lib/learning-plan/activities"
@@ -37,6 +43,7 @@ import {
   Clock3,
   Edit3,
   Eye,
+  HelpCircle,
   FastForward,
   FileText,
   Gauge,
@@ -59,12 +66,8 @@ import {
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useMemo, useState } from "react"
-import {
-  curriculumTopics,
-  demoStudents,
-  questionGuidelines,
-  topicById,
-} from "./data"
+import { getTopicsForGrade } from "./curriculum"
+import { demoStudents, questionGuidelines, topicById } from "./data"
 import "./learning-plan-builder.css"
 
 const SETUP_STEPS = [
@@ -699,12 +702,23 @@ export default function LearningPlanBuilderPage({
   const router = useRouter()
   const [student, setStudent] = useState<DemoStudent>(DEFAULT_EVIDENCE_STUDENT)
   const [studentSelected, setStudentSelected] = useState(false)
+  /**
+   * The teaching sequence for this student's grade. Every grade KG-8 is
+   * available; the prototype's demo students are all Grade 5.
+   */
+  const gradeTopics = useMemo(
+    () => getTopicsForGrade(student.grade),
+    [student.grade]
+  )
   const [setupStep, setSetupStep] = useState(1)
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>(() =>
-    getSuggestedTopicIds(curriculumTopics, DEFAULT_EVIDENCE_STUDENT)
+    getSuggestedTopicIds(
+      getTopicsForGrade(DEFAULT_EVIDENCE_STUDENT.grade),
+      DEFAULT_EVIDENCE_STUDENT
+    )
   )
   const [topicOrder, setTopicOrder] = useState<number[]>(() =>
-    getDefaultTopicOrder(curriculumTopics)
+    getDefaultTopicOrder(getTopicsForGrade(DEFAULT_EVIDENCE_STUDENT.grade))
   )
   const [draggedTopicId, setDraggedTopicId] = useState<number | null>(null)
   const [scopeMode, setScopeMode] = useState<"manual" | "evidence">("manual")
@@ -716,8 +730,9 @@ export default function LearningPlanBuilderPage({
   const [manualOverrideActive, setManualOverrideActive] = useState(false)
   const [plan, setPlan] = useState<GeneratedPlan | null>(null)
   const [planTab, setPlanTab] = useState<
-    "classes" | "topics" | "structure" | "next2weeks" | "mentor"
+    "classes" | "topics" | "structure" | "next2weeks" | "mentor" | "methodology"
   >("classes")
+  const [methodologyOpen, setMethodologyOpen] = useState(false)
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
   const [detailTopicId, setDetailTopicId] = useState<number | null>(null)
   const [editingTopicId, setEditingTopicId] = useState<number | null>(null)
@@ -822,12 +837,12 @@ export default function LearningPlanBuilderPage({
   }
 
   const suggestedTopicIds = useMemo(
-    () => getSuggestedTopicIds(curriculumTopics, student),
-    [student]
+    () => getSuggestedTopicIds(gradeTopics, student),
+    [gradeTopics, student]
   )
   const highTopicIds = useMemo(
     () =>
-      curriculumTopics
+      gradeTopics
         .filter(
           (topic) =>
             topic.priority === "high" &&
@@ -836,7 +851,7 @@ export default function LearningPlanBuilderPage({
             )
         )
         .map((topic) => topic.id),
-    [student]
+    [gradeTopics, student]
   )
   const suggestedSet = useMemo(
     () => new Set(suggestedTopicIds),
@@ -847,8 +862,8 @@ export default function LearningPlanBuilderPage({
     [selectedTopicIds]
   )
   const displayTopics = useMemo(
-    () => sortTopicsForDisplay(curriculumTopics, student, topicOrder),
-    [student, topicOrder]
+    () => sortTopicsForDisplay(gradeTopics, student, topicOrder),
+    [gradeTopics, student, topicOrder]
   )
   // Rows are numbered by their place in the teaching sequence, not by
   // curriculum sequence, so "Requires #03" points at the row above it.
@@ -859,8 +874,8 @@ export default function LearningPlanBuilderPage({
   const positionLabel = (topicId: number) =>
     String(displayPositionById.get(topicId) ?? 0).padStart(2, "0")
   const aiSuggestion = useMemo(
-    () => getAiAssistedTopicSuggestion(curriculumTopics, student),
-    [student]
+    () => getAiAssistedTopicSuggestion(gradeTopics, student),
+    [gradeTopics, student]
   )
   const aiRecommendationById = useMemo(
     () =>
@@ -883,14 +898,21 @@ export default function LearningPlanBuilderPage({
   const reviewPlan = useMemo(
     () =>
       buildLearningPlan({
-        topics: curriculumTopics,
+        topics: gradeTopics,
         student,
         selectedTopicIds,
         topicOrder,
         manualAdjustments,
         version: plan?.version ?? 1,
       }),
-    [manualAdjustments, plan?.version, selectedTopicIds, student, topicOrder]
+    [
+      gradeTopics,
+      manualAdjustments,
+      plan?.version,
+      selectedTopicIds,
+      student,
+      topicOrder,
+    ]
   )
   const reviewAllocationById = useMemo(
     () =>
@@ -1130,8 +1152,9 @@ export default function LearningPlanBuilderPage({
   const chooseStudent = (nextStudent: DemoStudent) => {
     setStudent(nextStudent)
     setStudentSelected(true)
-    setSelectedTopicIds(getSuggestedTopicIds(curriculumTopics, nextStudent))
-    setTopicOrder(getDefaultTopicOrder(curriculumTopics))
+    const nextTopics = getTopicsForGrade(nextStudent.grade)
+    setSelectedTopicIds(getSuggestedTopicIds(nextTopics, nextStudent))
+    setTopicOrder(getDefaultTopicOrder(nextTopics))
     setMentorTopicId(null)
     setScopeMode("manual")
     setManualAdjustments({})
@@ -1266,7 +1289,7 @@ export default function LearningPlanBuilderPage({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         student,
-        topics: curriculumTopics,
+        topics: gradeTopics,
       }),
     })
       .then((res) => res.json())
@@ -1289,7 +1312,7 @@ export default function LearningPlanBuilderPage({
           setManualAdjustments(newAdjustments)
         }
         setSelectedTopicIds(aiSuggestion.selectedTopicIds)
-        setTopicOrder(getDefaultTopicOrder(curriculumTopics))
+        setTopicOrder(getDefaultTopicOrder(gradeTopics))
       })
       .catch((err) => console.error("AI Plan error:", err))
       .finally(() => setAiLoading(false))
@@ -1409,7 +1432,7 @@ export default function LearningPlanBuilderPage({
 
   const buildPlan = async () => {
     const basePlan = buildLearningPlan({
-      topics: curriculumTopics,
+      topics: gradeTopics,
       student,
       selectedTopicIds,
       topicOrder,
@@ -1512,7 +1535,7 @@ export default function LearningPlanBuilderPage({
     setManualAdjustments(nextAdjustments)
     setManualOverrideActive(true)
     const nextBasePlan = buildLearningPlan({
-      topics: curriculumTopics,
+      topics: gradeTopics,
       student,
       selectedTopicIds,
       topicOrder,
@@ -1593,7 +1616,7 @@ export default function LearningPlanBuilderPage({
       },
     }
     const nextBasePlan = buildLearningPlan({
-      topics: curriculumTopics,
+      topics: gradeTopics,
       student,
       selectedTopicIds,
       topicOrder,
@@ -1664,7 +1687,7 @@ export default function LearningPlanBuilderPage({
     if (advanced <= 0) return
 
     const rebuilt = buildLearningPlan({
-      topics: curriculumTopics,
+      topics: gradeTopics,
       student,
       selectedTopicIds,
       topicOrder,
@@ -1740,8 +1763,19 @@ export default function LearningPlanBuilderPage({
     setStudentSelected(false)
   }
 
+  // Which methodology rules explain the screen currently on show. The overlay
+  // opens on these, so the reference is useful mid-presentation rather than
+  // being a wall of rules to scroll.
+  const methodologyContext: MethodologyContext = plan
+    ? planTab === "methodology"
+      ? "topics"
+      : planTab
+    : buildStage
+      ? "building"
+      : methodologyContextForSetupStep(setupStep)
+
   return (
-    <div className="lpb">
+    <div className={`lpb${methodologyOpen ? " why-open" : ""}`}>
       <link
         href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Space+Mono:wght@400;700&display=swap"
         rel="stylesheet"
@@ -1775,6 +1809,15 @@ export default function LearningPlanBuilderPage({
               Back to setup
             </button>
           ) : null}
+          <button
+            type="button"
+            className={`lpb-button lpb-button-ghost${methodologyOpen ? " active" : ""}`}
+            onClick={() => setMethodologyOpen((current) => !current)}
+            aria-pressed={methodologyOpen}
+          >
+            <HelpCircle size={15} />
+            Why this
+          </button>
           <button
             type="button"
             className="lpb-button lpb-button-ghost"
@@ -1959,7 +2002,9 @@ export default function LearningPlanBuilderPage({
                   </div>
                   <div>
                     <span>Package</span>
-                    <strong>{student.packageLabel ?? "—"}</strong>
+                    <strong>
+                      {student.packageLabel?.split(" · ")[0] ?? "—"}
+                    </strong>
                   </div>
                   <div>
                     <span>Classes remaining</span>
@@ -2216,7 +2261,7 @@ export default function LearningPlanBuilderPage({
                         <h3>Start with:</h3>
                         <select
                           className="lpb-parent-select"
-                          value={student.parentRequestedTopicId ?? curriculumTopics[0]?.id}
+                          value={student.parentRequestedTopicId ?? gradeTopics[0]?.id}
                           onChange={(e) => {
                             const newTopicId = Number(e.target.value)
                             const updatedStudent = {
@@ -2224,14 +2269,14 @@ export default function LearningPlanBuilderPage({
                               parentRequestedTopicId: newTopicId,
                             }
                             setStudent(updatedStudent)
-                            const newSuggested = getSuggestedTopicIds(curriculumTopics, updatedStudent)
+                            const newSuggested = getSuggestedTopicIds(gradeTopics, updatedStudent)
                             setSelectedTopicIds(newSuggested)
-                            const newTopicOrder = getDefaultTopicOrder(curriculumTopics)
+                            const newTopicOrder = getDefaultTopicOrder(gradeTopics)
                             setTopicOrder(newTopicOrder)
                             if (plan !== null) {
                               const currentPlan = plan as GeneratedPlan
                               const nextBasePlan = buildLearningPlan({
-                                topics: curriculumTopics,
+                                topics: gradeTopics,
                                 student: updatedStudent,
                                 selectedTopicIds: newSuggested,
                                 topicOrder: newTopicOrder,
@@ -2253,7 +2298,7 @@ export default function LearningPlanBuilderPage({
                             }
                           }}
                         >
-                          {curriculumTopics.map((topic) => (
+                          {gradeTopics.map((topic) => (
                             <option key={topic.id} value={topic.id}>
                               Topic {topic.sequence}: {topic.name} ({topic.priority} priority, {topic.idealClasses} classes)
                             </option>
@@ -2345,7 +2390,7 @@ export default function LearningPlanBuilderPage({
                         setScopeMode("manual")
                         setManualOverrideActive(true)
                         setSelectedTopicIds(
-                          curriculumTopics
+                          gradeTopics
                             .filter(
                               (topic) =>
                                 !student.completedTopics.some(
@@ -2423,7 +2468,7 @@ export default function LearningPlanBuilderPage({
                         .filter((t): t is CurriculumTopic => Boolean(t))
                         .filter((t) => !student.completedTopics.some((c) => c.topicId === t.id))
 
-                      const dependentTopics = curriculumTopics.filter(
+                      const dependentTopics = gradeTopics.filter(
                         (t) => selectedSet.has(t.id) && (t.prerequisiteIds || []).includes(topic.id)
                       )
 
@@ -2846,18 +2891,26 @@ export default function LearningPlanBuilderPage({
         </main>
       ) : (
         <main className="lpb-plan-shell lpb-plan-minimal">
-          <section className="lpb-plan-hero lpb-plan-hero-minimal">
+          <section className="lpb-plan-masthead">
+            <div className="lpb-masthead-top">
             <div className="lpb-plan-student">
               <span className="lpb-avatar">{student.initials}</span>
               <div>
                 <h1>{student.name}</h1>
-                <p>
-                  Grade {student.grade} · v{plan.version} ·{" "}
-                  {plan.allocations.length} topics · {plan.capacity.teaching}/
-                  {plan.capacity.available} classes
-                  {plan.capacity.difference > 0
-                    ? ` · ${plan.capacity.difference} over`
-                    : ""}
+                <p className="lpb-identity-meta">
+                  <span>Grade {student.grade}</span>
+                  <span>Plan v{plan.version}</span>
+                  <span>
+                    {plural(plan.allocations.length, "topic", "topics")}
+                  </span>
+                  <span>
+                    {plan.capacity.teaching}/{plan.capacity.available} classes
+                  </span>
+                  {plan.capacity.difference > 0 ? (
+                    <span className="over">
+                      {plan.capacity.difference} over capacity
+                    </span>
+                  ) : null}
                 </p>
               </div>
             </div>
@@ -2892,10 +2945,10 @@ export default function LearningPlanBuilderPage({
                 Record outcome
               </button>
             </div>
-          </section>
+            </div>
 
           {planStats ? (
-            <section className="lpb-plan-stats" aria-label="Plan summary">
+            <div className="lpb-plan-stats" aria-label="Plan summary">
               <div>
                 <span>Total classes</span>
                 <b>{planStats.totalClasses}</b>
@@ -2926,19 +2979,56 @@ export default function LearningPlanBuilderPage({
                   of {planStats.availableClasses} in the package
                 </small>
               </div>
-            </section>
+            </div>
           ) : null}
+
+          {planStats && planStats.availableClasses > 0 ? (
+            <div className="lpb-plan-progress">
+              <div
+                className="lpb-plan-progress-track"
+                role="img"
+                aria-label={`${planStats.completed} of ${planStats.totalClasses} scheduled classes taught, ${planStats.availableClasses} in the package`}
+              >
+                <span
+                  className="taught"
+                  style={{
+                    width: `${(planStats.completed / planStats.availableClasses) * 100}%`,
+                  }}
+                />
+                <span
+                  className="scheduled"
+                  style={{
+                    width: `${(Math.max(planStats.totalClasses - planStats.completed, 0) / planStats.availableClasses) * 100}%`,
+                  }}
+                />
+              </div>
+              <p className="lpb-plan-progress-legend">
+                <span className="taught">
+                  {planStats.completed} taught
+                </span>
+                <span className="scheduled">
+                  {Math.max(planStats.totalClasses - planStats.completed, 0)}{" "}
+                  scheduled
+                </span>
+                {planStats.availableClasses - planStats.totalClasses > 0 ? (
+                  <span className="free">
+                    {planStats.availableClasses - planStats.totalClasses} unused
+                  </span>
+                ) : null}
+              </p>
+            </div>
+          ) : null}
+          </section>
 
           {(contentGenerating ||
             persistenceState !== "idle" ||
             plan.warnings.length > 0 ||
-            plan.changesFromPrevious.length > 0 ||
             manualOverrideActive) && (
             <div className="lpb-status-strip">
               {persistenceState === "saving" ? (
                 <span className="lpb-status-chip generating">
                   <Save size={13} />
-                  Saving plan changesâ€¦
+                  Saving plan changes…
                 </span>
               ) : null}
               {persistenceState === "saved" ? (
@@ -2980,11 +3070,6 @@ export default function LearningPlanBuilderPage({
                   {warning.title}
                 </button>
               ))}
-              {plan.changesFromPrevious.length > 0 ? (
-                <span className="lpb-status-chip muted">
-                  Updated: {plan.changesFromPrevious[0]}
-                </span>
-              ) : null}
               {manualOverrideActive ? (
                 <span className="lpb-status-chip manual">
                   <LockKeyhole size={13} />
@@ -2995,14 +3080,17 @@ export default function LearningPlanBuilderPage({
           )}
 
           {plan.changesFromPrevious.length > 0 ? (
-            <section className="lpb-plan-changes" aria-label="Changes from previous plan">
-              <div className="lpb-plan-changes-head">
-                <Clock3 size={16} />
-                <div>
-                  <span className="lpb-kicker">Plan version {plan.version}</span>
-                  <h2>What changed</h2>
-                </div>
-              </div>
+            <details className="lpb-plan-changes">
+              <summary className="lpb-plan-changes-head">
+                <Clock3 size={15} />
+                <span className="lpb-kicker">Plan v{plan.version}</span>
+                <b>What changed</b>
+                <span className="lpb-changes-count">
+                  {plural(plan.changesFromPrevious.length, "update", "updates")}
+                </span>
+                <ChevronDown size={15} className="lpb-changes-caret" />
+              </summary>
+              <div className="lpb-plan-changes-body">
               {classDiff &&
               (classDiff.addedCount > 0 ||
                 classDiff.removed.length > 0 ||
@@ -3064,7 +3152,8 @@ export default function LearningPlanBuilderPage({
                   <li key={change}>{change}</li>
                 ))}
               </ul>
-            </section>
+              </div>
+            </details>
           ) : null}
 
           <div className="lpb-plan-grid lpb-plan-grid-minimal">
@@ -3118,6 +3207,13 @@ export default function LearningPlanBuilderPage({
                       onClick={() => setPlanTab("mentor")}
                     >
                       Mentor view
+                    </button>
+                    <button
+                      type="button"
+                      className={planTab === "methodology" ? "active" : ""}
+                      onClick={() => setPlanTab("methodology")}
+                    >
+                      Methodology
                     </button>
                   </div>
                 </header>
@@ -3383,7 +3479,7 @@ export default function LearningPlanBuilderPage({
                       )
                     })()}
                   </div>
-                ) : (
+                ) : planTab === "mentor" ? (
                   <div className="lpb-mentor-view">
                     <section className="lpb-mentor-snapshot">
                       <div>
@@ -3595,6 +3691,8 @@ export default function LearningPlanBuilderPage({
                       </div>
                     </section>
                   </div>
+                ) : (
+                  <MethodologyView plan={plan} student={student} />
                 )}
               </section>
 
@@ -3624,6 +3722,27 @@ export default function LearningPlanBuilderPage({
           </div>
         </main>
       )}
+
+      <MethodologySidebar
+        open={methodologyOpen}
+        onClose={() => setMethodologyOpen(false)}
+        context={methodologyContext}
+        student={student}
+        topics={gradeTopics}
+        // Before the plan is built, `reviewPlan` holds the same allocations and
+        // capacity the review screen is showing, so the panel can explain the
+        // arithmetic on screen rather than waiting for a build.
+        plan={plan ?? reviewPlan}
+        selectedTopicIds={selectedTopicIds}
+        onOpenFullMethodology={
+          plan
+            ? () => {
+                setPlanTab("methodology")
+                setMethodologyOpen(false)
+              }
+            : undefined
+        }
+      />
 
       {activeEditAllocation && editDraft ? (
         <div

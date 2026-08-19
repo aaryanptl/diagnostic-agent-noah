@@ -1,6 +1,18 @@
 # Learning Plan Builder Summary
 
-The Learning Plan Builder creates and continuously updates a class-by-class Grade 5 Maths plan for an individual student.
+The Learning Plan Builder creates and continuously updates a class-by-class Maths plan for an individual student. The demo students are all Grade 5, but the curriculum covers Kindergarten through Grade 8.
+
+### Where the curriculum comes from
+
+`curriculum.generated.ts` holds the teaching sequence for every grade and is built from `files/Maths Teaching Sequence All Grades.xlsx`. Do not edit it by hand — change the workbook and regenerate:
+
+```
+npx tsx --env-file=.env.local scripts/build-curriculum-from-workbook.ts
+```
+
+Topic IDs are the live `topics.id` values from the curriculum tables, so a topic missing from the database fails the build rather than getting an invented ID.
+
+The workbook supplies topic order, prerequisites, subtopics, and learning objectives. It does **not** carry class counts, activity counts, priority, or the easy/practice split. Grade 5 keeps the hand-tuned values that were signed off earlier; every other grade uses heuristics calibrated against those Grade 5 numbers (see the generator for the rules). Treat KG–4 and 6–8 class counts as defaults to be reviewed, not agreed figures.
 
 ### Inputs
 
@@ -22,6 +34,11 @@ The Learning Plan Builder creates and continuously updates a class-by-class Grad
 4. Review capacity, structural classes and topic allocations.
 5. Build the class-by-class learning plan (AI writes mentor teaching guides).
 
+The rules below are surfaced in the UI two ways, and both need updating when `lib/learning-plan/engine.ts` changes:
+
+- **“Why this” panel** (`methodology-sidebar.tsx`) — a right-hand panel toggled from the topbar on every screen. One or two lines per rule, computed from the student's own package, placement, mastery and capacity numbers: which rule fired here and what it did. Its notes are keyed by `MethodologyContext`, so a new screen needs a new context and a `buildNotes` case.
+- **Methodology tab** (`methodology.tsx`) — the long-form concept on the plan board, for reading rather than presenting.
+
 ### Planning rules
 
 - High-priority topics are always included and cannot be unselected.
@@ -38,6 +55,8 @@ The Learning Plan Builder creates and continuously updates a class-by-class Grad
 **Structural classes**
 
 The full-year workbook package is 66 teaching + 13 structural = 79 classes, where the structural 13 is 5 checkpoints + 5 RDP + 3 PTM.
+
+The Grade 5 ideal class counts add up to exactly those 66 teaching classes. That is deliberate: an untouched full-year plan runs every topic at its ideal length, keeps the full structural reserve, and lands on 79 with nothing compressed. Every class the plan then saves — a placement score of 75% or more shortening a topic to its minimum, a completed topic dropping out — shows up on the capacity card as real headroom under the package instead of being swallowed by an overage that was baked into the curriculum. `scripts/build-curriculum-from-workbook.ts` throws if the Grade 5 totals drift off 66, and `tests/learning-plan-capacity.test.ts` (`npm test`) covers the invariant end to end.
 
 - **Checkpoints** produce the mastery evidence every later rule reads, so they are protected the longest.
 - **RDP (revision, doubts & practice)** is the optional part of the structure and is shed first when the plan is tight.
