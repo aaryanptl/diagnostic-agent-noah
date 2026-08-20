@@ -134,10 +134,33 @@ export interface PlanTopicAllocation {
   practiceActivities: number
   easyPercent: number
   practicePercent: number
+  /** Ordered for teaching: whatever the student is weakest on comes first. */
   learningObjectives: LearningObjective[]
+  /**
+   * Per-objective standing, in the same order as `learningObjectives`. Empty
+   * when no objective in the topic has been measured.
+   */
+  objectiveFocus?: ObjectiveFocus[]
   reasons: string[]
   isCompressedRefresher: boolean
   manuallyEdited: boolean
+}
+
+/**
+ * Where one learning objective stands for this student, and therefore how much
+ * of the topic's class time it should get.
+ *
+ * This is the join between the mastery loop and the planner: the loop measures
+ * objectives, and the planner teaches the weak ones first and gives them the
+ * reinforcement classes.
+ */
+export type ObjectiveNeed = "needs-teaching" | "improving" | "secure" | "unmeasured"
+
+export interface ObjectiveFocus {
+  objectiveId: string
+  need: ObjectiveNeed
+  /** One line naming the evidence that put it in this state. */
+  reason: string
 }
 
 /** One practice/question slot assigned to a class. */
@@ -236,6 +259,14 @@ export interface GeneratedPlan {
 export interface QuestionGuideline {
   topicId: number
   learningObjectiveId: string
-  starter: string
-  master: string
+  /**
+   * Distinct prompts for this objective, easiest first.
+   *
+   * A bank rather than a single prompt: a class can carry several Starter slots
+   * on one objective, and serving the same question three times told the
+   * student nothing the first one had not. `buildClassActivities` walks the
+   * bank so every slot in a class is a different question.
+   */
+  starters: string[]
+  masters: string[]
 }

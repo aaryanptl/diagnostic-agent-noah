@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Journey — Fraction Arithmetic · Mastery Path</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#14213d;
+    --ink:#1e2a44;
+    --slate:#5f6e88;
+    --mute:#98a4ba;
+    --blue:#3556c9;
+    --blue-soft:#7c9bf5;
+    --blue-tint:#eef2fd;
+    --grid:#e9edf7;
+    --line:#dfe5f1;
+    --line-2:#edf1f8;
+    --bg:#fbfcff;
+    --green:#2f9e6e;
+    --green-bg:#eaf7f0;
+    --amber:#d0912d;
+    --amber-bg:#fdf5e6;
+    --red:#d4605c;
+    --red-bg:#fdeeed;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:auto;min-height:100%}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  /* ================= shell ================= */
+  .stage{
+    min-height:100vh;display:flex;flex-direction:column;
+    max-width:1500px;margin:0 auto;padding:18px 44px 14px;
+  }
+
+  /* ---------------- identity strip ---------------- */
+  .ident{
+    display:flex;align-items:center;gap:26px;padding:10px 0 12px;
+    border-bottom:2px solid var(--navy);
+    position:sticky;top:0;z-index:25;background:var(--bg);
+  }
+  .who{display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .avatar{
+    width:38px;height:38px;border-radius:50%;background:var(--navy);color:#fff;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Source Serif 4',serif;font-weight:700;font-size:15px;
+  }
+  .who h1{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;line-height:1.15}
+  .who .meta{font-size:11.5px;color:var(--slate);margin-top:1px}
+
+  .scen{display:flex;align-items:center;gap:10px;flex-shrink:0;position:relative}
+  .scen-l{font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--mute)}
+  .scen-btn{
+    display:flex;align-items:center;gap:10px;min-width:232px;
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:650;color:var(--navy);text-align:left;
+    background:#fff;border:1.5px solid var(--line);border-radius:9px;
+    padding:8px 12px;cursor:pointer;transition:all .18s ease;
+  }
+  .scen-btn:hover{border-color:var(--blue-soft)}
+  .scen-btn.open{border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-tint)}
+  .scen-btn svg{width:13px;height:13px;margin-left:auto;flex-shrink:0;color:var(--mute);
+                transition:transform .25s ease,color .2s ease}
+  .scen-btn.open svg{transform:rotate(180deg);color:var(--blue)}
+  .scen-menu{
+    position:absolute;top:calc(100% + 7px);left:74px;min-width:336px;z-index:30;padding:6px;
+    background:#fff;border:1.5px solid var(--line);border-radius:11px;
+    box-shadow:0 1px 2px rgba(20,33,61,.04),0 24px 46px -22px rgba(20,33,61,.42);
+    opacity:0;transform:translateY(-6px);pointer-events:none;
+    transition:opacity .2s ease,transform .2s ease;
+  }
+  .scen-menu.on{opacity:1;transform:none;pointer-events:auto}
+  .scen-opt{
+    display:block;width:100%;text-align:left;border:none;background:none;
+    padding:9px 11px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .scen-opt:hover{background:#f4f7fe}
+  .scen-opt.on{background:var(--blue-tint)}
+  .scen-opt .n{display:block;font-size:13px;font-weight:650;color:var(--ink);margin-bottom:2px}
+  .scen-opt.on .n{color:var(--blue)}
+  .scen-opt .d{display:block;font-size:11.5px;color:var(--mute);line-height:1.45}
+
+  .badges{display:flex;align-items:center;gap:7px;margin-left:auto;flex-shrink:0}
+  .badge-chip{
+    font-size:11px;font-weight:600;padding:5px 12px;
+    border:1.5px solid var(--line);border-radius:999px;
+    color:#c1cadb;background:#fff;transition:all .4s ease;
+  }
+  .badge-chip.earned{border-color:var(--blue);color:var(--blue);background:var(--blue-tint)}
+  .badge-chip.master.earned{background:var(--navy);border-color:var(--navy);color:#fff}
+
+
+  /* ---------------- 1 · the sentence ---------------- */
+  .hero{padding:20px 0}
+  .eyebrow{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+  .rule-pill{font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;border:1.5px solid;
+             flex-shrink:0;cursor:help;font-family:'Inter',sans-serif;transition:all .18s ease}
+  .rule-pill:hover{filter:brightness(.92)}
+  .eb-l{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);
+        white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .headline{font-family:'Source Serif 4',serif;font-size:32px;font-weight:700;line-height:1.16;color:var(--navy)}
+  .lede{font-size:15px;line-height:1.62;color:#4b5a76;margin-top:11px;max-width:104ch}
+  .lede b{color:var(--ink);font-weight:650}
+  .fade-swap{animation:fadeSwap .38s ease both}
+  @keyframes fadeSwap{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+  /* ---------------- 2 · left = the information, right = the graph ---------------- */
+  .split{display:flex;gap:26px;align-items:flex-start}
+  .left-col{flex:1.1;display:flex;flex-direction:column;gap:15px;min-width:0}
+  .right-col{
+    flex:1;display:flex;flex-direction:column;min-width:0;
+    position:sticky;top:84px;align-self:flex-start;
+  }
+  .right-head h2{font-family:'Source Serif 4',serif;font-size:18px;font-weight:700;line-height:1.2}
+  .right-head h2 em{color:var(--blue);font-style:italic}
+  .chart-wrap{height:min(56vh,520px);min-height:340px;position:relative}
+  svg#chart{width:100%;height:100%;display:block}
+  .axis-lbl{font-family:'Inter',sans-serif;font-size:11px;fill:var(--mute)}
+  .score-tag{font-family:var(--mono);font-weight:700;font-size:14px;fill:var(--navy)}
+  @keyframes pulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.1;transform:scale(1.6)}}
+  .pulse-ring{transform-origin:center;transform-box:fill-box;animation:pulse 1.9s ease-in-out infinite}
+  .jdot{transition:opacity .35s ease}
+  .legend{display:flex;gap:18px;padding:9px 0 0}
+  .lg{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--slate)}
+  .lg i{width:10px;height:10px;border-radius:50%;display:block;flex-shrink:0}
+  .lg i.reg{background:#fff;border:2.5px solid var(--navy)}
+  .lg i.chk{background:var(--blue);box-shadow:0 0 0 2px #fff,0 0 0 3.5px var(--blue)}
+
+  /* ---------------- 3 · the evidence ---------------- */
+  .panel{
+    min-width:0;background:#fff;border:1.5px solid var(--line);border-radius:14px;
+    padding:14px 20px 16px;display:flex;flex-direction:column;
+    box-shadow:0 1px 2px rgba(20,33,61,.03),0 16px 38px -30px rgba(20,33,61,.4);
+  }
+  .p-head{display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid var(--line-2)}
+  .p-sum{font-size:12px;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .p-sum b{color:var(--ink);font-weight:650}
+  .p-sum .good{color:var(--green);font-weight:650}
+  .p-sum .warn{color:var(--amber);font-weight:650}
+  .p-sum .bad {color:var(--red);font-weight:650}
+  .p-body{display:flex;flex-direction:column;padding-top:12px}
+  .p-body::-webkit-scrollbar{width:6px}
+  .p-body::-webkit-scrollbar-thumb{background:#dbe3f5;border-radius:3px}
+  .p-body::-webkit-scrollbar-track{background:transparent}
+  .d-body::-webkit-scrollbar{width:7px}
+  .d-body::-webkit-scrollbar-thumb{background:#dbe3f5;border-radius:4px}
+  .d-body::-webkit-scrollbar-track{background:transparent}
+
+  .layer-chip{
+    font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    padding:3px 8px;border-radius:5px;background:var(--navy);color:#fff;flex-shrink:0;white-space:nowrap;
+  }
+  .layer-chip.mid{background:var(--blue)}
+  .layer-chip.tst{background:#0f766e}
+
+  /* -- mastery panel -- */
+  .ts-row{display:flex;align-items:flex-end;gap:18px;padding-bottom:2px}
+  .ts-score .l{font-size:10.5px;color:var(--mute);display:block;margin-bottom:4px;
+               letter-spacing:.09em;text-transform:uppercase;font-weight:700}
+  .ts-score .v{font-size:40px;font-weight:700;line-height:.9;font-variant-numeric:tabular-nums;
+               display:flex;align-items:baseline;gap:9px}
+  .ts-score .v .delta{font-size:13px;font-weight:700}
+  .delta.up{color:var(--green)} .delta.down{color:var(--red)} .delta.flat{color:#c7cfdd}
+  .ts-cert{margin-left:auto;display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .pips{display:flex;gap:4px}
+  .pip{
+    width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line);background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    transition:all .4s cubic-bezier(.34,1.56,.64,1);
+  }
+  .pip svg{opacity:0;transition:opacity .3s ease}
+  .pip.on{background:var(--green-bg);border-color:var(--green)}
+  .pip.on svg{opacity:1}
+  .ts-cert .ct{font-size:11.5px;color:var(--slate);white-space:nowrap}
+
+  .los{display:flex;flex-direction:column;margin-top:12px}
+  .lo{padding:11px 0;border-top:1px solid var(--line-2)}
+  .lo-head{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+  .lo-name{font-size:14.5px;font-weight:650;color:var(--ink)}
+  .status{
+    font-size:11px;font-weight:600;padding:3px 9px;
+    border-radius:999px;border:1px solid;white-space:nowrap;
+  }
+  .st-good{color:var(--green);background:var(--green-bg);border-color:#bfe6d3}
+  .st-info{color:var(--blue);background:var(--blue-tint);border-color:#c8d4f8}
+  .st-warn{color:var(--amber);background:var(--amber-bg);border-color:#f0dcb0}
+  .st-bad{color:var(--red);background:var(--red-bg);border-color:#f5cbca}
+  .st-mute{color:var(--mute);background:#f5f7fb;border-color:var(--line)}
+  .lo-right{margin-left:auto;display:flex;align-items:baseline;gap:10px}
+  .lo-score{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+  .lo-delta{font-size:11.5px;font-weight:700;min-width:28px;text-align:right}
+  .lo-delta.up{color:var(--green)} .lo-delta.down{color:var(--red)} .lo-delta.flat{color:#c7cfdd}
+  .lo-track{position:relative;height:8px;background:#eef1f8;border-radius:999px;overflow:hidden}
+  .lo-fill{height:100%;border-radius:999px;width:0;transition:width .8s cubic-bezier(.4,0,.2,1),background-color .5s ease}
+  .lo-mk{position:absolute;top:0;left:75%;width:2px;height:100%;background:#fff;opacity:.95}
+  .lo-empty{
+    font-size:13.5px;line-height:1.6;color:var(--mute);
+    padding:22px 0 6px;border-top:1px solid var(--line-2);margin-top:16px;
+  }
+  .lo-empty b{color:var(--slate);font-weight:650}
+
+  /* -- spotlight: the plan -- */
+  .plan-list{display:flex;flex-direction:column;gap:9px;padding-top:8px}
+  .pv .plan-list{gap:8px;padding-top:12px}
+  .pv .pl-row{font-size:12.5px;padding:2px 0}
+  .pv .pl-name{width:176px}
+  .pv .pl-bar i{width:9px;height:12px}
+  .pv .pl-n{width:66px;font-size:12px}
+  .pv-foot{margin-top:16px}
+  .pl-row{display:flex;align-items:center;gap:12px;font-size:11.5px}
+  .pl-name{width:126px;flex-shrink:0;color:var(--slate);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pl-bar{flex:1;min-width:0;display:flex;gap:2px}
+  .pl-bar i{width:7px;height:10px;border-radius:2px;background:#dde4f4;display:block;flex-shrink:0;
+            transition:background-color .4s ease}
+  .pl-bar i.used {background:var(--blue)}
+  .pl-bar i.extra{background:var(--amber)}
+  .pl-bar i.freed{background:repeating-linear-gradient(-45deg,#a8dcc2 0 3px,#eaf7f0 3px 6px)}
+  .pl-bar i.min  {background:var(--blue-soft)}
+  .pl-bar i.gain {background:var(--green)}
+  .pl-bar i.cut  {background:repeating-linear-gradient(-45deg,#f3c6c4 0 3px,#fdeeed 3px 6px)}
+  /* Past ideal + 2: the builder will not add these on its own. */
+  .pl-bar i.over {background:var(--red);outline:1px solid #fff;outline-offset:-2px}
+  .pl-n{width:56px;flex-shrink:0;text-align:right;color:var(--mute);white-space:nowrap;
+        font-variant-numeric:tabular-nums}
+  .pl-row.done{opacity:.5}
+  .pl-row.cur .pl-name{color:var(--navy);font-weight:700}
+  .pl-row.cur .pl-n{color:var(--blue);font-weight:700}
+  .pl-row.gain .pl-n{color:var(--green);font-weight:700}
+  .pl-row.lose .pl-n{color:var(--red);font-weight:700}
+  .pl-row.halt .pl-name{color:var(--red);font-weight:700}
+
+  /* -- spotlight: the tests -- */
+
+
+  .t-list{display:flex;flex-direction:column}
+  .t-row{
+    display:flex;align-items:center;gap:11px;font-size:12.5px;
+    padding:8px 12px;margin:0 -12px;border-top:1px solid var(--line-2);border-radius:8px;
+    transition:background-color .35s ease;
+  }
+  .t-row:first-child{border-top:none}
+  .t-dot{width:8px;height:8px;border-radius:50%;background:#dde4f4;flex-shrink:0;transition:all .35s ease}
+  .t-row.seen .t-dot{background:var(--blue-soft)}
+  .t-row.now{background:var(--blue-tint);border-top-color:transparent}
+  .t-row.now + .t-row{border-top-color:transparent}
+  .t-row.now .t-dot{background:var(--blue);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--blue-soft)}
+  .t-row.now .t-name{color:var(--navy)}
+  .t-row.off{opacity:.42}
+  .t-name{font-weight:650;color:var(--ink);flex-shrink:0;width:148px}
+  .t-meta{color:var(--mute);font-size:11.5px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .t-right{margin-left:auto;display:flex;align-items:center;gap:9px;flex-shrink:0}
+  .t-c{font-size:11.5px;color:var(--slate);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .t-c .pl{color:var(--mute)}
+  .t-now,.t-next{
+    font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    padding:3px 8px;border-radius:5px;white-space:nowrap;
+  }
+  .t-now{background:var(--blue);color:#fff}
+  .t-next{border:1.5px solid #c8d4f8;color:var(--blue);background:#fff;padding:2px 7px}
+
+  /* ---------------- view tabs ---------------- */
+  .vtabs{display:flex;gap:3px;background:#eef1f8;border-radius:9px;padding:3px;flex-shrink:0;margin-left:auto}
+  .vtab{
+    font-family:'Inter',sans-serif;font-size:12.5px;font-weight:650;color:var(--slate);
+    border:none;background:none;padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .18s ease;
+  }
+  .vtab:hover{color:var(--ink)}
+  .vtab.on{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(20,33,61,.1)}
+  .view{flex:1;display:none;flex-direction:column}
+  .view.on{display:flex}
+
+  /* -- which objective gets class time -- */
+  .teach{
+    font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 8px;border-radius:5px;white-space:nowrap;flex-shrink:0;
+  }
+  .teach.now{background:var(--navy);color:#fff}
+  .teach.also{background:var(--red-bg);color:var(--red)}
+  .teach.recap{border:1.5px solid var(--line);color:var(--slate);background:#fff;padding:2px 7px}
+  .teach.mentor{background:#f3ecff;color:#7c3aed}
+
+  /* -- the class-by-class brief on the plan tab -- */
+  .cls-sec{margin-top:18px;padding-top:16px;border-top:1px solid var(--line-2)}
+  .cls-l{
+    display:block;font-size:10px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+    color:var(--mute);margin-bottom:10px;
+  }
+  .cls-row{
+    display:flex;align-items:center;gap:12px;font-size:12.5px;
+    padding:8px 10px;margin:0 -10px;border-top:1px solid var(--line-2);border-radius:8px;
+  }
+  .cls-row:first-of-type{border-top:none}
+  .cls-n{width:26px;flex-shrink:0;font-family:var(--mono);font-size:11px;font-weight:700;color:#c7cfdd}
+  .cls-kind{width:118px;flex-shrink:0;font-weight:650;color:var(--ink)}
+  .cls-focus{flex:1;min-width:0;color:var(--slate)}
+  .cls-focus b{color:var(--ink);font-weight:650}
+  .cls-row.done{opacity:.58}
+  .cls-row.now{background:var(--blue-tint);border-top-color:transparent}
+  .cls-row.now + .cls-row{border-top-color:transparent}
+  .cls-row.now .cls-n{color:var(--blue)}
+  .cls-tag{
+    font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    padding:3px 8px;border-radius:5px;background:var(--blue);color:#fff;flex-shrink:0;
+  }
+  .cls-rest{font-size:12px;color:var(--mute);line-height:1.55;padding:11px 0 0}
+  .cls-rest b{color:var(--slate);font-weight:650}
+
+  /* ---------------- learning plan view ---------------- */
+  .pv{
+    display:flex;flex-direction:column;
+    border:1.5px solid var(--line);border-radius:14px;background:#fff;padding:18px 24px 20px;
+    box-shadow:0 1px 2px rgba(20,33,61,.03),0 16px 38px -30px rgba(20,33,61,.4);
+  }
+  .pv-head{display:flex;align-items:center;gap:11px;padding-bottom:13px;border-bottom:1px solid var(--line-2)}
+  .pv-sum{font-size:12.5px;color:var(--slate)}
+  .pv-sum b{color:var(--ink);font-weight:650}
+  .pv-sum .good{color:var(--green);font-weight:650}
+  .pv-sum .warn{color:var(--amber);font-weight:650}
+  .pv-sum .bad{color:var(--red);font-weight:650}
+  .pv-key{display:flex;gap:18px;flex-wrap:wrap;padding:13px 0 6px}
+  .pv-key span{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--mute)}
+  .pv-key i{width:9px;height:11px;border-radius:2px;display:block;flex-shrink:0}
+  .pv-foot{
+    font-size:12.5px;color:var(--mute);line-height:1.6;
+    padding-top:14px;border-top:1px solid var(--line-2);
+  }
+  .pv-foot b{color:var(--slate);font-weight:650}
+
+  /* ---------------- methodology drawer ---------------- */
+  .m-btn{
+    font-family:'Inter',sans-serif;font-size:12px;font-weight:600;white-space:nowrap;
+    padding:6px 13px;border-radius:8px;border:1.5px solid var(--line);
+    background:#fff;color:var(--slate);cursor:pointer;transition:all .18s ease;
+  }
+  .m-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-tint)}
+  .scrim{
+    position:fixed;inset:0;background:rgba(20,33,61,.3);z-index:40;
+    opacity:0;pointer-events:none;transition:opacity .3s ease;
+  }
+  .scrim.on{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;height:100%;width:min(520px,94vw);z-index:50;
+    background:#fff;border-left:1.5px solid var(--line);
+    box-shadow:-34px 0 70px -34px rgba(20,33,61,.45);
+    transform:translateX(101%);visibility:hidden;
+    transition:transform .38s cubic-bezier(.4,0,.2,1),visibility 0s .38s;
+    display:flex;flex-direction:column;
+  }
+  .drawer.on{transform:none;visibility:visible;
+    transition:transform .38s cubic-bezier(.4,0,.2,1),visibility 0s}
+  .d-head{display:flex;align-items:center;gap:12px;padding:20px 26px 15px;border-bottom:1.5px solid var(--line)}
+  .d-head h3{font-family:'Source Serif 4',serif;font-size:20px;font-weight:700;color:var(--navy);line-height:1.2}
+  .d-close{
+    margin-left:auto;width:30px;height:30px;flex-shrink:0;padding:0;
+    border-radius:8px;border:1.5px solid var(--line);background:#fff;color:var(--slate);
+    cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;
+  }
+  .d-close:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .d-body{flex:1;overflow-y:auto;padding:20px 26px 36px}
+  .d-sec{margin-bottom:25px}
+  .d-sec:last-child{margin-bottom:0}
+  .d-sec h4{font-size:10.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+            color:var(--blue);margin-bottom:9px}
+  .d-sec p{font-size:13.5px;line-height:1.62;color:#4b5a76;margin-bottom:9px}
+  .d-sec p:last-child{margin-bottom:0}
+  .d-sec b{color:var(--ink);font-weight:650}
+  .d-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+  .d-tbl th{
+    text-align:left;font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+    color:var(--mute);padding:0 10px 7px 0;border-bottom:1px solid var(--line);
+  }
+  .d-tbl td{padding:7px 10px 7px 0;border-bottom:1px solid var(--line-2);color:var(--slate);vertical-align:top}
+  .d-tbl tr:last-child td{border-bottom:none}
+  .d-tbl td:first-child{color:var(--ink);font-weight:650;white-space:nowrap}
+  .d-tbl .yes{color:var(--green);font-weight:700}
+  .d-tbl .no{color:#c7cfdd}
+  .d-rule{display:flex;gap:11px;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line-2);font-size:12.5px}
+  .d-rule:last-child{border-bottom:none}
+  .d-rule .r{font-family:var(--mono);font-weight:700;font-size:11px;color:var(--blue);width:24px;flex-shrink:0}
+  .d-rule .w{flex:1;color:var(--slate);line-height:1.5}
+  .d-rule .g{color:var(--ink);font-weight:650;white-space:nowrap;flex-shrink:0}
+  .d-note{
+    font-size:12.5px;line-height:1.6;color:#4b5a76;
+    background:var(--blue-tint);border-radius:9px;padding:12px 14px;margin-top:11px;
+  }
+  .d-note b{color:var(--navy);font-weight:700}
+
+  /* ---------------- controls ---------------- */
+  .controls{
+    display:flex;align-items:center;gap:12px;padding:13px 0 10px;margin-top:18px;
+    border-top:1px solid var(--line);
+    position:sticky;bottom:0;z-index:20;background:var(--bg);
+  }
+  button{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    border:1.5px solid var(--navy);background:#fff;color:var(--navy);
+    padding:9px 18px;border-radius:999px;cursor:pointer;transition:all .15s ease;white-space:nowrap;
+  }
+  button:hover{background:var(--navy);color:#fff}
+  button:disabled{opacity:.26;cursor:default;pointer-events:none}
+  button.primary{background:var(--navy);color:#fff}
+  button.primary:hover{background:var(--blue);border-color:var(--blue)}
+  .dots{display:flex;gap:5px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  .dot{width:8px;height:8px;border-radius:50%;background:#dce2ef;cursor:pointer;
+       transition:all .22s ease;border:none;padding:0}
+  .dot:hover{background:var(--blue-soft)}
+  .dot.done{background:var(--blue-soft)}
+  .dot.now{background:var(--blue);transform:scale(1.5)}
+  .step-count{font-size:12.5px;color:var(--mute);white-space:nowrap}
+  .step-count b{color:var(--blue);font-size:15px;font-weight:700}
+
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <header class="ident">
+    <div class="who">
+      <div class="avatar">AS</div>
+      <div>
+        <h1>Aarav Sharma</h1>
+        <div class="meta">Grade 6</div>
+      </div>
+    </div>
+    <div class="scen">
+      <span class="scen-l">Scenario</span>
+      <button class="scen-btn" id="scenBtn"><span id="scenLbl">The steady climb</span>
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="scen-menu" id="scenMenu"></div>
+    </div>
+    <div class="badges">
+      <div class="badge-chip" id="bNovice">Novice</div>
+      <div class="badge-chip" id="bPro">Pro</div>
+      <div class="badge-chip master" id="bMaster">Master</div>
+    </div>
+    <div class="vtabs">
+      <button class="vtab on" data-v="loop">Mastery loop</button>
+      <button class="vtab" data-v="plan">Learning plan</button>
+    </div>
+    <button class="m-btn" id="mBtn">Methodology</button>
+  </header>
+
+  <section class="view on" id="viewLoop">
+
+  <!-- ---------- 1 · the one sentence ---------- -->
+  <section class="hero">
+    <div class="eyebrow">
+      <button class="rule-pill" id="rulePill">Start</button>
+      <span class="eb-l" id="ebL"></span>
+    </div>
+    <h2 class="headline" id="headline"></h2>
+    <p class="lede" id="lede"></p>
+  </section>
+
+  <div class="split">
+
+    <!-- ---------- left · the information ---------- -->
+    <div class="left-col">
+
+      <div class="panel">
+        <div class="p-head">
+          <span class="layer-chip mid">Mastery Learning</span>
+          <span class="p-sum">Fraction Arithmetic &middot; 3 learning objectives &middot; decides <b>when he is done</b></span>
+        </div>
+        <div class="p-body">
+          <div class="ts-row">
+            <div class="ts-score">
+              <span class="l">Topic mastery</span>
+              <span class="v"><span id="cTopic">50</span><span class="delta" id="cTopicD"></span></span>
+            </div>
+            <div class="ts-cert">
+              <div class="pips">
+                <div class="pip" id="pip1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.5 5.5L20 7" stroke="#2f9e6e" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="pip" id="pip2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.5 5.5L20 7" stroke="#2f9e6e" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <div class="pip" id="pip3"><svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5.5 5.5L20 7" stroke="#2f9e6e" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              </div>
+              <span class="ct" id="certTxt">0 of 3 certified</span>
+            </div>
+          </div>
+          <div class="los" id="los"></div>
+          <div class="lo-empty" id="loEmpty">No objective has been measured yet &mdash; <b>the topic test runs next.</b></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="p-head">
+          <span class="layer-chip tst">Tests &amp; activities</span>
+          <span class="p-sum" id="tSum"></span>
+        </div>
+        <div class="p-body">
+          <div class="t-list" id="testList"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---------- right · the graph ---------- -->
+    <div class="right-col">
+      <div class="right-head">
+        <h2>The distance to mastery &mdash; <em>and the route there.</em></h2>
+      </div>
+      <div class="chart-wrap"><svg id="chart" viewBox="0 0 640 580"></svg></div>
+      <div class="legend">
+        <span class="lg"><i class="reg"></i>Ordinary step</span>
+        <span class="lg"><i class="chk"></i>Certification check</span>
+      </div>
+    </div>
+
+  </div>
+
+  </section>
+
+  <!-- ---------- the learning plan, on its own tab ---------- -->
+  <section class="view" id="viewPlan">
+    <div class="pv">
+      <div class="pv-head">
+        <span class="layer-chip">Learning Plan Builder</span>
+        <span class="pv-sum" id="pvSum"></span>
+      </div>
+      <div class="pv-key">
+        <span><i style="background:var(--blue)"></i>Class taught</span>
+        <span><i style="background:#dde4f4"></i>Class still planned</span>
+        <span><i style="background:var(--blue-soft)"></i>Kept &mdash; topic minimum</span>
+        <span><i style="background:var(--amber)"></i>Added by the loop</span>
+        <span><i style="background:repeating-linear-gradient(-45deg,#a8dcc2 0 3px,#eaf7f0 3px 6px)"></i>Freed and handed back</span>
+        <span><i style="background:repeating-linear-gradient(-45deg,#f3c6c4 0 3px,#fdeeed 3px 6px)"></i>Compressed out</span>
+      </div>
+      <div class="plan-list" id="prTrack"></div>
+      <div class="cls-sec">
+        <span class="cls-l">Inside Fraction Arithmetic &mdash; what each class teaches</span>
+        <div id="clsList"></div>
+      </div>
+      <div class="pv-foot">The plan books the classes. <b>The loop decides what goes inside them</b> &mdash; every objective under 60 is flagged for teaching, and that flag becomes the brief for the next class.</div>
+    </div>
+  </section>
+
+  <footer class="controls">
+    <button id="prev">&larr; Prev</button>
+    <button id="next" class="primary">Next step &rarr;</button>
+    <div class="dots" id="dots"></div>
+    <span class="step-count">Step <b id="rNum">1</b> <span id="rTot">of 14</span></span>
+    <button id="play">&#9654; Play</button>
+  </footer>
+
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="d-head">
+    <h3>Methodology</h3>
+    <button class="d-close" id="dClose" title="Close">&times;</button>
+  </div>
+  <div class="d-body">
+
+    <div class="d-sec">
+      <h4>How the next test is chosen</h4>
+      <p>Eight rules, checked in order. <b>First match wins.</b></p>
+      <div class="d-rule"><span class="r">R0</span><span class="w">Every objective certified</span><span class="g">Topic closed</span></div>
+      <div class="d-rule"><span class="r">R1</span><span class="w">Topic under 60</span><span class="g">Re-teach the topic</span></div>
+      <div class="d-rule"><span class="r">R2</span><span class="w">3 failed checks, or 4 rounds stalled</span><span class="g">Hand to teacher</span></div>
+      <div class="d-rule"><span class="r">R3</span><span class="w">No topic test yet</span><span class="g">Topic test</span></div>
+      <div class="d-rule"><span class="r">R4</span><span class="w">An objective is stuck</span><span class="g">1:1 class</span></div>
+      <div class="d-rule"><span class="r">R5</span><span class="w">2+ objectives ready</span><span class="g">Certification check</span></div>
+      <div class="d-rule"><span class="r">R6</span><span class="w">An objective under 60</span><span class="g">Practice</span></div>
+      <div class="d-rule"><span class="r">R7</span><span class="w">Anything else</span><span class="g">Homework</span></div>
+      <div class="d-note"><b>Safety first, then certify, then teach, then test.</b> Move any of those and the loop breaks.</div>
+    </div>
+
+    <div class="d-sec">
+      <h4>What counts</h4>
+      <table class="d-tbl">
+        <thead><tr><th>Test</th><th>Counts</th><th>Certifies</th></tr></thead>
+        <tbody>
+          <tr><td>Topic test</td><td>Full</td><td class="no">No</td></tr>
+          <tr><td>Certification check</td><td>Full</td><td class="yes">Yes</td></tr>
+          <tr><td>Homework</td><td>Half</td><td class="no">No</td></tr>
+          <tr><td>Practice</td><td>Nothing</td><td class="no">No</td></tr>
+          <tr><td>Placement test</td><td>Seeds the topic, once</td><td class="no">No</td></tr>
+          <tr><td>Class</td><td>Nothing</td><td class="no">No</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="d-sec">
+      <h4>Certification check</h4>
+      <p>5 questions on one objective, <b>all unseen</b>. The only thing that can finish an objective, and a pass is permanent.</p>
+      <p>One easy question wrong fails it. Three failures stops the loop and calls a human.</p>
+    </div>
+
+    <div class="d-sec">
+      <h4>Outside the loop</h4>
+      <p><b>Grade tests and multi-topic tests</b> pick which topic to teach. This loop measures mastery inside one topic.</p>
+      <p><b>Placement</b> seeds the topic score, but reports at topic level &mdash; so it writes no objective scores.</p>
+    </div>
+
+    <div class="d-sec">
+      <h4>Thresholds</h4>
+      <table class="d-tbl">
+        <tbody>
+          <tr><td>Under 60</td><td>Needs teaching</td></tr>
+          <tr><td>60 &ndash; 74</td><td>Improving</td></tr>
+          <tr><td>75 and above</td><td>Ready for the check</td></tr>
+          <tr><td>Passed a check</td><td>Certified, permanent</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</aside>
+
+<script>
+/* ============ plain-language vocabulary ============ */
+const RULES = {
+  '—' : {name:'Start',   color:'#8a94a6', effect:'Seeds a topic score only — no objective has been measured yet.'},
+  'R3': {name:'R3',      color:'#3556c9', effect:'The only activity that writes a <b>first score for every objective</b>.'},
+  'R7': {name:'R7',      color:'#5f6e88', effect:'Teaches and measures. <b>Updates every objective\'s score.</b>'},
+  'R6': {name:'R6',      color:'#d0912d', effect:'Teaching only — <b>deliberately writes no score</b>.'},
+  'R5': {name:'R5',      color:'#2f9e6e', effect:'The only activity that can <b>finish</b> an objective. A pass is permanent.'},
+  'R1': {name:'R1',      color:'#d4605c', effect:'The whole topic is taught again. Writes no score.'},
+  'R4': {name:'R4',      color:'#7c3aed', effect:'A human takes over <b>one</b> objective. The rest keep running.'},
+  'R2': {name:'R2',      color:'#d4605c', effect:'The loop <b>stops itself</b> and escalates instead of guessing.'},
+  'R0': {name:'R0',      color:'#14213d', effect:'Every objective certified. Remaining classes are freed up.'},
+};
+/* The real subtopics of Fraction Arithmetic (topic 60) in the Grade 5 sequence. */
+const LO_NAMES = ['Adding & subtracting unlike','Multiplying fractions','Dividing fractions'];
+
+/* ============ scenarios ============ */
+const SCENARIOS = [
+{
+  label:'The steady climb',
+  note:'Aarav starts at <b>50</b> and gets there. The system re-orders itself around his weakest objective, teaches before it tests, and certifies nothing until he proves it on fresh questions. <b>14 steps.</b>',
+  rounds:[
+  {rule:'—', act:'Placement test', q:'20 questions', topic:50, lo:[null,null,null],
+   head:'Placed into Fractions — the scorecard is still blank.',
+   note:'58% overall, 2 of 4 on the Fractions questions. The topic is seeded at <b>50</b> and no objective has a score yet — which is exactly why the topic test has to run next.'},
+  {rule:'R3', act:'Topic test', q:'15 questions', topic:61, lo:[{s:84},{s:62},{s:38}],
+   head:'The weak spot is found: word problems, at 38.',
+   note:'The first real picture. Word problems is well under 60, so it is flagged for teaching. Comparing fractions misses the fast route by <b>one point</b> and has to earn it the long way.'},
+  {rule:'R6', act:'Practice · Word problems', q:'self-paced', topic:61, lo:[{s:84},{s:62},{s:38}],
+   head:'Teaching goes exactly where it hurts.',
+   note:'<b>No score moves, and that is the point.</b> An objective sitting at 38 does not need another measurement — it needs to be taught.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:69, lo:[{s:87},{s:68},{s:51}],
+   head:'Comparing fractions crosses the ready line.',
+   note:'Homework moves all three. Comparing fractions crosses <b>75</b> and is now ready for its certification check.'},
+  {rule:'R6', act:'Practice · Word problems', q:'self-paced', topic:69, lo:[{s:87},{s:68},{s:51}],
+   head:'One objective is ready — but it has to wait its turn.',
+   note:'A single ready objective waits two steps before it can be certified. <b>One lucky run is not proof.</b> Meanwhile the weakest objective gets taught again.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:75, lo:[{s:88},{s:74},{s:63}],
+   head:'All three objectives are out of the danger zone.',
+   note:'Word problems is back over 60 and off the teaching flag. Comparing fractions has now waited its two steps.'},
+  {rule:'R5', act:'Certification check · Comparing fractions', q:'5 questions', topic:76,
+   lo:[{s:90,lock:true},{s:74},{s:63}],
+   head:'First objective certified — and it is permanent.',
+   note:'<b>5 of 5</b>, every one a question he had never been served. Certified for this topic, and nothing else on the platform can do that. <b>Badge: Novice.</b>'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:79, lo:[{s:89,lock:true},{s:79},{s:70}],
+   head:'A certified objective still gets checked — just harder, and less often.',
+   note:'A light hard-only slice keeps an eye on the certified objective without wasting his time. Adding &amp; subtracting crosses 75.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:82, lo:[{s:89,lock:true},{s:82},{s:76}],
+   head:'Two objectives are queued for certification.',
+   note:'Word problems crosses 75 too. <b>Two ready objectives means the check fires next</b> — certification never queues behind ordinary homework.'},
+  {rule:'R5', act:'Certification check · Adding &amp; subtracting + Word problems', q:'10 questions', topic:81,
+   lo:[{s:88,lock:true},{s:86,lock:true},{s:68}],
+   head:'One passes, one fails — and failing is allowed to happen.',
+   note:'Adding &amp; subtracting passes 5 of 5. Word problems scores <b>14 of 16 and still fails</b> — it got the easy question wrong, which the check treats as disqualifying. <b>Badge: Pro.</b>'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:82, lo:[{s:88,lock:true},{s:85,lock:true},{s:73}],
+   head:'Cooldown — he has to earn the retry with real work.',
+   note:'A failed objective cannot be re-checked immediately. It needs <b>three fresh questions of new evidence</b> first, so the retry means something.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:84, lo:[{s:88,lock:true},{s:84,lock:true},{s:79}],
+   head:'Back over the line — the retry is unlocked.',
+   note:'Certified objectives drift down a point or two. Their upkeep questions are hard-only, so that dip is <b>expected, not a regression</b>.'},
+  {rule:'R5', act:'Certification check · Word problems', q:'5 questions', topic:84,
+   lo:[{s:88,lock:true},{s:83,lock:true},{s:81,lock:true}],
+   head:'The hardest objective is certified on the second attempt.',
+   note:'Passes 4 of 5 — one medium question wrong, easy and hard both clean. <b>All three objectives are now certified.</b>'},
+  {rule:'R0', act:'Topic closed', q:'classes freed', topic:84,
+   lo:[{s:88,lock:true},{s:83,lock:true},{s:81,lock:true}],
+   head:'Fractions is finished — the leftover classes go back into the plan.',
+   note:'Topic mastery <b>84</b>, all three certified. This scorecard becomes the baseline for the next topic. <b>Badge: Master.</b>'},
+  ]
+},
+{
+  label:'When he is struggling',
+  note:'Same student, a much harder run. He starts at <b>38</b>, fails the same check three times, and the system does what a worksheet queue never does — <b>it stops and calls a human.</b> 15 steps.',
+  rounds:[
+  {rule:'—', act:'Placement test', q:'20 questions', topic:38, lo:[null,null,null],
+   head:'Placed into Fractions, well below grade level.',
+   note:'41% overall, 1 of 4 on the Fractions questions. Seeded at <b>38</b>. Same opening move as before — a very different student underneath it.'},
+  {rule:'R3', act:'Topic test', q:'15 questions', topic:36, lo:[{s:44},{s:36},{s:29}],
+   head:'All three objectives are below the teaching line.',
+   note:'44, 36 and 29. Every objective is under 60. <b>This is not a weak spot — the concept never landed</b>, and the system reads that difference before it prescribes anything.'},
+  {rule:'R1', act:'Re-teach the whole topic', q:'topic class', topic:36, lo:[{s:44},{s:36},{s:29}],
+   head:'Teach the whole topic again, from the start.',
+   note:'Practice on one objective would be the wrong prescription here. <b>A student who is drowning never gets handed another worksheet.</b>'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:45, lo:[{s:52},{s:45},{s:38}],
+   head:'Real movement — but still under the line everywhere.',
+   note:'Every objective gains 8 to 9 points after the class. Visible progress, and still nowhere near 75.'},
+  {rule:'R6', act:'Practice · Word problems', q:'self-paced', topic:45, lo:[{s:52},{s:45},{s:38}],
+   head:'The weakest objective gets taught on its own.',
+   note:'Word problems is furthest behind, so it gets the targeted teaching. No score moves — practice never writes evidence.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:53, lo:[{s:60},{s:54},{s:46}],
+   head:'Climbing slowly. The topic is still under 60.',
+   note:'Comparing fractions reaches exactly 60. The topic as a whole is at <b>53</b> — still under the safety threshold.'},
+  {rule:'R1', act:'Re-teach the whole topic', q:'topic class · 2nd time', topic:53, lo:[{s:60},{s:54},{s:46}],
+   head:'A second full re-teach — and that itself is a signal.',
+   note:'The system re-teaches as often as the evidence demands. <b>Two topic classes on one topic is a flag a mentor can see</b>, long before anyone fails an exam.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:66, lo:[{s:76},{s:66},{s:55}],
+   head:'The second class lands — a 13-point jump.',
+   note:'Comparing fractions crosses <b>75</b> and is ready for its check. Word problems is still under 60 and still flagged for teaching.'},
+  {rule:'R5', act:'Certification check · Comparing fractions', q:'5 questions', topic:64,
+   lo:[{s:71},{s:66},{s:55}],
+   head:'First attempt fails — the easy question was wrong.',
+   note:'3 of 5. Getting an <b>easy</b> question wrong fails the check outright, whatever the total says. That rule exists to stop a shaky 75 being certified. <b>Failure 1 of 3.</b>'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:70, lo:[{s:77},{s:72},{s:61}],
+   head:'He recovers and earns the retry.',
+   note:'Fresh evidence clears the cooldown and the score is back over 75. Word problems finally crosses 60.'},
+  {rule:'R5', act:'Certification check · Comparing fractions', q:'5 questions', topic:68,
+   lo:[{s:73,blocked:true},{s:72},{s:61}],
+   head:'Second failure — the objective is stuck, not just weak.',
+   note:'Same shape of error again. <b>Two failed checks marks the objective stuck</b> and pulls it out of the automated loop entirely. <b>Failure 2 of 3.</b>'},
+  {rule:'R4', act:'1:1 with a mentor · Comparing fractions', q:'mentor session', topic:68,
+   lo:[{s:73,blocked:true},{s:72},{s:61}],
+   head:'A human takes over that one objective.',
+   note:'This is the escalation, not the end. <b>Only the stuck objective goes to a mentor</b> — the other two carry on inside the loop untouched.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:75, lo:[{s:80},{s:78},{s:66}],
+   head:'After the mentor session, two objectives are ready at once.',
+   note:'The block clears and comparing fractions is back at <b>80</b>. Adding &amp; subtracting reaches 78, so the check fires next.'},
+  {rule:'R5', act:'Certification check · Comparing fractions + Adding &amp; subtracting', q:'10 questions', topic:74,
+   lo:[{s:74},{s:82,lock:true},{s:66}],
+   head:'One certified. The other fails a third time.',
+   note:'Adding &amp; subtracting passes 5 of 5. Comparing fractions fails again — <b>three failures on one objective is the hard limit</b>. <b>Badge: Novice.</b>'},
+  {rule:'R2', act:'Handed to the teacher', q:'loop stopped', topic:74,
+   lo:[{s:74},{s:82,lock:true},{s:66}],
+   head:'The system stops itself and escalates, with the evidence attached.',
+   note:'<b>It refuses to keep guessing.</b> The teacher gets the whole picture: 3 failed checks, 2 topic re-teaches, a mentor session and 9 rounds of data. <b>This is the difference between adaptive practice and mastery learning.</b>'},
+  ]
+},
+{
+  label:'When he already knows it',
+  note:'Same student, a topic he is already strong in. He starts at <b>78</b>, and instead of drilling him the system certifies what he can prove and <b>closes the topic in 8 steps instead of 14.</b>',
+  rounds:[
+  {rule:'—', act:'Placement test', q:'20 questions', topic:78, lo:[null,null,null],
+   head:'Placed into Fractions near the top of the band.',
+   note:'81% overall, 4 of 4 on the Fractions questions. Seeded at <b>78</b>. A fixed plan would still hand him all 14 classes. This one will not.'},
+  {rule:'R3', act:'Topic test', q:'15 questions', topic:79, lo:[{s:91},{s:87},{s:54}],
+   head:'Two objectives are already strong. One real gap.',
+   note:'91 and 87 both clear 85 on the topic test alone — <b>the fast route</b>, the same certification test reached sooner. Word problems at 54 is the only genuine gap.'},
+  {rule:'R5', act:'Certification check · Comparing fractions + Adding &amp; subtracting', q:'10 questions', topic:82,
+   lo:[{s:92,lock:true},{s:89,lock:true},{s:54}],
+   head:'Two objectives certified on step 3 — he never sees a class for them.',
+   note:'Both pass on unseen questions and are <b>permanently off his plate</b>. Every class those objectives would have cost him goes back into the plan. <b>Badges: Novice + Pro.</b>'},
+  {rule:'R6', act:'Practice · Word problems', q:'self-paced', topic:82,
+   lo:[{s:92,lock:true},{s:89,lock:true},{s:54}],
+   head:'All the teaching time now goes at the one thing he cannot do.',
+   note:'This is the whole argument in one row. <b>100% of his teaching time is aimed at the 54</b>, not spread evenly across three objectives he mostly already knows.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:84, lo:[{s:91,lock:true},{s:88,lock:true},{s:71}],
+   head:'A 17-point jump on the gap in a single step.',
+   note:'Word problems goes <b>54 to 71</b>. The homework is weighted at it, with only a light hard-only slice on the two certified objectives.'},
+  {rule:'R7', act:'Homework', q:'12 questions', topic:86, lo:[{s:90,lock:true},{s:87,lock:true},{s:79}],
+   head:'The gap crosses the ready line.',
+   note:'Word problems reaches 79 and is ready for its check. Topic mastery is at <b>86</b> — already above where scenario 1 finished.'},
+  {rule:'R5', act:'Certification check · Word problems', q:'5 questions', topic:87,
+   lo:[{s:90,lock:true},{s:87,lock:true},{s:84,lock:true}],
+   head:'The last objective is certified first time.',
+   note:'Passes 5 of 5, easy and hard both clean. <b>Being a strong student does not skip the proof — only the drilling.</b>'},
+  {rule:'R0', act:'Topic closed', q:'8 steps · 6 classes freed', topic:87,
+   lo:[{s:90,lock:true},{s:87,lock:true},{s:84,lock:true}],
+   head:'Closed in 8 steps — six classes handed back to the plan.',
+   note:'Same rules, same ladder, same three objectives as scenario 1. The path is shorter purely because the evidence said so, and those <b>6 freed classes go to the topics he is actually behind on</b>. <b>Badge: Master.</b>'},
+  ]
+},
+];
+
+/* ============ helpers ============ */
+function loStatus(d){
+  if(!d)        return ['Not measured yet','st-mute'];
+  if(d.lock)    return ['Certified','st-good'];
+  if(d.blocked) return ['Stuck — mentor needed','st-bad'];
+  if(d.s>=75)   return ['Ready for the check','st-info'];
+  if(d.s<60)    return ['Needs teaching','st-bad'];
+  return ['Improving','st-warn'];
+}
+const barColor = s => s>=75 ? 'var(--green)' : s>=60 ? 'var(--amber)' : 'var(--red)';
+const $ = id => document.getElementById(id);
+
+/* ============ objective rows ============ */
+LO_NAMES.forEach((n,i)=>{
+  $('los').insertAdjacentHTML('beforeend',`
+    <div class="lo" id="lo${i}">
+      <div class="lo-head">
+        <span class="lo-name">${n}</span>
+        <span class="status st-mute" id="stat${i}">Not measured yet</span>
+        <span class="teach" id="tch${i}"></span>
+        <span class="lo-right">
+          <span class="lo-delta flat" id="dlt${i}"></span>
+          <span class="lo-score" id="scr${i}">—</span>
+        </span>
+      </div>
+      <div class="lo-track"><div class="lo-fill" id="fil${i}"></div><div class="lo-mk"></div></div>
+    </div>`);
+});
+
+/* ============================================================
+   LAYER 1 — the plan (Learning Plan Builder)
+   The package is fixed. Mastery outcomes resize the current
+   topic, and the difference is paid for out of another topic.
+   ============================================================ */
+/* The Grade 5 teaching sequence, with the class counts the Learning Plan
+   Builder actually allocates. Fraction Arithmetic is the topic in progress;
+   Percentages & Ratios receives any classes this topic frees, and Data Analysis
+   is the topic that pays for any extra classes it needs. */
+const TOPICS = [
+  {n:'Number Sense & Operations',  c:5, done:true},
+  {n:'Multi-Digit Operations',     c:5, done:true},
+  {n:'Factors, Multiples & Primes',c:5, done:true},
+  {n:'Decimal Arithmetic',         c:5, done:true},
+  {n:'Fraction Arithmetic',        c:8, cur:true},
+  {n:'Percentages & Ratios',       c:5, gain:true},
+  {n:'2D & 3D Geometry',           c:4},
+  {n:'Perimeter, Area & Measurement', c:6},
+  {n:'Algebraic Expressions',      c:4},
+  {n:'Data Analysis',              c:5, donor:true},
+];
+const IDEAL = 8;    /* classes the builder gave Fraction Arithmetic */
+const MIN   = 5;    /* its floor — no automatic rule may take a topic below this */
+const CAP   = IDEAL + 2;  /* the ceiling on "needs more time": ideal + 2 */
+const DONOR_MIN = 3;      /* Data Analysis has its own floor to respect */
+
+/* A class is a live session: a teaching class, or a checkpoint slot.
+   Homework is set in class and done at home, so it rides on that class.
+   Practice is purely self-paced and costs the package nothing. */
+const USES_CLASS = r => ['R3','R5','R7','R1','R4'].includes(r);
+const CUR   = TOPICS.findIndex(t=>t.cur);
+const GAIN  = TOPICS.findIndex(t=>t.gain);
+const DONOR = TOPICS.findIndex(t=>t.donor);
+
+function planState(i){
+  let alloc=IDEAL, used=0, closed=false, halted=false;
+  for(let k=0;k<=i;k++){
+    const ru=R[k].rule;
+    /* An extra class the plan did not budget for. The builder's "needs more
+       time" rule adds at most one at a time and never goes past ideal + 2. */
+    if(ru==='R1'||ru==='R4') alloc = Math.min(CAP, alloc+1);
+    if(USES_CLASS(ru)) used++;
+    if(ru==='R0') closed=true;
+    if(ru==='R2') halted=true;
+  }
+  /* Teaching that runs long still needs the classes: the allocation stretches
+     to cover it, up to the ceiling. Past the ceiling the builder stops
+     adjusting on its own and raises a warning for a manual decision. */
+  if(!closed) alloc = Math.min(CAP, Math.max(alloc, used));
+  const extra   = Math.min(alloc, CAP) - IDEAL;
+  const overCap = used > CAP;
+  const billed  = closed ? Math.max(used, MIN) : used;   /* the floor is charged even if unused */
+  const freed   = closed ? Math.max(0, alloc-billed) : 0;
+  return {alloc, extra, used, billed, freed, closed, halted, overCap};
+}
+
+function renderPlan(i){
+  const p = planState(i);
+  const size = TOPICS.map(t=>t.c);
+  size[CUR] = p.closed ? p.used : p.alloc;
+  /* Rule H1 cuts both ways: the topic paying for the extra classes cannot be
+     taken below its own minimum either. */
+  if(p.extra) size[DONOR] = Math.max(DONOR_MIN, TOPICS[DONOR].c - p.extra);
+  if(p.freed) size[GAIN]  = TOPICS[GAIN].c  + p.freed;
+
+  $('prTrack').innerHTML = TOPICS.map((t,k)=>{
+    const base=t.c, n=size[k];
+    let blocks='', label, cls='';
+    if(k===CUR){
+      const span = Math.max(p.alloc, p.used);
+      for(let j=0;j<span;j++)
+        blocks += `<i class="${j>=CAP?'over':j<p.used?'used':j<p.billed?'min':p.closed?'freed':j>=IDEAL?'extra':''}"></i>`;
+      label = p.closed ? `${p.billed} used` : `${p.used} of ${p.alloc}`;
+      cls   = 'cur'+(p.halted?' halt':'');
+    } else if(n>base){
+      for(let j=0;j<base;j++) blocks+='<i></i>';
+      for(let j=base;j<n;j++) blocks+='<i class="gain"></i>';
+      label = `${n} &#9650;${n-base}`; cls='gain';
+    } else if(n<base){
+      for(let j=0;j<n;j++)    blocks+='<i></i>';
+      for(let j=n;j<base;j++) blocks+='<i class="cut"></i>';
+      label = `${n} &#9660;${base-n}`; cls='lose';
+    } else {
+      for(let j=0;j<base;j++) blocks+='<i></i>';
+      label = t.done ? `${base} done` : `${base}`;
+      cls   = t.done ? 'done' : '';
+    }
+    return `<div class="pl-row ${cls}"><span class="pl-name">${t.n}</span>`
+         + `<span class="pl-bar">${blocks}</span><span class="pl-n">${label}</span></div>`;
+  }).join('');
+
+  const head = `Fraction Arithmetic &middot; <b>${p.used}</b> of <b>${p.alloc}</b> classes`;
+  planSumHTML =
+      p.halted  ? `${head} &middot; <span class="bad">plan paused, handed to the teacher</span>`
+    : p.freed   ? `Closed on class <b>${p.billed}</b> of ${p.alloc} &middot; <span class="good">${p.freed} classes freed &rarr; Percentages &amp; Ratios</span>`
+    : p.overCap ? `${head} &middot; <span class="bad">past ideal + 2 &mdash; the builder stops adjusting and warns instead</span>`
+    : p.extra   ? `${head} &middot; <span class="warn">+${p.extra} out of Data Analysis, which is now at its own floor</span>`
+    :             `${head} &middot; 79-class Grade 5 package`;
+  $('pvSum').innerHTML = planSumHTML;
+}
+
+/* ============================================================
+   LAYER 3 — the tests
+   Six assessment flows exist. Four run inside the loop, one
+   seeds it, and one is a teaching action that asks nothing.
+   ============================================================ */
+const TESTS = [
+  {name:'Placement test',      meta:'20 Q · whole grade',   rules:['—'] },
+  {name:'Topic test',          meta:'15 Q · all objectives', rules:['R3']},
+  {name:'Practice',            meta:'self-paced · no score', rules:['R6']},
+  {name:'Homework',            meta:'12 Q · counts half',    rules:['R7']},
+  {name:'Certification check', meta:'5 Q · unseen only',     rules:['R5']},
+  {name:'Class',               meta:'no questions',          rules:['R1','R4']},
+];
+
+let planSumHTML='', testSumHTML='';
+
+/* ============================================================
+   WHO GETS CLASS TIME
+   The plan books the classes. The loop decides what each one
+   teaches: anything under 60 is flagged, the weakest first.
+   ============================================================ */
+const TEACH_LINE = 60;
+
+function classRole(d){
+  if(!d || d.lock)  return null;          /* certified — no class time */
+  if(d.blocked)     return 'mentor';
+  if(d.s < TEACH_LINE) return 'teach';
+  if(d.s < 75)      return 'recap';
+  return null;                            /* ready — a light check is enough */
+}
+
+/* the brief for one class, read off the scorecard as it stood before it */
+function classBrief(k, loOverride){
+  const ru = R[k].rule;
+  const lo = loOverride || (k>0 ? R[k-1].lo : [null,null,null]);
+  if(ru==='R3') return {kind:'Topic test',  focus:'Measures all three objectives for the first time'};
+  if(ru==='R5') return {kind:'Checkpoint',  focus:'Certification check &middot; unseen questions only'};
+  if(ru==='R1') return {kind:'Class',       focus:'<b>Whole topic re-taught</b> &mdash; every objective was under 60'};
+  if(ru==='R4'){
+    let b = lo.findIndex(d=>d&&d.blocked); if(b<0) b = 0;
+    return {kind:'1:1 class', focus:`<b>${LO_NAMES[b]}</b> &middot; handed to a mentor`};
+  }
+  const live = lo.map((d,j)=>({d,j})).filter(x=>x.d && !x.d.lock && !x.d.blocked);
+  if(!live.length) return {kind:'Class', focus:'Light upkeep &mdash; everything is certified'};
+  const teach = live.reduce((a,b)=>b.d.s<a.d.s?b:a);
+  const recap = live.filter(x=>x.j!==teach.j && x.d.s<75).sort((a,b)=>a.d.s-b.d.s)[0];
+  return {kind:'Class', focus:`Teach <b>${LO_NAMES[teach.j]}</b> (${teach.d.s})`
+        + (recap ? ` &middot; recap ${LO_NAMES[recap.j].toLowerCase()} (${recap.d.s})` : '')};
+}
+
+function renderSchedule(i){
+  const p = planState(i);
+  const classes = [];
+  for(let k=0;k<R.length;k++) if(USES_CLASS(R[k].rule)) classes.push(k);
+
+  const done = classes.filter(k=>k<=i);
+  const next = classes.find(k=>k>i);
+
+  let rows = done.map((k,idx)=>{
+    const b = classBrief(k), now = (k===i);
+    return `<div class="cls-row ${now?'now':'done'}"><span class="cls-n">${idx+1}</span>`
+         + `<span class="cls-kind">${b.kind}</span><span class="cls-focus">${b.focus}</span>`
+         + (now ? '<span class="cls-tag">This class</span>' : '') + '</div>';
+  });
+
+  /* the next class is briefed from the scorecard as it stands right now */
+  if(next !== undefined){
+    const b = classBrief(next, R[i].lo);
+    rows.push(`<div class="cls-row now"><span class="cls-n">${done.length+1}</span>`
+      + `<span class="cls-kind">${b.kind}</span><span class="cls-focus">${b.focus}</span>`
+      + '<span class="cls-tag">Next class</span></div>');
+  }
+
+  const written = done.length + (next!==undefined ? 1 : 0);
+  let tail = '';
+  if(p.closed)      tail = `Topic closed on class <b>${p.billed}</b>. `
+                         + `The remaining <b>${p.freed}</b> went back to the plan.`;
+  else if(p.halted) tail = `Paused on class <b>${p.used}</b>. `
+                         + `The rest wait for the teacher's call.`;
+  else if(p.alloc > written)
+                    tail = `Classes <b>${written+1}&ndash;${p.alloc}</b> are not written yet &mdash; `
+                         + `the loop briefs each one from the scorecard when it gets there.`;
+
+  $('clsList').innerHTML = rows.join('') + (tail ? `<div class="cls-rest">${tail}</div>` : '');
+}
+
+function renderTests(i){
+  const now = R[i].rule;
+  const nxt = i+1 < R.length ? R[i+1].rule : null;
+
+  $('testList').innerHTML = TESTS.map(t=>{
+    let done=0, planned=0;
+    R.forEach((r,k)=>{
+      if(!t.rules.includes(r.rule)) return;
+      if(k<i) done++; else if(k>i) planned++;
+    });
+    const isNow  = t.rules.includes(now);
+    const isNext = nxt && t.rules.includes(nxt);
+
+    const tag = isNow  ? '<span class="t-now">Attempting now</span>'
+              : isNext ? '<span class="t-next">Next</span>' : '';
+    const bits = [];
+    if(done)    bits.push(`${done} done`);
+    if(planned) bits.push(`<span class="pl">${planned} planned</span>`);
+    const count = bits.length ? bits.join(' · ') : (isNow ? '' : 'not used');
+
+    const cls = isNow ? 'now' : done ? 'seen' : planned ? '' : 'off';
+    return `<div class="t-row ${cls}">`
+         + `<span class="t-dot"></span>`
+         + `<span class="t-name">${t.name}</span>`
+         + `<span class="t-meta">${t.meta}</span>`
+         + `<span class="t-right">${tag}<span class="t-c">${count}</span></span>`
+         + `</div>`;
+  }).join('');
+
+  const live = TESTS.find(t=>t.rules.includes(now));
+  const left = R.length - 1 - i;
+  testSumHTML = live
+    ? `Attempting now: <b>${live.name}</b> &middot; ${r_q(i)}${left?` &middot; ${left} more planned`:''}`
+    : now==='R0' ? 'Topic closed &middot; <b>no test left to run</b>'
+    :              'Loop stopped &middot; <b>handed to the teacher</b>';
+  $('tSum').innerHTML = testSumHTML;
+}
+const r_q = i => R[i].q;
+
+/* ============================================================
+   The spotlight — the second panel only ever holds ONE layer,
+   and the step decides which one that is.
+   ============================================================ */
+/* ============ view switching ============ */
+document.querySelectorAll('.vtab').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('.vtab').forEach(x=>x.classList.toggle('on',x===b));
+    const v = b.dataset.v;
+    $('viewLoop').classList.toggle('on', v==='loop');
+    $('viewPlan').classList.toggle('on', v==='plan');
+    if(v==='loop'){ buildChart(); render(cur); }
+  };
+});
+
+
+const svg  = document.getElementById('chart');
+const wrap = document.querySelector('.chart-wrap');
+const NS   = 'http://www.w3.org/2000/svg';
+let W=640, H=580, X0=64, X1=588, Y_TOP=52, Y_BOT=520;
+
+/* the chart fills its container exactly — viewBox tracks real pixel size */
+function sizeChart(){
+  W = Math.max(360, Math.round(wrap.clientWidth));
+  H = Math.max(260, Math.round(wrap.clientHeight));
+  X0 = 58; X1 = W - 58;
+  Y_TOP = 44; Y_BOT = H - 48;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+}
+
+function el(t,at,p){const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);(p||svg).appendChild(e);return e}
+
+/* ============ chart ============ */
+
+let R=[], pts=[], lenAt=[], totalLen=0, dotEls=[], ringEls=[], haloPath, mainPath, scoreTag, S_MIN, S_MAX;
+const py = s => Y_BOT - (s-S_MIN)/(S_MAX-S_MIN)*(Y_BOT-Y_TOP);
+
+function smoothPath(p){
+  if(p.length<2) return `M ${p[0].x} ${p[0].y}`;
+  let d=`M ${p[0].x} ${p[0].y}`;
+  for(let i=0;i<p.length-1;i++){
+    const a=p[Math.max(0,i-1)],b=p[i],c=p[i+1],e=p[Math.min(p.length-1,i+2)];
+    d+=` C ${b.x+(c.x-a.x)/6} ${b.y+(c.y-a.y)/6}, ${c.x-(e.x-b.x)/6} ${c.y-(e.y-b.y)/6}, ${c.x} ${c.y}`;
+  }
+  return d;
+}
+
+function buildChart(){
+  sizeChart();
+  while(svg.firstChild) svg.removeChild(svg.firstChild);
+  dotEls=[]; ringEls=[];
+
+  const t = R.map(r=>r.topic);
+  S_MIN = Math.max(0,  Math.min(...t) - 10);
+  S_MAX = Math.min(100, Math.max(90, Math.max(...t) + 8));
+
+  const px = i => R.length===1 ? X0 : X0 + (X1-X0)*i/(R.length-1);
+  pts = R.map((r,i)=>({x:px(i), y:py(r.topic)}));
+
+  const gx=(X1-X0)/Math.max(1,Math.round((X1-X0)/62));
+  for(let x=X0;x<=X1+1;x+=gx) el('line',{x1:x,y1:22,x2:x,y2:H-24,stroke:'var(--grid)','stroke-width':1});
+  const gy=(Y_BOT-Y_TOP)/Math.max(1,Math.round((Y_BOT-Y_TOP)/62));
+  for(let y=Y_TOP;y<=Y_BOT+1;y+=gy) el('line',{x1:22,y1:y,x2:W-22,y2:y,stroke:'var(--grid)','stroke-width':1});
+
+  [[60,'Needs teaching below 60'],[75,'Ready line · 75']].forEach(([v,lbl])=>{
+    if(v<S_MIN+3||v>S_MAX-3) return;
+    el('line',{x1:22,y1:py(v),x2:W-22,y2:py(v),stroke:'#c9d5f0','stroke-width':1.4,'stroke-dasharray':'3 6'});
+    const tx=el('text',{x:24,y:py(v)-8,class:'axis-lbl'}); tx.textContent=lbl;
+  });
+
+  const last = pts[pts.length-1];
+  el('circle',{cx:last.x,cy:last.y,r:34,fill:'none',stroke:'#cfd9f0','stroke-width':1.4});
+  el('circle',{cx:last.x,cy:last.y,r:21,fill:'none',stroke:'#dde4f4','stroke-width':1.4});
+  const endLbl = el('text',{x:last.x,y:last.y-48,'text-anchor':'middle',class:'axis-lbl'});
+  endLbl.textContent = R[R.length-1].rule==='R2' ? 'Handed over' : 'Topic closed';
+
+  const d = smoothPath(pts);
+  const ghost = el('path',{d:d,fill:'none',stroke:'none'});
+  totalLen = ghost.getTotalLength();
+  lenAt = pts.map(p=>{
+    let lo=0,hi=totalLen;
+    for(let k=0;k<26;k++){const m=(lo+hi)/2;(ghost.getPointAtLength(m).x<p.x)?lo=m:hi=m}
+    return (lo+hi)/2;
+  });
+  lenAt[0]=0; lenAt[lenAt.length-1]=totalLen;
+
+  haloPath = el('path',{d:d,fill:'none',stroke:'#3556c9','stroke-opacity':.12,'stroke-width':12,'stroke-linecap':'round'});
+  mainPath = el('path',{d:d,fill:'none',stroke:'var(--blue)','stroke-width':5,'stroke-linecap':'round'});
+  [haloPath,mainPath].forEach(p=>{
+    p.setAttribute('stroke-dasharray',totalLen);
+    p.setAttribute('stroke-dashoffset',totalLen);
+    p.style.transition='stroke-dashoffset .85s cubic-bezier(.45,0,.25,1)';
+  });
+
+  el('circle',{cx:pts[0].x,cy:pts[0].y,r:19,fill:'none',stroke:'#dde4f4','stroke-width':1.4});
+  const st = el('text',{x:pts[0].x,y:pts[0].y+38,'text-anchor':'middle',class:'axis-lbl'});
+  st.textContent='Start';
+
+  pts.forEach((p,i)=>{
+    ringEls.push(el('circle',{cx:p.x,cy:p.y,r:13,fill:'var(--blue)',opacity:0,class:'pulse-ring'}));
+    const major = ['R5','R0','R2'].includes(R[i].rule);
+    dotEls.push(i===0
+      ? el('circle',{cx:p.x,cy:p.y,r:8,fill:'var(--navy)',class:'jdot',opacity:0})
+      : el('circle',{cx:p.x,cy:p.y,r:major?8:6,fill:major?'var(--blue)':'#fff',
+                     stroke:major?'#fff':'var(--navy)','stroke-width':2.8,class:'jdot',opacity:0}));
+  });
+
+  /* clicking anywhere in a step's column jumps to it */
+  const slot=(X1-X0)/Math.max(1,R.length-1);
+  pts.forEach((p,i)=>{
+    const hit=el('rect',{x:p.x-slot/2,y:0,width:slot,height:H,fill:'transparent'});
+    hit.style.cursor='pointer';
+    hit.onclick=()=>{ stopPlay(); cur=i; render(cur); };
+  });
+
+  scoreTag = el('text',{class:'score-tag','text-anchor':'middle',opacity:0});
+  scoreTag.style.transition='opacity .3s ease';
+}
+
+/* ============ render ============ */
+function render(i,dir){
+  const r=R[i], prev=i>0?R[i-1]:null, meta=RULES[r.rule];
+
+  /* ---- 1 · the one sentence ---- */
+  const pill=$('rulePill');
+  pill.textContent = meta.name;
+  pill.style.color=meta.color; pill.style.borderColor=meta.color; pill.style.background=meta.color+'12';
+  pill.title = (RULE_WHY[r.rule]||'') + '  —  click for the full logic';
+  $('ebL').innerHTML     = `Step ${i+1} of ${R.length} &middot; ${r.act} &middot; ${r.q}`;
+  $('headline').textContent = r.head;
+  $('lede').innerHTML    = r.note;
+  $('rNum').textContent  = i+1;
+  $('rTot').textContent  = 'of '+R.length;
+
+  /* ---- 3 · the evidence ---- */
+  renderPlan(i);
+  renderTests(i);
+  renderSchedule(i);
+
+
+  ['ebL','headline','lede'].forEach(id=>{
+    const e=$(id); e.classList.remove('fade-swap'); void e.offsetWidth; e.classList.add('fade-swap');
+  });
+
+  $('cTopic').textContent = r.topic;
+  const td = prev ? r.topic-prev.topic : 0;
+  const tdEl=$('cTopicD');
+  tdEl.textContent = td>0?`\u25b2 ${td}` : td<0?`\u25bc ${-td}` : (prev?'no change':'');
+  tdEl.className='delta '+(td>0?'up':td<0?'down':'flat');
+
+  const locked = r.lo.filter(d=>d&&d.lock).length;
+  for(let k=1;k<=3;k++) $('pip'+k).classList.toggle('on', locked>=k);
+  $('certTxt').textContent = locked+' of 3 certified';
+
+  /* nothing measured yet? then don't draw three empty rows */
+  /* the weakest objective under the line is the one the next class leads with */
+  let primary = -1, low = 999;
+  r.lo.forEach((d,k)=>{ if(classRole(d)==='teach' && d.s<low){ low=d.s; primary=k; } });
+
+  const measured = r.lo.some(d=>d);
+  $('los').style.display     = measured ? 'flex'  : 'none';
+  $('loEmpty').style.display = measured ? 'none'  : 'block';
+
+  r.lo.forEach((d,k)=>{
+    if(!d) return;
+    const [txt,cls]=loStatus(d);
+    $('stat'+k).textContent=txt; $('stat'+k).className='status '+cls;
+    const role=classRole(d), ch=$('tch'+k);
+    ch.textContent = role==='mentor' ? 'With mentor'
+                   : role==='recap'  ? 'Recap'
+                   : role==='teach'  ? (k===primary ? 'Next class' : 'Teach') : '';
+    ch.className = 'teach' + (role==='mentor' ? ' mentor' : role==='recap' ? ' recap'
+                            : role==='teach'  ? (k===primary ? ' now' : ' also') : '');
+    $('scr'+k).textContent=d.s;
+    const f=$('fil'+k); f.style.width=d.s+'%';
+    f.style.background = d.lock ? 'var(--green)' : d.blocked ? 'var(--red)' : barColor(d.s);
+    const pd = prev && prev.lo[k] ? d.s - prev.lo[k].s : null;
+    const dl=$('dlt'+k);
+    if(pd===null){ dl.textContent=''; dl.className='lo-delta flat'; }
+    else { dl.textContent = pd>0?`\u25b2${pd}` : pd<0?`\u25bc${-pd}` : '\u2014';
+           dl.className='lo-delta '+(pd>0?'up':pd<0?'down':'flat'); }
+  });
+
+  $('bNovice').classList.toggle('earned', locked>=1);
+  $('bPro').classList.toggle('earned',    locked>=2);
+  /* Master is the only badge with a score bar on it: every objective
+     certified AND every objective still at 80 or better. A topic can close
+     with everything certified and stop at Pro. */
+  const MASTER_BAR = 80;
+  const scores = (r.lo||[]).filter(Boolean);
+  const allCertified = scores.length===LO_NAMES.length && scores.every(d=>d.lock);
+  const allAtBar     = scores.length===LO_NAMES.length && scores.every(d=>d.s>=MASTER_BAR);
+  $('bMaster').classList.toggle('earned', allCertified && allAtBar);
+
+  /* ---- 2 · the route ---- */
+  const off = totalLen - lenAt[i];
+  haloPath.setAttribute('stroke-dashoffset',off);
+  mainPath.setAttribute('stroke-dashoffset',off);
+  dotEls.forEach((dot,k)=>{
+    dot.setAttribute('opacity', k<=i ? 1 : 0);
+    ringEls[k].style.display = k===i?'':'none';
+    ringEls[k].setAttribute('opacity', k===i?.4:0);
+  });
+  const p=pts[i], isLast=i===pts.length-1;
+  scoreTag.setAttribute('x',p.x);
+  scoreTag.setAttribute('y',p.y-(isLast?68:22));
+  scoreTag.textContent=r.topic;
+  scoreTag.setAttribute('opacity',0);
+  setTimeout(()=>scoreTag.setAttribute('opacity',1), dir==='fwd'?540:80);
+
+  [...document.querySelectorAll('.dot')].forEach((d,k)=>{
+    d.classList.toggle('now',k===i); d.classList.toggle('done',k<i);
+  });
+  $('prev').disabled = i===0;
+  $('next').disabled = i===R.length-1;
+}
+
+/* ============ navigation ============ */
+let cur=0, timer=null;
+/* the R-codes are internal shorthand — say what each one means in plain words */
+const RULE_WHY = {
+  '\u2014':'Placement test \u2014 the entry test. It seeds the topic score and writes no objective scores.',
+  'R0':'Rule R0 \u2014 every objective certified, so the topic closes.',
+  'R1':'Rule R1 \u2014 topic under 60, so the whole topic is re-taught.',
+  'R2':'Rule R2 \u2014 three failed checks or four stalled rounds, so it goes to the teacher.',
+  'R3':'Rule R3 \u2014 no topic test yet, so the topic test runs.',
+  'R4':'Rule R4 \u2014 an objective is stuck, so it gets a 1:1 class.',
+  'R5':'Rule R5 \u2014 objectives are ready, so the certification check fires.',
+  'R6':'Rule R6 \u2014 an objective is under 60, so it gets taught, not tested.',
+  'R7':'Rule R7 \u2014 nothing else matched, so: homework.',
+};
+
+const SCEN_SHORT = [
+  'Starts at 50. Gets there in 14 steps.',
+  'Starts at 38. Fails three checks, and a human takes over.',
+  'Starts at 78. Closes in 8 steps, six classes freed.',
+];
+const scenBtn=$('scenBtn'), scenMenu=$('scenMenu');
+scenMenu.innerHTML = SCENARIOS.map((sc,k)=>
+  `<button class="scen-opt" data-k="${k}"><span class="n">${sc.label}</span>`
+  + `<span class="d">${SCEN_SHORT[k]}</span></button>`).join('');
+
+function scenOpen(v){ scenBtn.classList.toggle('open',v); scenMenu.classList.toggle('on',v); }
+scenBtn.onclick = e=>{ e.stopPropagation(); scenOpen(!scenMenu.classList.contains('on')); };
+scenMenu.onclick = e=>{
+  const b=e.target.closest('.scen-opt'); if(!b) return;
+  loadScenario(+b.dataset.k); scenOpen(false);
+};
+document.addEventListener('click',()=>scenOpen(false));
+
+function loadScenario(k){
+  stopPlay(); cur=0;
+  R = SCENARIOS[k].rounds;
+  $('scenLbl').textContent = SCENARIOS[k].label;
+  [...scenMenu.children].forEach((b,j)=>b.classList.toggle('on',j===k));
+  const dotsBox=$('dots'); dotsBox.innerHTML='';
+  R.forEach((_,j)=>{
+    const b=document.createElement('button');
+    b.className='dot'; b.title='Step '+(j+1);
+    b.onclick=()=>{stopPlay();cur=j;render(cur)};
+    dotsBox.appendChild(b);
+  });
+  buildChart(); render(0);
+}
+
+function step(d){const n=cur+d; if(n<0||n>=R.length) return false; cur=n; render(cur,d>0?'fwd':'back'); return true}
+function stopPlay(){ if(timer){clearInterval(timer);timer=null;$('play').textContent='▶ Play'} }
+$('prev').onclick=()=>{stopPlay();step(-1)};
+$('next').onclick=()=>{stopPlay();step(1)};
+$('play').onclick=()=>{
+  if(timer){stopPlay();return}
+  if(cur===R.length-1){cur=0;render(cur)}
+  $('play').textContent='⏸ Pause';
+  timer=setInterval(()=>{ if(!step(1)) stopPlay(); },2600);
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ meth(false); return }
+  if(drawer.classList.contains('on')) return;
+  if(e.key==='ArrowRight'){stopPlay();step(1)}
+  else if(e.key==='ArrowLeft'){stopPlay();step(-1)}
+  else if(e.key===' '){e.preventDefault();$('play').click()}
+  else if(['1','2','3'].includes(e.key)){loadScenario(+e.key-1)}
+});
+
+let rzT=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(rzT);
+  rzT=setTimeout(()=>{ buildChart(); render(cur); },140);
+});
+
+/* ============ methodology drawer ============ */
+const drawer=$('drawer'), scrim=$('scrim');
+function meth(open){
+  drawer.classList.toggle('on',open);
+  scrim.classList.toggle('on',open);
+  drawer.setAttribute('aria-hidden', open?'false':'true');
+}
+$('mBtn').onclick     = ()=>meth(true);
+$('rulePill').onclick = ()=>meth(true);
+$('dClose').onclick = ()=>meth(false);
+scrim.onclick       = ()=>meth(false);
+
+loadScenario(0);
+/* re-fit once layout + webfonts have settled */
+window.addEventListener('load',()=>{ buildChart(); render(cur); });
+</script>
+</body>
+</html>

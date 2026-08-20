@@ -3567,6 +3567,11 @@ a.lpb-status-chip.link:hover {
 .lpb-structural-list article.ptm strong { color: #a55e1c; }
 
 .lpb-mentor-view { display: grid; gap: 14px; background: #fbfcfb; }
+/* Grid children default to min-width:auto, so anything wide inside them — the
+   diagnosis table at its 720px minimum, the glance carousel's single long row —
+   stretches the column instead of scrolling inside it, and the whole page
+   overflows sideways. Every child of this grid scrolls its own overflow. */
+.lpb-mentor-view > * { min-width: 0; }
 .lpb-mentor-snapshot { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .lpb-mentor-snapshot > div { padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: white; }
 .lpb-mentor-snapshot span { display: block; color: var(--ink-muted); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
@@ -3592,11 +3597,13 @@ a.lpb-status-chip.link:hover {
    swipeable without them. */
 .lpb-glance-carousel {
   position: relative;
+  min-width: 0;
   margin-top: 9px;
 }
 
 .lpb-glance-track {
   display: flex;
+  min-width: 0;
   gap: 6px;
   overflow-x: auto;
   scroll-snap-type: x proximity;
@@ -3662,9 +3669,13 @@ a.lpb-status-chip.link:hover {
 .lpb-mentor-head-actions { display: inline-flex; align-items: center; gap: 7px; flex: 0 0 auto; }
 .lpb-mentor-table-wrap { margin-top: 11px; overflow-x: auto; }
 .lpb-mentor-guidance { margin: 11px 0 0; color: var(--ink-soft); font-size: .86rem; line-height: 1.55; }
-.lpb-mentor-table-wrap table { width: 100%; min-width: 720px; border-collapse: collapse; }
+.lpb-mentor-table-wrap table { width: 100%; min-width: 720px; border-collapse: separate; border-spacing: 0; border-radius: 9px; overflow: hidden; }
 .lpb-mentor-table-wrap th { padding: 10px; color: white; background: #1e5d59; text-align: left; font-size: .82rem; }
-.lpb-mentor-table-wrap td { padding: 11px 10px; border: 1px solid var(--line); color: var(--ink-soft); font-size: .85rem; line-height: 1.55; vertical-align: top; }
+.lpb-mentor-table-wrap td { padding: 11px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); color: var(--ink-soft); font-size: .85rem; line-height: 1.55; vertical-align: top; }
+.lpb-mentor-table-wrap td:last-child { border-right: 0; }
+.lpb-mentor-table-wrap tbody tr:last-child td { border-bottom: 0; }
+/* The header bled to the card edge because the table had no radius of its own. */
+.lpb-mentor-table-wrap { border: 1px solid var(--line); border-radius: 9px; }
 .lpb-mentor-table-wrap td:first-child { color: var(--ink); font-weight: 700; }
 .lpb-diagnosis-pill { display: inline-block; padding: 4px 6px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; white-space: nowrap; }
 .lpb-diagnosis-pill.secure { color: #116a48; background: #def5e7; }
@@ -9620,4 +9631,102 @@ p.lpb-methodology-live {
     max-height: 100vh;
     border-radius: 0;
   }
+}
+
+/* Hand-off to the mastery-loop simulation. It is an anchor, not a button, so
+   it needs the button box model spelled out. */
+.lpb-journey-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  text-decoration: none;
+}
+
+/* ── Objective standing inside a class ────────────────────────────────────
+   The mastery loop measures objectives; this is that read carried into the
+   class it produced. An objective the loop flagged is the reason the class
+   exists, so it is marked in the list rather than left to the reader. */
+.lpb-objective-need {
+  display: inline-block;
+  margin-left: 7px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.lpb-objective-need.needs-teaching {
+  color: #c0432c;
+  background: #fbeae5;
+}
+
+.lpb-objective-need.improving {
+  color: #8a5f0c;
+  background: #fdf3dd;
+}
+
+.lpb-objective-need.secure {
+  color: #1f7169;
+  background: #e4f2ed;
+}
+
+.lpb-objective-need-why {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+/* The objective this class is really for. */
+.lpb-lesson-bullets li.need-needs-teaching {
+  padding-left: 9px;
+  border-left: 2px solid #e2795f;
+}
+
+/* ── Question banks ───────────────────────────────────────────────────────
+   An objective carries several distinct Starter and Master questions, so a
+   class with three Starter slots asks three different questions. These style
+   the places the bank is shown in full or summarised. */
+.lpb-question-bank {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+}
+
+.lpb-question-bank li {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.lpb-question-bank li::marker {
+  color: var(--ink-muted);
+  font-family: "Space Mono", monospace;
+  font-size: 0.75rem;
+}
+
+.lpb-question-pair > div > span > b {
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: var(--teal);
+  background: #eef6f3;
+  border-radius: 999px;
+  font-size: 0.7rem;
+}
+
+/* How many more questions the bank holds beyond the one shown. */
+.lpb-bank-more {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: var(--ink-muted);
+  background: var(--surface-muted);
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
 }

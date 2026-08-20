@@ -175,105 +175,227 @@ export const questionGuidelines: QuestionGuideline[] = [
   {
     topicId: 60,
     learningObjectiveId: "60-common-denominator",
-    starter: "1/4 + 2/4 = ?",
-    master:
+    starters: [
+      "1/4 + 2/4 = ?",
+      "1/2 + 1/4 = ?",
+      "2/3 − 1/6 = ?",
+      "3/5 + 1/10 = ?",
+    ],
+    masters: [
       "5/6 − 3/8 + 1/4 = ? (three unlike denominators; simplify the answer)",
+      "7/12 + 5/18 = ? Show how you chose the denominator, then simplify.",
+      "Ravi says 2/3 + 3/4 = 5/7. Find his mistake and give the correct answer.",
+    ],
   },
   {
     topicId: 60,
     learningObjectiveId: "60-mixed-numbers",
-    starter: "1½ + 2½ = ?",
-    master: "4⅖ − 2¾ = ? (requires borrowing across the whole number)",
+    starters: [
+      "1½ + 2½ = ?",
+      "3¼ + 1½ = ?",
+      "5¾ − 2¼ = ?",
+      "2⅓ + 1⅙ = ?",
+    ],
+    masters: [
+      "4⅖ − 2¾ = ? (requires borrowing across the whole number)",
+      "A plank 6⅛ m long has 2⅚ m cut off. How much is left?",
+      "Add 3⅗ and 2¾, then subtract 1½. Give the answer as a mixed number in simplest form.",
+    ],
   },
   {
     topicId: 60,
     learningObjectiveId: "60-multiply-fractions",
-    starter: "½ × 4 = ?",
-    master:
+    starters: [
+      "½ × 4 = ?",
+      "⅓ × 6 = ?",
+      "½ × ⅓ = ?",
+      "⅖ × 10 = ?",
+    ],
+    masters: [
       "¾ × ⅚ = ? Then explain why the product is smaller than both fractions.",
+      "Work out ⅔ × 4½ and explain why the answer is smaller than 4½.",
+      "⅝ × ⅘ = ? Simplify before multiplying and explain why that is allowed.",
+    ],
   },
   {
     topicId: 60,
     learningObjectiveId: "60-multiply-problems",
-    starter: "A recipe needs ½ cup of sugar. How much for 2 recipes?",
-    master:
+    starters: [
+      "A recipe needs ½ cup of sugar. How much for 2 recipes?",
+      "A ribbon is ¾ m long. How long are 3 such ribbons?",
+      "There are 12 sweets. Ravi eats ⅓ of them. How many did he eat?",
+      "A jug holds ⅖ litre. How much do 5 jugs hold?",
+    ],
+    masters: [
       "A tank is ¾ full. ⅔ of that water is used. What fraction of the full tank was used?",
+      "A field is ⅘ of a hectare. ⅜ of the field is planted with wheat. What fraction of a hectare is under wheat?",
+      "Meera spends ⅓ of her money on books and ¼ of the remainder on food. What fraction of her money is left?",
+    ],
   },
   {
     topicId: 60,
     learningObjectiveId: "60-divide-fractions",
-    starter: "½ ÷ 2 = ?",
-    master:
+    starters: [
+      "½ ÷ 2 = ?",
+      "¼ ÷ 3 = ?",
+      "4 ÷ ½ = ?",
+      "3 ÷ ⅓ = ?",
+    ],
+    masters: [
       "How many ¼-litre bottles can be filled from 6 litres, and what does the answer represent?",
+      "A 5 m rope is cut into ⅕ m pieces. How many pieces, and why is the answer larger than 5?",
+      "Explain, with a calculation, why ⅙ ÷ 3 and ⅙ × ⅓ give the same answer.",
+    ],
   },
   {
     topicId: 60,
     learningObjectiveId: "60-division-diagrams",
-    starter: "Shade a diagram to show ½ ÷ 2.",
-    master:
+    starters: [
+      "Shade a diagram to show ½ ÷ 2.",
+      "Draw a model for ¼ ÷ 2 and write the answer.",
+      "Use a number line to show 2 ÷ ½.",
+      "Shade a bar model to show ⅓ ÷ 3.",
+    ],
+    masters: [
       "Draw a model for 3 ÷ ⅕ and write the matching division sentence and answer.",
+      "Draw one diagram that shows both ½ ÷ 4 and ½ × ¼, and explain what it proves.",
+      "A diagram shows 4 wholes split into ⅔ pieces. Write the division sentence it represents and give the answer.",
+    ],
   },
   {
     topicId: 59,
     learningObjectiveId: "59-hcf",
-    starter: "Find the HCF of 8 and 12.",
-    master:
+    starters: [
+      "Find the HCF of 8 and 12.",
+      "Find the HCF of 15 and 25.",
+      "Find the HCF of 18 and 27.",
+      "Find the HCF of 14 and 21.",
+    ],
+    masters: [
       "Find the HCF of 24, 36, and 60, and explain what it tells you about the three numbers.",
+      "Find the HCF of 84 and 126 using prime factorisation, and show the working.",
+      "Two numbers have an HCF of 6. One of them is 18. Give two possible values for the other and explain your choice.",
+    ],
   },
   {
     topicId: 59,
     learningObjectiveId: "59-lcm",
-    starter: "Find the LCM of 4 and 6.",
-    master:
+    starters: [
+      "Find the LCM of 4 and 6.",
+      "Find the LCM of 5 and 8.",
+      "Find the LCM of 9 and 12.",
+      "Find the LCM of 3, 4 and 6.",
+    ],
+    masters: [
       "Two bells ring every 12 and 18 minutes. They ring together now—after how many minutes will they ring together again?",
+      "Find the LCM of 15, 20 and 25 using prime factorisation.",
+      "Two buses leave a stand every 24 and 36 minutes, starting together at 8:00 am. Give the next two times they leave together.",
+    ],
   },
   {
     topicId: 59,
     learningObjectiveId: "59-hcf-lcm-problems",
-    starter:
+    starters: [
       "Ribbons of 6 cm and 9 cm—what is the longest piece that measures both exactly?",
-    master:
+      "Tiles of 4 cm and 6 cm—what is the shortest length both measure exactly?",
+      "Two lights flash every 5 s and 7 s. After how long do they flash together?",
+      "What is the largest equal group size that divides both 12 and 30 exactly?",
+    ],
+    masters: [
       "Three ropes of 42 m, 56 m, and 70 m must be cut into equal pieces of the greatest possible length with nothing left over. Find the length and total number of pieces.",
+      "Sweets come in boxes of 24 and packets of 40. What is the smallest number of sweets you could buy as a whole number of each?",
+      "A hall floor is 15 m by 24 m. Find the largest square tile that fits exactly, and how many tiles are needed.",
+    ],
   },
   {
     topicId: 59,
     learningObjectiveId: "59-prime-factors",
-    starter: "Write 12 as a product of prime factors.",
-    master:
+    starters: [
+      "Write 12 as a product of prime factors.",
+      "Write 30 as a product of prime factors.",
+      "Write 45 as a product of prime factors.",
+      "Write 100 as a product of prime factors.",
+    ],
+    masters: [
       "Write 360 as a product of prime factors in index notation, and use it to say whether 360 is divisible by 27.",
+      "Write 504 in index notation, and use the prime factors to list three factors of 504 greater than 20.",
+      "Two numbers are 2² × 3 and 2 × 3². Find their HCF and LCM from the prime factors alone.",
+    ],
   },
   {
     topicId: 59,
     learningObjectiveId: "59-factor-trees",
-    starter: "Complete a factor tree for 18.",
-    master:
+    starters: [
+      "Complete a factor tree for 18.",
+      "Complete a factor tree for 24.",
+      "Complete a factor tree for 50.",
+      "Complete a factor tree for 36.",
+    ],
+    masters: [
       "Complete two different factor trees for 48 and explain why both end with the same prime factors.",
+      "Build a factor tree for 720 and write the result in index notation.",
+      "A factor tree ends in 2, 2, 5 and 5. What number did it start from? Write it in index notation.",
+    ],
   },
   {
     topicId: 57,
     learningObjectiveId: "57-large-numbers",
-    starter: "Write 4,205,000 in words.",
-    master:
+    starters: [
+      "Write 4,205,000 in words.",
+      "Write 3,070,400 in words.",
+      "Write ‘two million five hundred thousand’ in figures.",
+      "What is the value of the 6 in 6,432,109?",
+    ],
+    masters: [
       "Write ‘seven million forty thousand and nine’, then increase it by 100,000.",
+      "Write 8,009,050 in words, then write the number that is 10,000 less.",
+      "Order these from smallest to largest and explain your method: 4,099,999 · 4,100,000 · 4,090,999.",
+    ],
   },
   {
     topicId: 57,
     learningObjectiveId: "57-estimation",
-    starter: "Estimate 298 + 512 by rounding to hundreds.",
-    master:
+    starters: [
+      "Estimate 298 + 512 by rounding to hundreds.",
+      "Estimate 4,812 − 1,979 by rounding to thousands.",
+      "Estimate 39 × 21 by rounding to tens.",
+      "Round 4,783,216 to the nearest hundred thousand.",
+    ],
+    masters: [
       "A student says 4,890 × 21 ≈ 10,000. Is that reasonable? Estimate properly and explain the error.",
+      "Estimate 6,930,025 + 2,146,809, then say whether 69,300,250 could be the exact answer and why.",
+      "A shop takes ₹4,982 a day. Estimate the takings for 31 days, then say whether your estimate is above or below the true value.",
+    ],
   },
   {
     topicId: 57,
     learningObjectiveId: "57-order-operations",
-    starter: "12 + 3 × 2 = ?",
-    master: "36 ÷ (2 + 4) × 3 − 5 = ?",
+    starters: [
+      "12 + 3 × 2 = ?",
+      "20 − 6 ÷ 2 = ?",
+      "5 × 4 + 3 = ?",
+      "18 ÷ 3 + 7 × 2 = ?",
+    ],
+    masters: [
+      "36 ÷ (2 + 4) × 3 − 5 = ?",
+      "50 − 3 × (4 + 2) ÷ 2 = ?",
+      "Two students answer 2 + 4 × 3 as 14 and 18. Which is correct, and what did the other one do?",
+    ],
   },
   {
     topicId: 57,
     learningObjectiveId: "57-brackets",
-    starter: "Solve (5 + 3) × 2 and 5 + 3 × 2. Why do they differ?",
-    master: "Insert brackets to make this true: 4 + 8 ÷ 2 × 3 = 18.",
+    starters: [
+      "Solve (5 + 3) × 2 and 5 + 3 × 2. Why do they differ?",
+      "Work out (10 − 4) × 3.",
+      "Work out 10 − (4 × 3).",
+      "Does 2 × (3 + 5) equal 2 × 3 + 5? Show why.",
+    ],
+    masters: [
+      "Insert brackets to make this true: 4 + 8 ÷ 2 × 3 = 18.",
+      "Insert brackets to make this true: 3 + 2 × 5 + 1 = 26.",
+      "Using 4, 6 and 2 once each, write one expression with brackets giving 20 and one without brackets giving 16.",
+    ],
   },
 ];
 

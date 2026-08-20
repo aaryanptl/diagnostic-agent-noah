@@ -32,6 +32,16 @@ import type { CurriculumTopic, DemoStudent } from "./types"
 export const CONFIDENCE_LOCK = 0.55
 /** §06 — the platform's existing `secure` band. Not a new bar. */
 export const READY_SCORE = 75
+/**
+ * The Master bar, at topic level.
+ *
+ * Certification (R5) proves an objective on unseen questions; it is what makes
+ * a pass permanent. Master is the stronger claim on top of it: every objective
+ * in the topic is certified *and* still scoring 80 or better. A topic can close
+ * with everything certified and still not be Master — that gap is deliberate,
+ * because "finished" and "mastered" are different things to tell a parent.
+ */
+export const MASTER_SCORE = 80
 /** §05 R1/R6 — below this an objective is taught, not measured again. */
 export const NEEDS_HELP_SCORE = 60
 /** §06 — basics must be sound before a score above them is trusted. */
@@ -375,13 +385,22 @@ function rollUp(card: MasteryScorecard): MasteryScorecard {
   const signedOffCount = rows.filter((row) => row.signedOff).length
   const topicLocked = rows.every((row) => row.locked)
   const half = Math.ceil(rows.length / 2)
-  const badge: MasteryScorecard["badge"] = card.closed
-    ? "Master"
-    : signedOffCount >= half && signedOffCount > 0
-      ? "Pro"
-      : card.surveyDone
-        ? "Novice"
-        : "None"
+  /*
+   * Master is the only badge with a score bar on it: every objective certified
+   * AND every objective at or above MASTER_SCORE. Closing the topic alone earns
+   * Pro, not Master.
+   */
+  const allCertified = rows.length > 0 && rows.every((row) => row.signedOff)
+  const allAtMasterBar =
+    rows.length > 0 && rows.every((row) => row.rawScore >= MASTER_SCORE)
+  const badge: MasteryScorecard["badge"] =
+    allCertified && allAtMasterBar
+      ? "Master"
+      : allCertified || (signedOffCount >= half && signedOffCount > 0)
+        ? "Pro"
+        : card.surveyDone
+          ? "Novice"
+          : "None"
   return { ...card, rows, topicScore, topicLocked, signedOffCount, badge }
 }
 

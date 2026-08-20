@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mastery Loop, Drawn</title>
+<style>
+:root{
+  --paper:#F1F3F1; --surface:#FBFCFB; --surface-2:#E7ECEA;
+  --ink:#121A19; --ink-2:#4C5A57; --ink-3:#7B8784;
+  --rule:#D5DCDA; --rule-2:#C3CCC9;
+  --accent:#14636F; --accent-ink:#0E4C55; --accent-soft:rgba(20,99,111,.10);
+  --b1:#AC4830; --b2:#A97C22; --b3:#3B7855; --b4:#14636F;
+  --b1-soft:rgba(172,72,48,.12); --b2-soft:rgba(169,124,34,.14);
+  --b3-soft:rgba(59,120,85,.13); --b4-soft:rgba(20,99,111,.12);
+  --shadow:0 1px 2px rgba(18,26,25,.05), 0 8px 24px -18px rgba(18,26,25,.35);
+  --serif:Charter,"Bitstream Charter","Sitka Text",Cambria,"Palatino Linotype",Palatino,Georgia,serif;
+  --sans:"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+  --mono:"Cascadia Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+/* The dark palette has been removed: this page is served inside a
+   light-themed app and must not follow the viewer's OS setting. */
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+     font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.page{max-width:1060px;margin:0 auto;padding:0 24px 88px}
+
+.mast{padding:60px 0 32px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(32px,5vw,50px);line-height:1.07;
+   letter-spacing:-.015em;margin:0 0 16px;text-wrap:balance;max-width:18ch}
+.standfirst{font-size:clamp(16.5px,2vw,19px);line-height:1.55;color:var(--ink-2);max-width:64ch;margin:0}
+
+section{padding-top:48px}
+.col{max-width:74ch}
+h2{font-family:var(--serif);font-weight:600;font-size:clamp(24px,3vw,31px);line-height:1.15;
+   letter-spacing:-.01em;margin:0 0 8px;text-wrap:balance}
+h2 .num{font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--accent);
+        display:block;margin-bottom:10px;font-weight:400}
+h3{font-family:var(--sans);font-weight:650;font-size:16.5px;margin:38px 0 10px;color:var(--ink)}
+p{margin:0 0 14px;max-width:74ch}
+.lede{font-size:17px;color:var(--ink-2);line-height:1.55;margin-bottom:22px;max-width:70ch}
+strong{font-weight:650;color:var(--ink)}
+code{font-family:var(--mono);font-size:.86em;background:var(--surface-2);padding:1px 5px;
+     border-radius:3px;color:var(--ink);white-space:nowrap}
+
+.tbl{overflow-x:auto;margin:20px 0 24px;border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:600px}
+thead th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+         text-transform:uppercase;color:var(--ink-3);font-weight:500;padding:11px 14px;
+         border-bottom:1px solid var(--rule-2);background:var(--surface-2);white-space:nowrap}
+tbody td{padding:11px 14px;border-bottom:1px solid var(--rule);vertical-align:top;line-height:1.45}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td code{white-space:normal}
+
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+      text-transform:uppercase;padding:3px 8px;border-radius:99px;border:1px solid currentColor;
+      white-space:nowrap;line-height:1.5}
+.p-bad{color:var(--b1);background:var(--b1-soft)}
+.p-warn{color:var(--b2);background:var(--b2-soft)}
+.p-good{color:var(--b3);background:var(--b3-soft)}
+.p-info{color:var(--b4);background:var(--b4-soft)}
+.p-mute{color:var(--ink-3);background:var(--surface-2)}
+
+.note{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);
+      border-radius:0 6px 6px 0;padding:15px 18px;margin:22px 0;max-width:74ch}
+.note.key{border-left-color:var(--b3)}
+.note.key .note-t{color:var(--b3)}
+.note-t{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+        color:var(--accent);margin:0 0 8px}
+.note p{font-size:14.5px;margin-bottom:9px}
+.note p:last-child{margin-bottom:0}
+
+pre{font-family:var(--mono);font-size:12.5px;line-height:1.7;background:var(--surface);
+    border:1px solid var(--rule);border-radius:6px;padding:16px 18px;overflow-x:auto;
+    margin:20px 0;color:var(--ink)}
+pre code{background:none;padding:0;font-size:inherit;white-space:pre}
+pre .c{color:var(--ink-3)}
+pre .k{color:var(--accent-ink);font-weight:600}
+
+figure{margin:26px 0 24px}
+.scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--surface);padding:18px}
+figcaption{font-size:13px;color:var(--ink-3);margin-top:11px;line-height:1.5;max-width:70ch}
+figcaption b{color:var(--ink-2);font-weight:650}
+svg.diagram{display:block;width:100%;height:auto}
+svg text{font-family:var(--sans);fill:var(--ink)}
+svg .lbl{font-size:13.5px;font-weight:650}
+svg .sub{font-size:10.5px;fill:var(--ink-2);font-weight:400}
+svg .edge{font-family:var(--mono);font-size:10px;fill:var(--ink-3);letter-spacing:.04em}
+svg .box{fill:var(--surface-2);stroke:var(--rule-2);stroke-width:1}
+svg .box-hi{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4}
+svg .box-good{fill:var(--b3-soft);stroke:var(--b3);stroke-width:1}
+svg .box-bad{fill:var(--b1-soft);stroke:var(--b1);stroke-width:1}
+svg .flow{stroke:var(--rule-2);stroke-width:1.6;fill:none}
+svg .flow-a{stroke:var(--accent);stroke-width:1.8;fill:none}
+svg .flow-d{stroke:var(--accent);stroke-width:1.2;fill:none;stroke-dasharray:4 4;opacity:.8}
+
+.ladder{border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--surface);margin:16px 0 0}
+.band{display:flex;align-items:stretch;border-bottom:1px solid var(--rule)}
+.band:last-child{border-bottom:0}
+.band-l{flex:0 0 100px;padding:12px;background:var(--surface-2);border-right:1px solid var(--rule);
+        font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);line-height:1.5}
+.band-r{flex:1 1 auto;min-width:0}
+.rung{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;padding:10px 14px;border-bottom:1px solid var(--rule)}
+.rung:last-child{border-bottom:0}
+.rung-n{flex:0 0 30px;font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent)}
+.rung-c{flex:1 1 240px;font-size:13.5px;color:var(--ink);min-width:0}
+.rung-c em{display:block;font-style:normal;font-size:12px;color:var(--ink-3);line-height:1.4}
+.rung-a{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-2);
+        background:var(--surface-2);border:1px solid var(--rule-2);border-radius:4px;padding:3px 9px;white-space:nowrap}
+.rung.hit{background:var(--accent-soft)}
+.rung.hit .rung-a{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.rung.dead{opacity:.4}
+
+.bar{display:flex;align-items:center;gap:7px;min-width:118px}
+.bar-t{flex:1 1 auto;height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden;min-width:48px}
+.bar-f{display:block;height:100%;border-radius:99px;background:var(--ink-3)}
+.f-bad{background:var(--b1)} .f-warn{background:var(--b2)} .f-good{background:var(--b3)}
+.bar-v{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--ink-2);flex:0 0 auto}
+.bar-e{font-family:var(--mono);font-size:10px;color:var(--ink-3);flex:0 0 auto}
+.lock{color:var(--b3)}
+.empty{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+.wfgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px;margin:22px 0 4px}
+.wf{border:1px solid var(--rule-2);border-radius:10px;background:var(--surface);overflow:hidden;box-shadow:var(--shadow)}
+.wf-bar{height:26px;background:var(--surface-2);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 10px;gap:5px}
+.wf-dot{width:6px;height:6px;border-radius:50%;background:var(--rule-2)}
+.wf-cap{margin-left:6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.wf-b{padding:14px 14px 16px}
+.wf-k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 6px}
+.wf-h{font-family:var(--serif);font-size:17px;font-weight:600;margin:0 0 3px;line-height:1.2}
+.wf-s{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;line-height:1.42}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.chip{font-family:var(--mono);font-size:10px;padding:4px 8px;border-radius:4px;border:1px dashed var(--rule-2);color:var(--ink-3)}
+.chip.on{border-style:solid;border-color:var(--b3);background:var(--b3-soft);color:var(--b3)}
+.chip.now{border-style:solid;border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+.cta{margin-top:12px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:6px;padding:10px 12px}
+.cta-t{font-size:13.5px;font-weight:650;margin:0 0 2px}
+.cta-s{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);margin:0}
+.wf-note{border-top:1px dashed var(--rule-2);margin-top:12px;padding-top:9px;
+         font-family:var(--mono);font-size:10px;line-height:1.55;color:var(--ink-3)}
+.rowline{display:flex;justify-content:space-between;align-items:center;gap:8px;
+         font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.rowline:last-of-type{border-bottom:0}
+.rowline .m{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+
+.plain{border:1px solid var(--rule-2);border-radius:8px;background:var(--surface);
+       padding:20px 22px;margin:22px 0 6px;max-width:74ch;box-shadow:var(--shadow)}
+.plain p{font-family:var(--serif);font-size:17.5px;line-height:1.6;margin:0 0 12px}
+.plain p:last-child{margin-bottom:0}
+.plain b{font-weight:600;color:var(--accent-ink)}
+.grp{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+     color:var(--accent);margin:32px 0 -8px}
+td.term{white-space:nowrap;font-weight:650;width:1%}
+td.term .alt{display:block;font-family:var(--mono);font-size:10.5px;font-weight:400;
+             color:var(--ink-3);letter-spacing:.04em;text-transform:none;margin-top:2px}
+
+.sim{border:1px solid var(--rule);border-radius:8px;background:var(--surface);padding:18px;margin:20px 0 0}
+.sim-h{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.btn{font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;padding:5px 10px;border-radius:5px;
+     border:1px solid var(--rule-2);background:var(--surface-2);color:var(--ink-2);cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid-in{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
+@media(min-width:640px){.grid-in{grid-template-columns:repeat(3,1fr)}}
+.locard{border:1px solid var(--rule);border-radius:6px;padding:10px 12px;background:var(--paper)}
+.locard h5{margin:0 0 8px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.fld{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;font-size:12px;color:var(--ink-2)}
+.fld input[type=number]{width:62px;font-family:var(--mono);font-size:12px;padding:3px 6px;
+  border:1px solid var(--rule-2);border-radius:4px;background:var(--surface);color:var(--ink)}
+.fld input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent)}
+.st{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    padding:3px 7px;border-radius:99px;border:1px solid currentColor;display:inline-block;margin-top:6px}
+.globals{display:flex;flex-wrap:wrap;gap:16px;padding:10px 12px;border:1px solid var(--rule);
+         border-radius:6px;background:var(--paper);margin-bottom:14px;font-size:12px;color:var(--ink-2)}
+.globals label{display:flex;align-items:center;gap:6px}
+.globals input[type=number]{width:56px;font-family:var(--mono);font-size:12px;padding:3px 6px;
+  border:1px solid var(--rule-2);border-radius:4px;background:var(--surface);color:var(--ink)}
+.globals input[type=checkbox]{width:15px;height:15px;accent-color:var(--accent)}
+.verdict{border:1px solid var(--accent);background:var(--accent-soft);border-radius:6px;padding:12px 14px;margin-top:14px}
+.verdict-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);margin:0 0 4px}
+.verdict-v{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 0 4px}
+.verdict-w{font-size:13px;color:var(--ink-2);margin:0}
+
+footer{margin-top:64px;padding-top:24px;border-top:1px solid var(--rule);
+       font-size:13px;color:var(--ink-3);max-width:74ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+<header class="mast">
+  <p class="eyebrow">Noah 2.0 · Companion to “The Mastery Loop”</p>
+  <h1>The Mastery Loop, drawn</h1>
+  <p class="standfirst">Every term defined in one line, the router you can poke, what each
+  activity does to the score, and one student driven through a whole topic by it. Fractions,
+  3 objectives.</p>
+</header>
+
+<section id="s0">
+  <h2><span class="num">§ 00</span>The words, first</h2>
+  <div class="col">
+    <p class="lede">Every term this document uses, in one line each. If a sentence later on
+    stops making sense, the word you are missing is on this page.</p>
+  </div>
+
+  <div class="plain">
+    <p>Here is the whole idea in four sentences.</p>
+    <p>A topic is made of two or three <b>learning objectives</b>. Each objective carries one
+    number, 0–100, saying how well the student has it — all of those numbers together are the
+    <b>scorecard</b>.</p>
+    <p>At the start of a session the <b>router</b> reads that scorecard, runs down a fixed list of
+    rules, and picks the single thing that helps this student most right now — a test, a practice
+    set, or a class.</p>
+    <p>The student does it, the numbers move, and next session the router reads them again. It stops
+    when every objective is <b>signed off</b>.</p>
+  </div>
+
+  <p class="grp">The things being measured</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>In plain language</th></tr></thead>
+    <tbody>
+      <tr><td class="term">Learning objective<span class="alt">LO</span></td>
+      <td>One specific skill inside a topic. In <em>Fractions</em>: "compare two fractions",
+      "add fractions with unlike denominators". The smallest thing this system tracks. Real
+      curriculum data says a topic carries <strong>2–3 of them</strong>, not six.</td></tr>
+
+      <tr><td class="term">Topic</td>
+      <td>The unit a student works through — Fractions, Decimals. It has its own score too, but
+      that score is a summary of its objectives, not a separate measurement.</td></tr>
+
+      <tr><td class="term">Round</td>
+      <td>One session. The router decides once per round. "4 rounds stalled" means four sessions
+      in a row where nothing improved.</td></tr>
+
+      <tr><td class="term">Attempt</td>
+      <td>What one activity scored on one objective, 0–100. Points earned ÷ points possible.
+      It is the <em>new evidence</em>, not the new score — the score only moves part of the way
+      toward it.</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="grp">The record</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>In plain language</th></tr></thead>
+    <tbody>
+      <tr><td class="term">Scorecard</td>
+      <td>One row per objective, plus one row for the topic. This is the <strong>only thing that
+      survives between sessions</strong>. Everything the router knows, it reads from here.</td></tr>
+
+      <tr><td class="term">Score</td>
+      <td>The 0–100 number on an objective. Not an average of every question ever answered — it
+      leans toward recent work on purpose, so a student who started at 60 and is now at 85 reads
+      as 85, not 73.</td></tr>
+
+      <tr><td class="term">Confidence</td>
+      <td>A separate 0–1 number answering "how much do we trust that score?" A score of 82 built
+      on three questions and a score of 82 built on twenty are not the same claim. Below the bar
+      the platform returns <strong>no score at all</strong> rather than a guess. It rises with
+      more questions, more question types, and more difficulty bands — not just more questions.
+      This already exists on the platform.</td></tr>
+
+      <tr><td class="term">Locked<span class="alt">confidence locked</span></td>
+      <td>Shorthand for "we have enough evidence to act on this score". Several rules refuse to
+      fire until an objective is locked, so the router never makes a big decision on thin
+      data.</td></tr>
+
+      <tr><td class="term">LO state</td>
+      <td>A label the router works out from the score and confidence — it is never stored. Six of
+      them: <code>untested</code> (no evidence yet), <code>working</code> (in progress),
+      <code>ready</code> (looks masterable, worth testing properly), <code>needs_help</code>
+      (below 60, teach it), <code>blocked</code> (failed the check twice, a human is needed),
+      <code>signed_off</code> (done).</td></tr>
+
+      <tr><td class="term">Signed off<span class="alt">certified</span></td>
+      <td>An objective is finished and will not come back. Only <strong>one</strong> activity is
+      allowed to do this — the LO check. Nothing else can end an objective, no matter how high the
+      score gets.</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="grp">The decision</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>In plain language</th></tr></thead>
+    <tbody>
+      <tr><td class="term">Router</td>
+      <td>The piece that decides what the student gets next. It reads the scorecard and outputs
+      <strong>exactly one activity</strong>. It has no memory of its own and no schedule — ask it
+      the same question with the same scorecard and it always answers the same way.</td></tr>
+
+      <tr><td class="term">Rule ladder<span class="alt">R0–R7</span></td>
+      <td>The router's logic: eight rules in a fixed order, read top to bottom,
+      <strong>first match wins</strong>, stop. No scoring of options, no weighting, no tie-breaks
+      — which is why you can read the ladder and predict exactly what a student will be given.
+      The <em>order</em> is the design: safety first, then certification, then teaching, then
+      testing.</td></tr>
+
+      <tr><td class="term">Activity</td>
+      <td>The thing the router hands back — a topic survey, an LO check, homework, practice, or a
+      class. One per round.</td></tr>
+
+      <tr><td class="term">Sequencer</td>
+      <td>The layer <em>above</em> this loop that chooses which topic a student works on. The
+      loop takes the topic as given and never argues with it. Placement, grade tests and
+      multi-topic tests feed the sequencer, not the loop.</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="grp">The activities</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>In plain language</th></tr></thead>
+    <tbody>
+      <tr><td class="term">Topic survey</td>
+      <td>The <strong>first</strong> thing a student gets in a new topic, before any teaching.
+      It touches every objective in the topic, at least 3 questions each, and its whole job is to
+      fill in the scorecard so the router has something to read. It is a real test and it moves
+      scores — but it fires before teaching, so it is not allowed to sign anything off.
+      <span class="pill p-mute">today: the topic test</span></td></tr>
+
+      <tr><td class="term">LO check</td>
+      <td>A short, strict test on <strong>one</strong> objective only — 5 questions, timed, no
+      hints, and every question is one the student has never seen. It is the exam at the end of
+      an objective, and the only activity allowed to sign one off. The router only calls it when
+      an objective already looks ready; it is confirmation, not exploration.
+      <span class="pill p-mute">today: the topic test, narrowed</span></td></tr>
+
+      <tr><td class="term">Homework</td>
+      <td>The workhorse — about 12 questions across the topic, unhinted, untimed. It is a real
+      measurement and it moves scores, just at half weight because it is low-pressure. What
+      changes is <em>which</em> objectives it picks: driven by the scorecard instead of an even
+      spread.</td></tr>
+
+      <tr><td class="term">Practice</td>
+      <td>5 questions with hints and unlimited retries. Because the format guarantees a correct
+      answer eventually, it <strong>cannot measure anything</strong> — so it moves no score at
+      all. It teaches. That is a change: practice writes a score today.</td></tr>
+
+      <tr><td class="term">Class</td>
+      <td>A request into the mentor tool — get a human to teach this. Produces no questions and
+      moves no numbers. The router's answer when more testing would be pointless.</td></tr>
+
+      <tr><td class="term">Placement</td>
+      <td>20 questions across a whole grade, taken once. Its job is choosing where to
+      <em>start</em>. It seeds the topic row with a cautious first guess and is thrown away the
+      moment that topic's survey runs. It writes nothing per objective — 20 questions across a
+      grade is far too thin for that.</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="grp">The maths</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Term</th><th>In plain language</th></tr></thead>
+    <tbody>
+      <tr><td class="term">Score weight<span class="alt">w</span></td>
+      <td>How much an activity's result is believed. Survey and check <code>1.0</code>, homework
+      <code>0.5</code>, practice <code>0</code>. Answers "how honest is this measurement?"</td></tr>
+
+      <tr><td class="term">Learning rate<span class="alt">k(n)</span></td>
+      <td>How far the score moves toward the new evidence. Big early, smaller later — the first
+      result on a fresh objective should move it a lot; the tenth should not. <code>n</code> is
+      how many measured rounds that objective already has. It has a <strong>floor</strong> so
+      that a long-standing score can still change when a student genuinely improves.</td></tr>
+
+      <tr><td class="term">Difficulty modifier<span class="alt">d</span> <span class="pill p-warn">under review</span></td>
+      <td>An adjustment for how hard the questions were. Careful: difficulty is
+      <strong>already</strong> inside the attempt score, because a hard question is worth 4 points
+      and an easy one 2. Applying it twice quietly inflates hard-question gains. Whether
+      <code>d</code> should exist at all is the one number still open — see §02.</td></tr>
+
+      <tr><td class="term">Fresh-only</td>
+      <td>Every question is one this student has never been served, in any flow. The LO check
+      demands it — you cannot certify someone on questions they have already seen the answer to.
+      The platform already tracks this across flows.</td></tr>
+
+      <tr><td class="term">Golden LO rule</td>
+      <td>An existing platform rule: an objective is only included in a test if it can get at
+      least 3 questions. Fewer than that and it is silently dropped — which matters, because a
+      short survey config can leave objectives untested without saying so.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note key">
+    <p class="note-t">The one distinction people keep tripping over</p>
+    <p><strong>Topic survey and LO check are the same engine.</strong> Today's topic test does
+    both jobs at once: it sweeps every objective, and it is also what decides whether a student
+    is done. Those are different jobs and they want different shapes.</p>
+    <p>The survey is <em>wide and early</em> — every objective, before teaching, to find out where
+    the student stands. The check is <em>narrow and late</em> — one objective, fresh questions,
+    after teaching, to close it out. Same question bank, same scorer, two blueprints.</p>
+  </div>
+</section>
+
+<section id="s1">
+  <h2><span class="num">§ 01</span>The logic</h2>
+  <div class="col">
+    <p class="lede">One scorecard, one router, one activity at a time. The number of tests a student
+    takes is an <em>output</em> of this cycle, never an input.</p>
+  </div>
+
+  <figure>
+    <div class="scroll">
+      <svg class="diagram" viewBox="0 0 900 420" style="min-width:700px" role="img" aria-label="The cycle: placement seeds the scorecard, the router reads it and dispatches one activity, which writes back">
+        <defs>
+          <marker id="a1" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto">
+            <path d="M0,0 L7,3.2 L0,6.4 z" fill="var(--rule-2)"/></marker>
+          <marker id="a2" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto">
+            <path d="M0,0 L7,3.2 L0,6.4 z" fill="var(--accent)"/></marker>
+          <marker id="a3" markerWidth="9" markerHeight="9" refX="7.5" refY="3.2" orient="auto">
+            <path d="M0,0 L7,3.2 L0,6.4 z" fill="var(--b3)"/></marker>
+        </defs>
+
+        <rect class="box" x="330" y="10" width="240" height="52" rx="6"/>
+        <text class="lbl" x="450" y="32" text-anchor="middle">Placement · 20 Q, once per grade</text>
+        <text class="sub" x="450" y="49" text-anchor="middle">seeds the TOPIC row only — never certifies</text>
+        <path class="flow" d="M450,62 L450,94" marker-end="url(#a1)"/>
+
+        <rect class="box-hi" x="290" y="96" width="320" height="74" rx="7"/>
+        <text class="lbl" x="450" y="123" text-anchor="middle">THE SCORECARD</text>
+        <text class="sub" x="450" y="141" text-anchor="middle">3 LO rows + 1 topic row</text>
+        <text class="sub" x="450" y="157" text-anchor="middle">the only state that survives a session</text>
+        <path class="flow-a" d="M450,170 L450,202" marker-end="url(#a2)"/>
+        <text class="edge" x="462" y="190">reads</text>
+
+        <rect class="box-hi" x="290" y="204" width="320" height="74" rx="7"/>
+        <text class="lbl" x="450" y="231" text-anchor="middle">THE ROUTER</text>
+        <text class="sub" x="450" y="249" text-anchor="middle">8 rules · top to bottom · first match wins</text>
+        <text class="sub" x="450" y="265" text-anchor="middle">no queue, no schedule, no fixed test count</text>
+        <path class="flow-a" d="M450,278 L450,310" marker-end="url(#a2)"/>
+        <text class="edge" x="462" y="298">dispatches exactly one</text>
+
+        <rect class="box" x="290" y="312" width="320" height="58" rx="6"/>
+        <text class="lbl" x="450" y="336" text-anchor="middle">ONE ACTIVITY</text>
+        <text class="sub" x="450" y="354" text-anchor="middle">survey · homework · practice · LO check · class</text>
+
+        <path class="flow-a" d="M290,341 L200,341 L200,133 L286,133" marker-end="url(#a2)"/>
+        <text class="edge" x="120" y="230">writes back</text>
+        <text class="edge" x="120" y="244">score · confidence</text>
+        <text class="edge" x="120" y="258">state · timestamps</text>
+
+        <path class="flow" d="M610,241 L698,241" marker-end="url(#a3)" stroke="var(--b3)"/>
+        <text class="edge" x="618" y="231">R0 fires</text>
+        <rect class="box-good" x="700" y="215" width="176" height="52" rx="6"/>
+        <text class="lbl" x="788" y="237" text-anchor="middle">Topic closed</text>
+        <text class="sub" x="788" y="254" text-anchor="middle">every LO signed off</text>
+      </svg>
+    </div>
+    <figcaption><b>Figure 1 — the cycle.</b> The per-LO record already exists on the platform
+    (<code>progress_student_lo</code>). What is missing is the middle box — nothing reads it to
+    decide the next activity. Score weights are in §02.</figcaption>
+  </figure>
+
+  <h3>The eight rules — set a scorecard and watch one fire</h3>
+
+  <div class="sim">
+    <div class="sim-h">
+      <p class="note-t" style="margin:0">Router simulator</p>
+      <div class="btns">
+        <button class="btn" type="button" data-preset="day1">Day one</button>
+        <button class="btn" type="button" data-preset="mid">Mid-topic</button>
+        <button class="btn" type="button" data-preset="topper">Topper</button>
+        <button class="btn" type="button" data-preset="waiting">One ready</button>
+        <button class="btn" type="button" data-preset="blocked">Blocked</button>
+        <button class="btn" type="button" data-preset="steady">Steady</button>
+        <button class="btn" type="button" data-preset="drowning">Drowning</button>
+        <button class="btn" type="button" data-preset="escalate">3 fails</button>
+        <button class="btn" type="button" data-preset="done">All signed</button>
+      </div>
+    </div>
+
+    <div class="grid-in">
+      <div class="locard">
+        <h5>LO1 · Compare &amp; order</h5>
+        <div class="fld"><span>score</span><input type="number" id="c0" min="0" max="100" step="1" value="0"></div>
+        <div class="fld"><span>confidence</span><input type="number" id="e0" min="0" max="1" step="0.05" value="0"></div>
+        <div class="fld"><span>check fails</span><input type="number" id="f0" min="0" max="3" step="1" value="0"></div>
+        <div class="fld"><span>signed off</span><input type="checkbox" id="s0"></div>
+        <span class="st" id="st0">untested</span>
+      </div>
+      <div class="locard">
+        <h5>LO2 · Add &amp; subtract</h5>
+        <div class="fld"><span>score</span><input type="number" id="c1" min="0" max="100" step="1" value="0"></div>
+        <div class="fld"><span>confidence</span><input type="number" id="e1" min="0" max="1" step="0.05" value="0"></div>
+        <div class="fld"><span>check fails</span><input type="number" id="f1" min="0" max="3" step="1" value="0"></div>
+        <div class="fld"><span>signed off</span><input type="checkbox" id="s1"></div>
+        <span class="st" id="st1">untested</span>
+      </div>
+      <div class="locard">
+        <h5>LO3 · Word problems</h5>
+        <div class="fld"><span>score</span><input type="number" id="c2" min="0" max="100" step="1" value="0"></div>
+        <div class="fld"><span>confidence</span><input type="number" id="e2" min="0" max="1" step="0.05" value="0"></div>
+        <div class="fld"><span>check fails</span><input type="number" id="f2" min="0" max="3" step="1" value="0"></div>
+        <div class="fld"><span>signed off</span><input type="checkbox" id="s2"></div>
+        <span class="st" id="st2">untested</span>
+      </div>
+    </div>
+
+    <div class="globals">
+      <label><input type="checkbox" id="gSurvey"> survey done</label>
+      <label>rounds stalled <input type="number" id="gStalled" min="0" max="9" step="1" value="0"></label>
+      <label>rounds since an LO went ready <input type="number" id="gReady" min="0" max="9" step="1" value="0"></label>
+      <label><input type="checkbox" id="gMeasured" checked> measured since last practice</label>
+    </div>
+
+    <div class="ladder" id="ladder">
+      <div class="band">
+        <div class="band-l">exit</div>
+        <div class="band-r">
+          <div class="rung" data-r="R0"><span class="rung-n">R0</span>
+            <span class="rung-c">every LO <code>signed_off</code><em>the only way out of the loop</em></span>
+            <span class="rung-a">Close topic</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">safety<br>first</div>
+        <div class="band-r">
+          <div class="rung" data-r="R1"><span class="rung-n">R1</span>
+            <span class="rung-c">topic score &lt; 60 <strong>and</strong> confidence locked<em>the concept never landed — re-teach the whole topic</em></span>
+            <span class="rung-a">Topic class</span></div>
+          <div class="rung" data-r="R2"><span class="rung-n">R2</span>
+            <span class="rung-c">3 check failures on one LO, <strong>or</strong> 4 rounds stalled<em>the loop is not converging — stop trying</em></span>
+            <span class="rung-a">Flag to teacher</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">fill the<br>map</div>
+        <div class="band-r">
+          <div class="rung" data-r="R3"><span class="rung-n">R3</span>
+            <span class="rung-c">no survey yet<em>nothing in the scorecard to read</em></span>
+            <span class="rung-a">Topic survey</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">unblock</div>
+        <div class="band-r">
+          <div class="rung" data-r="R4"><span class="rung-n">R4</span>
+            <span class="rung-c">an LO is <code>blocked</code><em>waiting on a mentor — that LO only, the rest keep running</em></span>
+            <span class="rung-a">LO class</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">certify<br>above all</div>
+        <div class="band-r">
+          <div class="rung" data-r="R5"><span class="rung-n">R5</span>
+            <span class="rung-c">2+ LOs <code>ready</code>, or 1 ready that has waited 2 rounds<em>sign-off never queues behind ordinary work</em></span>
+            <span class="rung-a">LO check</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">teach<br>above test</div>
+        <div class="band-r">
+          <div class="rung" data-r="R6"><span class="rung-n">R6</span>
+            <span class="rung-c">an LO <code>needs_help</code> <strong>and</strong> has been measured since its last practice<em>an LO at 47 does not need another measurement</em></span>
+            <span class="rung-a">Practice</span></div>
+        </div>
+      </div>
+      <div class="band">
+        <div class="band-l">default</div>
+        <div class="band-r">
+          <div class="rung" data-r="R7"><span class="rung-n">R7</span>
+            <span class="rung-c">otherwise<em>the only activity that both moves an LO and produces evidence</em></span>
+            <span class="rung-a">Homework</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="verdict">
+      <p class="verdict-k">Dispatched</p>
+      <p class="verdict-v" id="vOut">Topic survey</p>
+      <p class="verdict-w" id="vWhy">R3 matched — no survey yet, so there is nothing in the scorecard to read.</p>
+    </div>
+  </div>
+
+  <div class="col">
+    <div class="note key">
+      <p class="note-t">The order is the design</p>
+      <p><strong>Safety above everything</strong> — a student who is drowning or looping never gets
+      handed another worksheet.<br>
+      <strong>Certification above teaching</strong> — move R5 below R7 and sign-off starves.<br>
+      <strong>Teaching above measuring</strong> — an LO at 47 needs teaching, not another test.<br>
+      <strong>R6's second clause is load-bearing.</strong> Practice writes no score, so without
+      “measured since last practice” the router prescribes practice, sees no change, and prescribes
+      it again forever. And it fails <em>silently</em> — the student can be improving the
+      whole time, and because practice writes no score there is nothing for the router or the mentor
+      to see.</p>
+      <p><strong>Practice at weight 0 is a change, not the status quo</strong> — it writes to
+      <code>progress_student_lo</code> today. See §02.</p>
+    </div>
+  </div>
+
+</section>
+
+<section id="s2">
+  <h2><span class="num">§ 02</span>What is in the loop, and what moves the score</h2>
+  <div class="col">
+    <p class="lede">Six assessment flows exist today. Nothing is thrown away — two move out to the
+    layer above, one test splits into two shapes, two are reshaped, and one new activity is added.
+    Here is where each one lands.</p>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Existing flow</th><th>In the loop?</th><th>What happens to it</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Placement</strong><br><span style="color:var(--ink-3);font-size:12.5px">20 Q, whole grade, once</span></td>
+          <td><span class="pill p-warn">Partly</span></td>
+          <td>Unchanged as a flow. It picks the entry topic and seeds the <strong>topic row</strong>. It writes no per-objective score — the flow reports at topic level and its content ratios are not enforced, so a per-LO read is not supportable.</td>
+        </tr>
+        <tr>
+          <td><strong>Topic test</strong><br><span style="color:var(--ink-3);font-size:12.5px">all LOs, ≥3 Q each</span></td>
+          <td><span class="pill p-info">Splits in two</span></td>
+          <td>Same engine, two blueprints. → <strong>Topic survey</strong> (existing blueprint, moved to the front of the topic, cannot certify) and <strong>LO check</strong> (one objective, 5 Q, fresh-only, the only thing that can certify).</td>
+        </tr>
+        <tr>
+          <td><strong>Grade test</strong></td>
+          <td><span class="pill p-bad">Out</span></td>
+          <td>A topic-<em>selection</em> instrument. Belongs to the sequencer above this loop, not inside it.</td>
+        </tr>
+        <tr>
+          <td><strong>Multi-topic test</strong></td>
+          <td><span class="pill p-bad">Out</span></td>
+          <td>Same reason. It is a grade config over a topic subset, not a mastery instrument.</td>
+        </tr>
+        <tr>
+          <td><strong>Homework</strong><br><span style="color:var(--ink-3);font-size:12.5px">~12 Q, one topic</span></td>
+          <td><span class="pill p-good">In, reshaped</span></td>
+          <td>The workhorse. LO selection changes from an even spread to a prescribed <strong>60 gap / 25 probe / 15 maintain</strong> mix driven by the scorecard.</td>
+        </tr>
+        <tr>
+          <td><strong>Practice</strong><br><span style="color:var(--ink-3);font-size:12.5px">5 Q, hints, retries</span></td>
+          <td><span class="pill p-good">In, reshaped</span></td>
+          <td><strong>Score weight drops to zero.</strong> This is a change, not the status quo — practice writes to <code>progress_student_lo</code> today.</td>
+        </tr>
+        <tr>
+          <td><em>(new)</em> <strong>Class</strong></td>
+          <td><span class="pill p-info">New</span></td>
+          <td>A request into the mentor tool. Produces no attempts and moves no numbers.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col">
+    <h3>What each one does to the score</h3>
+    <p>Every activity gets judged on three separate questions, and the answers do not have to
+    match: <strong>how much does its result count</strong>, <strong>does it make us more sure</strong>,
+    and <strong>is it allowed to declare an objective finished</strong>. The temptation is to collapse
+    them into one "how good is this test" rating. Don't — the topic survey scores as cleanly as a
+    check but must never end a topic, and that is only expressible with three dials.</p>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Activity</th><th class="num">Score weight <code>w</code></th><th>Adds confidence</th><th>Can certify</th><th>Why that combination</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Topic survey</strong></td><td class="num">1.0</td><td><span class="pill p-good">Yes</span></td><td><span class="pill p-bad">No</span></td><td>Timed, unhinted, one attempt — as clean as a check. But it fires before any teaching, so it must not be able to end a topic.</td></tr>
+        <tr><td><strong>LO check</strong></td><td class="num">1.0</td><td><span class="pill p-good">Yes</span></td><td><span class="pill p-good">Yes</span></td><td>Same rigour, plus every question is one the student has never seen. The only activity that can sign an objective off.</td></tr>
+        <tr><td><strong>Homework</strong></td><td class="num">0.5</td><td><span class="pill p-good">Yes</span></td><td><span class="pill p-bad">No</span></td><td>Real unhinted work, but untimed and low-pressure. Half, not zero.</td></tr>
+        <tr><td><strong>Practice</strong></td><td class="num">0</td><td><span class="pill p-bad">No</span></td><td><span class="pill p-bad">No</span></td><td>Hints and unlimited retries mean a correct answer is guaranteed by the format. It teaches; it cannot measure.</td></tr>
+        <tr><td colspan="5" style="background:var(--surface-2)"><strong>Partial answers earn zero across every activity.</strong> The live scorer gives them half points; this design does not. The results screen still shows partial credit — only the mastery number changes.</td></tr>
+        <tr><td><strong>Placement</strong></td><td class="num">—</td><td><span class="pill p-bad">No</span></td><td><span class="pill p-bad">No</span></td><td>Seeds the topic row once, shrunk toward 50, ceiling 67. Discarded the moment that topic's survey runs.</td></tr>
+        <tr><td><strong>Class</strong></td><td class="num">—</td><td><span class="pill p-bad">No</span></td><td><span class="pill p-bad">No</span></td><td>A dispatch action, not an assessment.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col">
+    <h3>The update rule</h3>
+    <p>Read it as one sentence: <strong>move the score part of the way toward the new result, and
+    how far depends on how much we trust it.</strong> Nothing is ever replaced outright, and nothing
+    is a plain average — a lifetime average would strand a student who started at 60 and finished
+    at 85 on a permanent 73.</p>
+  </div>
+
+  <pre><code><span class="k">score' = score + w · k(n) · d · (attempt − score)</span>
+
+  attempt   this activity's result on THIS objective, 0–100
+            <span class="c">points earned ÷ points possible, where a question is worth</span>
+            <span class="c">easy 2 · medium 3 · hard 4, × correct 1.0 · <span class="k">partial 0</span> · incorrect 0</span>
+            <span class="c">partial earns nothing — half an answer is not half an objective</span>
+            <span class="c">a correct-but-slow answer already takes a 0.9× hit in the live scorer</span>
+
+  w         how much this activity's word is worth
+            survey/check 1.0 · homework 0.5 · practice 0
+  k(n)      how far the score moves toward it
+            0.80 / (1 + n/6), floored at 0.15
+            <span class="c">n = prior measured rounds. Early rounds move the score a lot, later ones less —</span>
+            <span class="c">the floor is what stops it freezing once a student has history.</span>
+  d         difficulty modifier  <span class="c">applied to the GAIN, never to the attempt score</span></code></pre>
+
+  <div class="col">
+    <div class="note warn">
+      <p class="note-t">The trap: difficulty counted twice</p>
+      <p>The live scorer already weights by band — 2 / 3 / 4 points. Because <code>attempt</code> is
+      earned over possible, <strong>difficulty cancels out of it</strong>. Multiplying the attempt
+      score by a difficulty modifier again would silently inflate hard-question gains. It belongs on
+      the gain term, and asymmetrically:</p>
+    </div>
+  </div>
+
+  <div class="tbl">
+    <table>
+      <thead><tr><th>Band</th><th class="num">d, score rising</th><th class="num">d, score falling</th><th>Reads as</th></tr></thead>
+      <tbody>
+        <tr><td>Easy</td><td class="num">0.50</td><td class="num">1.00</td><td>Cheap to pass, expensive to fail</td></tr>
+        <tr><td>Medium</td><td class="num">0.70</td><td class="num">0.85</td><td>Roughly symmetric</td></tr>
+        <tr><td>Hard</td><td class="num">1.00</td><td class="num">0.60</td><td>The only route to a high score; failing one is forgivable</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col">
+    <h3>One round, worked</h3>
+    <p>LO3 sits at <strong>51</strong> with 2 prior measured rounds. A homework round serves it four
+    questions: easy correct, medium correct, medium <em>partial</em>, hard wrong. The partial earns
+    nothing.</p>
+  </div>
+
+  <pre><code>  points     easy 2×1.0 + med 3×1.0 + med 3×<span class="k">0</span> + hard 4×0     =  5.0
+  possible   2 + 3 + 3 + 4                                   = 12.0
+  <span class="k">attempt    5.0 / 12.0                                    = 42</span>
+
+  w          0.5                    <span class="c">homework</span>
+  k(2)       0.80 / (1 + 2/6)       = 0.60
+  d          0.85                   <span class="c">medium-weighted set, score FALLING</span>
+
+  <span class="k">score' = 51 + 0.5 × 0.60 × 0.85 × (42 − 51) = 51 − 2.3 = 48.7</span></code></pre>
+
+  <div class="col">
+    <p>Note the sign. With partial credit the same round scored 54 and nudged the objective
+    <em>up</em> by 0.6; at partial 0 it scores 42 and pulls it <strong>down 2.3</strong> — and the
+    falling-side difficulty modifier is harsher, which compounds it. Had the round come back clean
+    at 85 the move would be <code>0.5 × 0.60 × 0.70 × 34 = +7.1</code>. <strong>The score chases
+    the evidence at a rate set by how much history it already has.</strong></p>
+
+    <div class="note">
+      <p class="note-t">Two things to settle before this is built</p>
+      <p><strong>Per activity, not per question.</strong> <code>attempt</code> is one activity's
+      result on one objective — apply it per question and <code>k</code> is far too hot, swinging an
+      LO several points on a single easy item. The plan does not say this explicitly; it should.</p>
+      <p><strong>The run in §03 is illustrative.</strong> Its numbers were authored to show the rule
+      order, not computed from this formula. Phase 0's simulator is what produces real ones.</p>
+    </div>
+  </div>
+</section>
+
+<section id="s3">
+  <h2><span class="num">§ 03</span>The workflow, one student</h2>
+  <div class="col">
+    <p class="lede">Fractions, 3 objectives. Nothing is scheduled — every row is the router matching
+    a rule against the scorecard the row above left behind.</p>
+    <p style="font-size:13.5px;color:var(--ink-3)">Bars are <code>score</code>; the small number is
+    measured rounds on that objective. A lock means signed off.</p>
+  </div>
+
+  <div class="tbl"><table style="min-width:900px"><thead><tr><th class="num">#</th><th>Rule</th><th>Activity</th><th class="num">LO1 compare</th><th class="num">LO2 add/sub</th><th class="num">LO3 word prob</th><th>What changed</th></tr></thead><tbody><tr><td class="num">1</td><td><span style="color:var(--ink-3)">—</span></td><td><strong>Placement · 20 Q</strong></td><td class="num"><span class="empty">not seeded</span></td><td class="num"><span class="empty">not seeded</span></td><td class="num"><span class="empty">not seeded</span></td><td>58% overall, 2 of 4 on the Fractions questions. The sequencer picks Fractions and the <strong>topic row</strong> is seeded at 50. <strong>No LO rows are written</strong> — placement reports at topic level, so there is nothing per-objective to write. That empty scorecard is what makes R3 the only rule that can match.</td></tr><tr><td class="num">2</td><td><span class="pill p-info">R3</span></td><td><strong>Topic survey · 15 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:84%"></span></span><span class="bar-v">84</span><span class="bar-e">1</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:62%"></span></span><span class="bar-v">62</span><span class="bar-e">1</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-bad" style="width:38%"></span></span><span class="bar-v">38</span><span class="bar-e">1</span></div></td><td>The existing topic-test blueprint, moved to the front of the topic. LO3 under 60 → <code>needs_help</code>. LO1 scores well but 84 misses the fast route’s 85 by a point, so it waits.</td></tr><tr><td class="num">3</td><td><span class="pill p-warn">R6</span></td><td><strong>Practice · LO3</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:84%"></span></span><span class="bar-v">84</span><span class="bar-e">1</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:62%"></span></span><span class="bar-v">62</span><span class="bar-e">1</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-bad" style="width:38%"></span></span><span class="bar-v">38</span><span class="bar-e">1</span></div></td><td>Nothing moves — weight 0, by design. <code>assists</code> +5. The adaptive ladder still runs, so <code>practice_level</code> does move.</td></tr><tr><td class="num">4</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:87%"></span></span><span class="bar-v">87</span><span class="bar-e">2</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:68%"></span></span><span class="bar-v">68</span><span class="bar-e">2</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-bad" style="width:51%"></span></span><span class="bar-v">51</span><span class="bar-e">2</span></div></td><td>LO1 crosses 75 with the lock met → <code>ready</code>. R6 could not fire again — LO3 had not been measured since its practice.</td></tr><tr><td class="num">5</td><td><span class="pill p-warn">R6</span></td><td><strong>Practice · LO3</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:87%"></span></span><span class="bar-v">87</span><span class="bar-e">2</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:68%"></span></span><span class="bar-v">68</span><span class="bar-e">2</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-bad" style="width:51%"></span></span><span class="bar-v">51</span><span class="bar-e">2</span></div></td><td>R5 held back: one LO ready, and it has not waited two rounds yet.</td></tr><tr><td class="num">6</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">3</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:74%"></span></span><span class="bar-v">74</span><span class="bar-e">3</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:63%"></span></span><span class="bar-v">63</span><span class="bar-e">3</span></div></td><td>LO3 back over 60, out of <code>needs_help</code>. LO1 has now waited its two rounds.</td></tr><tr><td class="num">7</td><td><span class="pill p-good">R5</span></td><td><strong>LO check · LO1 · 5 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:90%"></span></span><span class="bar-v">90</span><span class="bar-e">4</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:74%"></span></span><span class="bar-v">74</span><span class="bar-e">3</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:63%"></span></span><span class="bar-v">63</span><span class="bar-e">3</span></div></td><td>5 of 5 · 16 points. <strong>Signed off</strong> — permanent for this topic. All five questions were ones this student had never been served, which the platform’s exposure policy already guarantees. Badge: Novice.</td></tr><tr><td class="num">8</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:89%"></span></span><span class="bar-v">89</span><span class="bar-e">5</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:79%"></span></span><span class="bar-v">79</span><span class="bar-e">4</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:70%"></span></span><span class="bar-v">70</span><span class="bar-e">4</span></div></td><td>The maintain slice finally has somewhere to go: 15% hard-only on LO1. LO2 crosses 75 → <code>ready</code>.</td></tr><tr><td class="num">9</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:89%"></span></span><span class="bar-v">89</span><span class="bar-e">6</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:82%"></span></span><span class="bar-v">82</span><span class="bar-e">5</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:76%"></span></span><span class="bar-v">76</span><span class="bar-e">5</span></div></td><td>LO3 crosses 75 too. Two ready → R5 fires next.</td></tr><tr><td class="num">10</td><td><span class="pill p-good">R5</span></td><td><strong>LO check · LO2 + LO3 · 10 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">6</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:86%"></span></span><span class="bar-v">86</span><span class="bar-e">6</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:68%"></span></span><span class="bar-v">68</span><span class="bar-e">6</span></div></td><td>LO2 passes 5 of 5. LO3 scores <strong>14 of 16 and fails</strong> — the easy question was wrong, condition 2. <code>check_failures</code> 1. Badge: Pro.</td></tr><tr><td class="num">11</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">7</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:85%"></span></span><span class="bar-v">85</span><span class="bar-e">7</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-warn" style="width:73%"></span></span><span class="bar-v">73</span><span class="bar-e">7</span></div></td><td>Cooldown: LO3 needs 3 fresh questions before it can be re-checked.</td></tr><tr><td class="num">12</td><td><span class="pill p-mute">R7</span></td><td><strong>Homework · 12 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:84%"></span></span><span class="bar-v">84</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:79%"></span></span><span class="bar-v">79</span><span class="bar-e">8</span></div></td><td>Cooldown met, score back over 75 → <code>ready</code>. Signed LOs drift down a point or two — maintain is hard-only, which is intended.</td></tr><tr><td class="num">13</td><td><span class="pill p-good">R5</span></td><td><strong>LO check · LO3 · 5 Q</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:83%"></span></span><span class="bar-v">83</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:81%"></span></span><span class="bar-v">81</span><span class="bar-e">9</span> <span class="lock" title="signed off">&#128274;</span></div></td><td>Passes 4 of 5 — one medium wrong, 13 of 16. <strong>Signed off.</strong></td></tr><tr><td class="num">14</td><td><span class="pill p-good">R0</span></td><td><strong>Topic closed</strong></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:88%"></span></span><span class="bar-v">88</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:83%"></span></span><span class="bar-v">83</span><span class="bar-e">8</span> <span class="lock" title="signed off">&#128274;</span></div></td><td class="num"><div class="bar"><span class="bar-t"><span class="bar-f f-good" style="width:81%"></span></span><span class="bar-v">81</span><span class="bar-e">9</span> <span class="lock" title="signed off">&#128274;</span></div></td><td>Topic score <strong>84</strong>. Master badge. Control hands back to the sequencer.</td></tr></tbody></table></div>
+
+  <div class="col">
+    <div class="note key">
+      <p class="note-t">Three things this run shows</p>
+      <p><strong>Practice is always followed by measurement.</strong> Sessions 3 and 5 are practice;
+      R6 will not fire twice in a row, because practice writes no score and the router would
+      otherwise loop on it forever.<br>
+      <strong>Certification does not wait.</strong> Session 7 checks one objective while the other
+      two are still mid-flight.<br>
+      <strong>The topic ends at 84.</strong> Everything certified, nothing left to prescribe — and
+      an 85 topic-score gate would trap this student permanently.</p>
+    </div>
+
+    <div class="note warn">
+      <p class="note-t">The confidence lock is still a placeholder</p>
+      <p>The platform's live confidence formula saturates at four questions — one question already
+      clears it, and five records read the same as thirty. It cannot gate a multi-week loop as-is.
+      This run assumes a re-capped version. See §03 of the main doc.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <p>Companion to <strong>The Mastery Loop</strong> (<code>mastery-loop-flow-ap.html</code>) — that
+  doc carries the argument, the corrections against the six live flow docs, and the open-decision
+  register. Runs here use a 3-objective topic, the measured average.</p>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var STATE_CLASS = {
+    untested:   'p-mute',
+    working:    'p-warn',
+    ready:      'p-info',
+    signed_off: 'p-good',
+    needs_help: 'p-bad',
+    blocked:    'p-bad'
+  };
+
+  var PRESETS = {
+    day1:     { lo: [[0,0,0,false],[0,0,0,false],[0,0,0,false]],       survey:false, stalled:0, ready:0, measured:true },
+    mid:      { lo: [[87,0.9,0,false],[68,0.9,0,false],[51,0.9,0,false]],    survey:true,  stalled:0, ready:0, measured:true },
+    topper:   { lo: [[92,0.7,0,false],[88,0.7,0,false],[90,0.7,0,false]],    survey:true,  stalled:0, ready:0, measured:true },
+    waiting:  { lo: [[88,0.95,0,false],[74,0.95,0,false],[63,0.95,0,false]],    survey:true,  stalled:2, ready:2, measured:true },
+    blocked:  { lo: [[68,0.98,2,false],[88,0.98,0,true],[85,0.98,0,true]],   survey:true,  stalled:0, ready:0, measured:true },
+    drowning: { lo: [[52,0.95,0,false],[48,0.95,0,false],[55,0.95,0,false]],    survey:true,  stalled:0, ready:0, measured:true },
+    steady:   { lo: [[70,0.9,0,false],[68,0.9,0,false],[72,0.9,0,false]],    survey:true,  stalled:0, ready:0, measured:true },
+    escalate: { lo: [[70,0.98,3,false],[88,0.98,0,true],[85,0.98,0,true]],   survey:true,  stalled:0, ready:0, measured:true },
+    done:     { lo: [[88,0.98,0,true],[83,0.98,0,true],[81,0.98,0,true]],    survey:true,  stalled:0, ready:0, measured:true }
+  };
+
+  function $(id) { return document.getElementById(id); }
+  function num(id) { var v = parseFloat($(id).value); return isNaN(v) ? 0 : v; }
+  function chk(id) { return $(id).checked; }
+
+  function loState(i) {
+    if (chk('s' + i)) return 'signed_off';
+    var score = num('c' + i), ev = num('e' + i), fails = num('f' + i);
+    if (fails >= 2) return 'blocked';
+    if (ev <= 0) return 'untested';
+    // easy_accuracy and hard_cleared are held true here; both gate this route for real.
+    // The fast route is the SAME test reached sooner - it locks off the survey alone at 85+.
+    if (ev >= 0.55 && score >= 75) return 'ready';
+    if (score < 60) return 'needs_help';
+    return 'working';
+  }
+
+  function evaluate() {
+    var states = [loState(0), loState(1), loState(2)];
+    var scores = [num('c0'), num('c1'), num('c2')];
+    var evs = [num('e0'), num('e1'), num('e2')];
+    var fails = [num('f0'), num('f1'), num('f2')];
+
+    var maxConf = Math.max(evs[0], evs[1], evs[2]);
+    var topicScore = Math.round((scores[0] + scores[1] + scores[2]) / 3);
+    var surveyDone = chk('gSurvey');
+    var stalled = num('gStalled');
+    var roundsReady = num('gReady');
+    var measured = chk('gMeasured');
+
+    var nSigned = 0, nReady = 0, nBlocked = 0, nNeedsHelp = 0, maxFails = 0, i;
+    for (i = 0; i < 3; i++) {
+      if (states[i] === 'signed_off') nSigned++;
+      if (states[i] === 'ready') nReady++;
+      if (states[i] === 'blocked') nBlocked++;
+      if (states[i] === 'needs_help') nNeedsHelp++;
+      if (fails[i] > maxFails) maxFails = fails[i];
+    }
+
+    var rules = [
+      { id: 'R0', hit: nSigned === 3,
+        why: 'All three objectives are signed off. This is the only exit from the loop.' },
+      { id: 'R1', hit: topicScore < 60 && maxConf >= 0.55,
+        why: 'Topic score ' + topicScore + ' with confidence locked — enough measurement to say the concept never landed. Re-teach the topic, do not hand out more work.' },
+      { id: 'R2', hit: maxFails >= 3 || stalled >= 4,
+        why: maxFails >= 3
+          ? 'One objective has failed three checks. The loop is not converging — a teacher gets it by name.'
+          : stalled + ' rounds with no movement. Stop trying and escalate.' },
+      { id: 'R3', hit: !surveyDone,
+        why: 'No survey yet, so there is nothing in the scorecard to read. Only the survey can fill an empty map.' },
+      { id: 'R4', hit: nBlocked > 0,
+        why: 'An objective is blocked on two failed checks. It waits on a mentor — every other objective keeps running.' },
+      { id: 'R5', hit: nReady >= 2 || (nReady === 1 && roundsReady >= 2),
+        why: nReady >= 2
+          ? nReady + ' objectives are checkable. Certification never queues behind ordinary work.'
+          : 'One objective has been checkable for ' + roundsReady + ' rounds. Long enough — check it.' },
+      { id: 'R6', hit: nNeedsHelp > 0 && measured,
+        why: 'An objective is under 60 and has been measured since its last practice. It needs teaching, not another measurement.' },
+      { id: 'R7', hit: true,
+        why: 'Nothing more urgent matched. Homework is the default because it is the only activity that both moves an objective and produces evidence.' }
+    ];
+
+    var firstHit = -1;
+    for (i = 0; i < rules.length; i++) {
+      if (rules[i].hit) { firstHit = i; break; }
+    }
+
+    // paint LO state pills
+    for (i = 0; i < 3; i++) {
+      var el = $('st' + i);
+      el.textContent = states[i].replace('_', ' ');
+      el.className = 'st pill ' + (STATE_CLASS[states[i]] || 'p-mute');
+    }
+
+    // paint the ladder
+    var rungs = document.querySelectorAll('#ladder .rung');
+    for (i = 0; i < rungs.length; i++) {
+      var id = rungs[i].getAttribute('data-r');
+      var idx = -1, j;
+      for (j = 0; j < rules.length; j++) { if (rules[j].id === id) { idx = j; break; } }
+      rungs[i].className = 'rung' + (idx === firstHit ? ' hit' : (idx > firstHit ? ' dead' : ''));
+    }
+
+    var ACTIVITY = {
+      R0: 'Topic closed', R1: 'Topic class', R2: 'Flag to teacher', R3: 'Topic survey',
+      R4: 'LO class', R5: 'LO check', R6: 'Practice', R7: 'Homework'
+    };
+    var win = rules[firstHit];
+    $('vOut').textContent = ACTIVITY[win.id];
+    $('vWhy').textContent = win.id + ' matched — ' + win.why;
+  }
+
+  function applyPreset(name) {
+    var p = PRESETS[name];
+    if (!p) return;
+    for (var i = 0; i < 3; i++) {
+      $('c' + i).value = p.lo[i][0];
+      $('e' + i).value = p.lo[i][1];
+      $('f' + i).value = p.lo[i][2];
+      $('s' + i).checked = p.lo[i][3];
+    }
+    $('gSurvey').checked = p.survey;
+    $('gStalled').value = p.stalled;
+    $('gReady').value = p.ready;
+    $('gMeasured').checked = p.measured;
+    evaluate();
+  }
+
+  function init() {
+    var sim = document.querySelector('.sim');
+    if (!sim) return;
+    sim.addEventListener('input', evaluate);
+    sim.addEventListener('change', evaluate);
+
+    var btns = sim.querySelectorAll('.btn[data-preset]');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].addEventListener('click', function (e) {
+        applyPreset(e.currentTarget.getAttribute('data-preset'));
+      });
+    }
+    evaluate();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+</script>
+
+</body>
+</html>

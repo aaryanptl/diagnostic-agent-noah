@@ -1083,7 +1083,7 @@ export function MethodologySidebar({
             }}
           >
             <BookOpen size={14} />
-            Full methodology
+            About this tool
           </button>
         </footer>
       ) : null}

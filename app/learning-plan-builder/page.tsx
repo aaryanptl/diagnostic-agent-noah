@@ -27,6 +27,7 @@ import type {
   GeneratedPlan,
   ManualAdjustments,
   ManualTopicAdjustment,
+  ObjectiveFocus,
   PlanItem,
   Priority,
 } from "@/lib/learning-plan/types"
@@ -44,6 +45,7 @@ import {
   CircleAlert,
   ClipboardCheck,
   Clock3,
+  Compass,
   Edit3,
   Eye,
   HelpCircle,
@@ -570,11 +572,18 @@ function ClassLessonGuide({
   student,
   contentGenerating,
   contentSource,
+  objectiveFocus,
 }: {
   item: PlanItem
   student: DemoStudent
   contentGenerating: boolean
   contentSource: "ai" | "fallback" | null
+  /**
+   * Where each objective stands, keyed by objective id. This is the mastery
+   * loop's read, carried into the class it produced: an objective the loop
+   * flagged is the objective this class exists to teach.
+   */
+  objectiveFocus?: Map<string, ObjectiveFocus>
 }) {
   const activities =
     item.activities ?? buildClassActivities(item, questionGuidelines)
@@ -621,14 +630,29 @@ function ClassLessonGuide({
         <div className="lpb-lesson-block">
           <span className="lpb-detail-label">Objectives</span>
           <ul className="lpb-lesson-bullets">
-            {item.learningObjectives.map((objective) => (
-              <li key={objective.id}>
-                {objective.subtopic ? (
-                  <strong>{objective.subtopic}: </strong>
-                ) : null}
-                {objective.text}
-              </li>
-            ))}
+            {item.learningObjectives.map((objective) => {
+              const focus = objectiveFocus?.get(objective.id)
+              return (
+                <li key={objective.id} className={focus ? `need-${focus.need}` : undefined}>
+                  {objective.subtopic ? (
+                    <strong>{objective.subtopic}: </strong>
+                  ) : null}
+                  {objective.text}
+                  {focus && focus.need !== "unmeasured" ? (
+                    <span className={`lpb-objective-need ${focus.need}`}>
+                      {focus.need === "needs-teaching"
+                        ? "Teach this"
+                        : focus.need === "secure"
+                          ? "Secure"
+                          : "Improving"}
+                    </span>
+                  ) : null}
+                  {focus?.need === "needs-teaching" ? (
+                    <small className="lpb-objective-need-why">{focus.reason}</small>
+                  ) : null}
+                </li>
+              )
+            })}
           </ul>
         </div>
       ) : null}
@@ -1033,6 +1057,20 @@ export default function LearningPlanBuilderPage({
       skipped: plan.items.length - liveItems.length,
     }
   }, [completedCount, plan])
+  /**
+   * Every objective's standing across the whole plan, so a class can show why
+   * it is teaching what it is teaching. Objective ids are unique per topic, so
+   * one flat map is safe.
+   */
+  const objectiveFocusById = useMemo(() => {
+    const map = new Map<string, ObjectiveFocus>()
+    for (const allocation of plan?.allocations ?? []) {
+      for (const entry of allocation.objectiveFocus ?? []) {
+        map.set(entry.objectiveId, entry)
+      }
+    }
+    return map
+  }, [plan])
   const structuralItems = plan
     ? plan.items.filter((item) => item.kind !== "teaching")
     : []
@@ -1824,14 +1862,35 @@ export default function LearningPlanBuilderPage({
               Back to setup
             </button>
           ) : null}
+          {/*
+            The contextual rail keeps its own trigger. It answers "why does
+            *this* screen say that", which is a different question from the
+            explainer dialog next to it.
+          */}
           <button
             type="button"
             className={`lpb-button lpb-button-ghost${methodologyOpen ? " active" : ""}`}
             onClick={() => setMethodologyOpen((current) => !current)}
             aria-pressed={methodologyOpen}
           >
+            <Compass size={15} />
+            Why this screen
+          </button>
+          <button
+            type="button"
+            className={`lpb-button lpb-button-ghost${fullMethodologyOpen ? " active" : ""}`}
+            // Opens the full explainer dialog directly. The contextual "Why
+            // this" rail is a separate control — this button is the one people
+            // reach for when they want the whole story, so it should not make
+            // them click twice to get it.
+            onClick={() => {
+              setMethodologyOpen(false)
+              setFullMethodologyOpen(true)
+            }}
+            aria-pressed={fullMethodologyOpen}
+          >
             <HelpCircle size={15} />
-            Methodology
+            About this tool
           </button>
           <button
             type="button"
@@ -2692,7 +2751,17 @@ export default function LearningPlanBuilderPage({
                             ? `${reviewPlan.capacity.difference} classes over the package`
                             : reviewPlan.capacity.difference === 0
                               ? "Fits the package exactly"
-                              : `Reduced by ${Math.abs(reviewPlan.capacity.difference)} classes`}
+                              : /*
+                                   Not "reduced" — nothing was taken away. The
+                                   plan needs fewer classes than the package
+                                   holds, and the difference is still the
+                                   student's to use.
+                                 */
+                                `Fits with ${Math.abs(reviewPlan.capacity.difference)} ${
+                                  Math.abs(reviewPlan.capacity.difference) === 1
+                                    ? "class"
+                                    : "classes"
+                                } to spare`}
                         </h3>
                       </div>
                       <span
@@ -2981,6 +3050,21 @@ export default function LearningPlanBuilderPage({
               >
                 Edit scope
               </button>
+              {/*
+                Second half of the parent demo. The plan board shows what was
+                booked; the journey shows what happens inside those classes and
+                how the loop hands classes back. Opened in its own tab so the
+                plan stays where it was.
+              */}
+              <a
+                className="lpb-button lpb-button-primary lpb-journey-link"
+                href="/student-journey.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Sparkles size={15} />
+                Student journey
+              </a>
             </div>
             </div>
 
@@ -3268,7 +3352,7 @@ export default function LearningPlanBuilderPage({
                       onClick={() => setFullMethodologyOpen(true)}
                     >
                       <BookOpen size={13} />
-                      How this works
+                      About this tool
                     </button>
                   </div>
                 </header>
@@ -3395,6 +3479,7 @@ export default function LearningPlanBuilderPage({
                                   student={student}
                                   contentGenerating={contentGenerating}
                                   contentSource={contentSource}
+                                  objectiveFocus={objectiveFocusById}
                                 />
                               ) : (
                                 <div className="lpb-lesson-plan-card">
@@ -3561,7 +3646,14 @@ export default function LearningPlanBuilderPage({
                       </div>
                       <div>
                         <span>Topics completed</span>
-                        <b>{student.completedTopics.length} of 13</b>
+                        {/*
+                          The denominator is this grade's teaching sequence, not
+                          a hardcoded workbook anchor — it has to agree with the
+                          topic chips directly underneath.
+                        */}
+                        <b>
+                          {student.completedTopics.length} of {gradeTopics.length}
+                        </b>
                       </div>
                       <div>
                         <span>Current topic</span>
@@ -3658,8 +3750,22 @@ export default function LearningPlanBuilderPage({
                                 return <tr key={objective.id}>
                                   <td>{objective.text}</td>
                                   {!isNewStudent ? <td><span className={`lpb-diagnosis-pill ${level === "master" ? "secure" : level === "stuck" ? "support" : "neutral"}`}>{mentorLevelCopy(level)}</span></td> : null}
-                                  <td>{guideline?.starter ?? "No supplied question"}</td>
-                                  <td>{guideline?.master ?? "No supplied question"}</td>
+                                  <td>
+                                    {guideline?.starters[0] ?? "No supplied question"}
+                                    {guideline && guideline.starters.length > 1 ? (
+                                      <span className="lpb-bank-more">
+                                        +{guideline.starters.length - 1} more
+                                      </span>
+                                    ) : null}
+                                  </td>
+                                  <td>
+                                    {guideline?.masters[0] ?? "No supplied question"}
+                                    {guideline && guideline.masters.length > 1 ? (
+                                      <span className="lpb-bank-more">
+                                        +{guideline.masters.length - 1} more
+                                      </span>
+                                    ) : null}
+                                  </td>
                                 </tr>
                               })}
                             </tbody>
@@ -4120,15 +4226,29 @@ export default function LearningPlanBuilderPage({
                       {guideline ? (
                         <div className="lpb-question-pair">
                           <div>
-                            <span>Starter question</span>
-                            <p>{guideline.starter}</p>
+                            <span>
+                              Starter questions
+                              <b>{guideline.starters.length}</b>
+                            </span>
+                            <ol className="lpb-question-bank">
+                              {guideline.starters.map((question) => (
+                                <li key={question}>{question}</li>
+                              ))}
+                            </ol>
                           </div>
                           <span className="lpb-question-arrow">
                             <ArrowRight size={17} />
                           </span>
                           <div>
-                            <span>Master question</span>
-                            <p>{guideline.master}</p>
+                            <span>
+                              Master questions
+                              <b>{guideline.masters.length}</b>
+                            </span>
+                            <ol className="lpb-question-bank">
+                              {guideline.masters.map((question) => (
+                                <li key={question}>{question}</li>
+                              ))}
+                            </ol>
                           </div>
                         </div>
                       ) : (
@@ -4200,14 +4320,14 @@ export default function LearningPlanBuilderPage({
           >
             <header>
               <div>
-                <span className="lpb-kicker">Methodology</span>
+                <span className="lpb-kicker">About this tool</span>
                 <h2>How this builder works</h2>
               </div>
               <button
                 type="button"
                 className="lpb-icon-button"
                 onClick={() => setFullMethodologyOpen(false)}
-                aria-label="Close methodology"
+                aria-label="Close about this tool"
               >
                 <X size={18} />
               </button>

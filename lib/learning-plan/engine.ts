@@ -7,10 +7,13 @@ import type {
   GeneratedPlan,
   LearningObjective,
   ManualAdjustments,
+  ObjectiveFocus,
+  ObjectiveNeed,
   PlanItem,
   PlanTopicAllocation,
   PlanWarning,
   Priority,
+  QuestionAttemptEvidence,
 } from "./types"
 
 const PRIORITY_RANK: Record<Priority, number> = {
@@ -394,6 +397,46 @@ function adjustTopic(
   const easyActivities = Math.round(activities * (easyPercent / 100))
   const practiceActivities = activities - easyActivities
 
+  /*
+   * Objective-level teaching order — the join with the mastery loop.
+   *
+   * The rules above decided how long the topic is. This decides what happens
+   * inside that time: the objectives the student is stuck on are taught first
+   * and take the reinforcement classes, rather than the topic being taught
+   * front-to-back regardless of what the evidence says.
+   */
+  const focus = buildObjectiveFocus(topic, student)
+  const hasObjectiveEvidence = focus.some((entry) => entry.need !== "unmeasured")
+  const orderedIndexes = focus
+    .map((entry, index) => ({ entry, index }))
+    .sort((a, b) => {
+      const rank = NEED_RANK[a.entry.need] - NEED_RANK[b.entry.need]
+      return rank !== 0 ? rank : a.index - b.index
+    })
+  const orderedObjectives = hasObjectiveEvidence
+    ? orderedIndexes.map(({ index }) => topic.learningObjectives[index])
+    : topic.learningObjectives
+  const orderedFocus = hasObjectiveEvidence
+    ? orderedIndexes.map(({ entry }) => entry)
+    : focus
+
+  const needsTeaching = orderedFocus.filter(
+    (entry) => entry.need === "needs-teaching"
+  )
+  if (needsTeaching.length > 0) {
+    const names = needsTeaching
+      .map(
+        (entry) =>
+          topic.learningObjectives.find(
+            (objective) => objective.id === entry.objectiveId
+          )?.subtopic
+      )
+      .filter(Boolean)
+    reasons.push(
+      `${needsTeaching.length} of ${topic.learningObjectives.length} objectives need teaching before they are measured again (${names.join(", ")}), so they are taught first and take the reinforcement classes.`
+    )
+  }
+
   return {
     topicId: topic.id,
     topicName: topic.name,
@@ -409,7 +452,8 @@ function adjustTopic(
     practiceActivities,
     easyPercent,
     practicePercent: 100 - easyPercent,
-    learningObjectives: topic.learningObjectives,
+    learningObjectives: orderedObjectives,
+    objectiveFocus: hasObjectiveEvidence ? orderedFocus : undefined,
     reasons,
     isCompressedRefresher,
     manuallyEdited: Boolean(manual),
@@ -626,9 +670,86 @@ function fitAllocationsToCapacity(
   }
 }
 
+/**
+ * Rank a topic's objectives by how much teaching they need, using the same
+ * evidence the sizing rules read.
+ *
+ * `needs-teaching` matches the "stuck" test used to extend a topic: an
+ * objective recorded not-secure, or one whose question attempts are under half
+ * right. Those are the objectives the loop would hand to a teaching activity
+ * rather than measure again, so they are the ones the plan teaches first.
+ */
+function buildObjectiveFocus(
+  topic: CurriculumTopic,
+  student: DemoStudent
+): ObjectiveFocus[] {
+  const attemptsByObjective = new Map<string, QuestionAttemptEvidence[]>()
+  for (const attempt of student.questionAttemptEvidence ?? []) {
+    if (attempt.topicId !== topic.id) continue
+    const list = attemptsByObjective.get(attempt.learningObjectiveId) ?? []
+    list.push(attempt)
+    attemptsByObjective.set(attempt.learningObjectiveId, list)
+  }
+
+  return topic.learningObjectives.map((objective) => {
+    const evidence = student.objectiveEvidence.filter(
+      (entry) => entry.learningObjectiveId === objective.id
+    )
+    const attempts = attemptsByObjective.get(objective.id) ?? []
+
+    if (evidence.length === 0 && attempts.length === 0) {
+      return {
+        objectiveId: objective.id,
+        need: "unmeasured" as const,
+        reason: "Not measured yet — taught in curriculum order.",
+      }
+    }
+
+    const secureAtMaster = evidence.some(
+      (entry) => entry.level === "master" && entry.result === "secure"
+    )
+    if (secureAtMaster) {
+      return {
+        objectiveId: objective.id,
+        need: "secure" as const,
+        reason: "Secure at Master level — consolidation only.",
+      }
+    }
+
+    const notSecure = evidence.some((entry) => entry.result === "not-secure")
+    const weakAttempt = attempts.find(
+      (attempt) => attempt.attempted > 0 && attempt.correct / attempt.attempted < 0.5
+    )
+    if (notSecure || weakAttempt) {
+      return {
+        objectiveId: objective.id,
+        need: "needs-teaching" as const,
+        reason: weakAttempt
+          ? `${weakAttempt.correct} of ${weakAttempt.attempted} correct at ${weakAttempt.level === "starter" ? "Starter" : "Master"} level — teach this before measuring it again.`
+          : "Recorded not secure — teach this before measuring it again.",
+      }
+    }
+
+    return {
+      objectiveId: objective.id,
+      need: "improving" as const,
+      reason: "Measured and progressing — normal teaching time.",
+    }
+  })
+}
+
+/** Weakest first. Ties keep curriculum order, so the sequence stays readable. */
+const NEED_RANK: Record<ObjectiveNeed, number> = {
+  "needs-teaching": 0,
+  improving: 1,
+  unmeasured: 2,
+  secure: 3,
+}
+
 function distributeObjectives(
   objectives: LearningObjective[],
-  classCount: number
+  classCount: number,
+  focus?: ObjectiveFocus[]
 ) {
   if (classCount <= 0 || objectives.length === 0) return []
 
@@ -642,6 +763,30 @@ function distributeObjectives(
 
   const classes = objectives.map((objective) => [objective])
   let extra = classCount - objectives.length
+
+  /*
+   * Spare classes are reinforcement, so they go to whatever the student is
+   * actually weakest on. With no evidence there is nothing to aim at and the
+   * original behaviour stands: walk back from the last objective, which spreads
+   * the extras over the material taught most recently.
+   */
+  const needFor = new Map(focus?.map((entry) => [entry.objectiveId, entry.need]))
+  const weakest = objectives
+    .map((objective, index) => ({ objective, index }))
+    .filter(
+      ({ objective }) => needFor.get(objective.id) === "needs-teaching"
+    )
+
+  if (weakest.length > 0) {
+    let pointer = 0
+    while (extra > 0) {
+      classes.push([weakest[pointer % weakest.length].objective])
+      pointer += 1
+      extra -= 1
+    }
+    return classes
+  }
+
   let cursor = objectives.length - 1
   while (extra > 0) {
     classes.push([objectives[Math.max(0, cursor)]])
@@ -664,7 +809,8 @@ function distributeCount(total: number, slots: number) {
 function buildTopicItems(allocation: PlanTopicAllocation, hasRdp: boolean) {
   const objectiveGroups = distributeObjectives(
     allocation.learningObjectives,
-    allocation.classes
+    allocation.classes,
+    allocation.objectiveFocus
   )
   const easyByClass = distributeCount(
     allocation.easyActivities,

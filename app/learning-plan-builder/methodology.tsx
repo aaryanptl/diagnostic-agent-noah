@@ -1040,7 +1040,7 @@ export function MethodologyView({
   return (
     <div className="lpb-methodology">
       <header className="lpb-methodology-intro">
-        <span className="lpb-detail-label">Methodology</span>
+        <span className="lpb-detail-label">About this tool</span>
         <h3>How this plan is decided</h3>
         <p>
           The builder does not pick topics by feel. It reads what the student has

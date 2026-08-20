@@ -159,6 +159,55 @@ sizing does — a 6-objective topic needs an 18-question survey, and the static
 materialiser's golden LO rule silently drops objectives it cannot give 3
 questions to. Validate `survey total >= 3 x LOs` before this leaves prototype.
 
+### Objective-level planning — the join with the mastery loop
+
+The loop measures learning objectives; the planner teaches them. `buildObjectiveFocus()`
+in `engine.ts` reads the same evidence the sizing rules use and gives every objective
+a standing: `needs-teaching` (recorded not secure, or question attempts under half
+right), `improving`, `secure` (secure at Master), or `unmeasured`.
+
+That standing does two things inside a topic whose length is already decided:
+
+- **Teaching order** — objectives are sorted weakest-first, so a topic is not taught
+  front-to-back regardless of what the evidence says. Ties keep curriculum order.
+- **Reinforcement classes** — when a topic has more classes than objectives, the spare
+  classes go to the `needs-teaching` objectives instead of walking back from the last
+  one. With no evidence the original behaviour stands.
+
+The standing rides on `PlanTopicAllocation.objectiveFocus` and is shown on each class
+in the lesson guide, so a mentor sees which objective the class exists for.
+
+### Question banks
+
+`questionGuidelines` holds a **bank** per objective — `starters: string[]` and
+`masters: string[]`, currently 4 and 3 — not a single prompt each. A class can carry
+several Starter slots on one objective, and serving the same question three times told
+the student nothing the first one had not.
+
+`buildClassActivities()` walks the bank so every slot in a class is a different
+question. Each class starts at its own offset in the bank, derived from the class id,
+so an objective taught across several classes does not open with the same question
+every time — and the offset is a hash, not a random pick, because the plan has to stay
+deterministic. Objectives with no bank yet fall back to a rotating set of differently
+framed tasks rather than one sentence repeated.
+
+### The Master bar
+
+`MASTER_SCORE = 80` in `mastery.ts`. Certification (R5) makes an objective's pass
+permanent; **Master** is the stronger claim on top of it — every objective in the topic
+certified *and* still scoring 80 or better. A topic can close with everything certified
+and stop at **Pro**. `READY_SCORE` stays 75 (ready to sit the check) and
+`NEEDS_HELP_SCORE` stays 60 (teach rather than measure).
+
+### The student journey simulation
+
+`public/student-journey.html` is the mastery-loop simulation, reached from the
+**Student journey** button on the plan board — the second half of the parent demo.
+It is re-pointed at the real curriculum: Fraction Arithmetic, ideal 8, floor 5, with
+the real Grade 5 topic sequence around it. The allocation stretches to cover teaching
+that runs long but stops at ideal + 2, and the topic paying for those extra classes
+cannot go below its own minimum either.
+
 ### Colour
 
 The UI is deliberately near-monochrome — deep green on warm paper — with one
