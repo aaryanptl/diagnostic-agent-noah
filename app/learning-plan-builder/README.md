@@ -104,6 +104,64 @@ After a class, the teacher records whether the student:
 
 The builder previews the updated allocation and creates a new plan version only after teacher approval. A “faster” outcome never takes a topic below its minimum classes.
 
+### Personalisation — the mastery loop
+
+`lib/learning-plan/mastery.ts` is the decision layer that runs *inside* a planned
+class. The builder decides which topics get taught and how many classes each one
+gets; the loop decides what happens in each session, one activity at a time,
+until every learning objective in the topic has been certified.
+
+It is surfaced in two places, both additive — no existing screen changed shape:
+
+- **Step 2** gets a scorecard lens (`MasteryEvidenceLens`) under the evidence
+  panels: the same placement scores and question attempts, read as one row per
+  objective, plus the rule the router would fire if a session started now.
+- **The `Personalisation` tab** on the plan board (`MasteryView`) — the two
+  systems and how they join, a map of where every assessment flow sits, the
+  activity ledger, a steppable run of the loop over the focused topic, and what
+  the run hands back to the plan.
+
+The loop's own rules, in short:
+
+- The **scorecard** is one row per objective — score, confidence, state. It is
+  the only thing that survives between sessions.
+- A **score is withheld** below a confidence of 0.55. Two questions and twenty
+  questions are not the same claim, so the platform returns nothing rather than
+  a guess.
+- The **router** is eight rules read top to bottom, first match wins: safety
+  (R0–R2), then certification (R5), then teaching (R6), then homework as the
+  default (R7). The order is the design — move R5 below R7 and nothing ever gets
+  signed off.
+- **Only the LO check can certify** an objective, on 5 fresh questions, and
+  sign-off is permanent within the topic. Practice carries score weight zero: it
+  has hints and unlimited retries, so it teaches and never measures.
+- Three guards stop the loop spinning, and all three are load-bearing: practice
+  may not repeat on an objective until something measured it, practice may not
+  run two rounds in a row at all, and a whole-topic re-teach may not repeat
+  until a measurement has run *and* the previous re-teach failed to move the
+  score.
+
+**Where the numbers come from.** The starting scorecard is derived entirely from
+data already on `DemoStudent` — `placementResults` seed the topic row through the
+shrinkage formula, `questionAttemptEvidence` are raw attempts, `objectiveEvidence`
+is a weaker secure/not-secure signal at half weight. Everything after that is a
+deterministic simulation (seeded PRNG, no `Math.random`) so a demo replays
+identically. The scoring model, thresholds and confidence formula are the ones in
+`plans/mastery-loop-flow-ap.html`; the confidence record cap is widened from 4 to
+12 because the live gate was built for a single session's report, not a whole
+topic window.
+
+**Checkpoints now carry their mastery role.** `engine.ts` labels the first
+checkpoint on a plan as the topic survey (fills the scorecard before teaching)
+and every later one as an LO check (the only activity that certifies). Same
+classes as before, named for what they are for.
+
+**Known fidelity gap.** The mastery flow document is sized on 2–3 objectives per
+topic; the Grade 5 workbook gives 4–6. The router does not care, but survey
+sizing does — a 6-objective topic needs an 18-question survey, and the static
+materialiser's golden LO rule silently drops objectives it cannot give 3
+questions to. Validate `survey total >= 3 x LOs` before this leaves prototype.
+
 ### AI in the prototype
 
 AI recommendations are currently simulated locally from the dummy placement and mastery data. No external AI model is connected yet. The workflow, design and exact production output are still prototype decisions rather than finalized specifications.

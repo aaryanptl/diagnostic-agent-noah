@@ -885,13 +885,22 @@ function buildClassSequence(
       const coveredTopics = allocations
         .slice(lastCheckpointTopicIndex, topicIndex + 1)
         .map((covered) => covered.topicName)
+      // A checkpoint is not a generic test. The first one on a topic is the
+      // survey that fills an empty scorecard; every later one is the LO check,
+      // the only activity allowed to certify an objective. Naming the role here
+      // is what lets the plan board say what a checkpoint is actually for.
+      const masteryRole =
+        checkpointIndex === 0
+          ? "Topic survey · 3 questions per objective · fills the scorecard before teaching"
+          : "LO check · 5 fresh questions per ready objective · the only activity that certifies"
+
       items.push({
         id: `checkpoint-${checkpointIndex + 1}`,
         classNumber: 0,
         kind: "checkpoint",
         status: "planned",
         title: checkpointTitle,
-        subtitle: `Checkpoint assessment · ${coveredTopics.join(", ")}`,
+        subtitle: `${masteryRole} · ${coveredTopics.join(", ")}`,
         learningObjectives: [],
         easyActivities: 0,
         practiceActivities: 0,

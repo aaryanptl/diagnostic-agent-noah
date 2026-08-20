@@ -6,6 +6,7 @@ import {
 } from "./methodology"
 import type { MethodologyContext } from "./methodology"
 import { MethodologySidebar } from "./methodology-sidebar"
+import { MasteryEvidenceLens, MasteryView } from "./mastery-view"
 import {
   buildClassActivities,
   groupActivitiesByObjective,
@@ -710,6 +711,21 @@ export default function LearningPlanBuilderPage({
     () => getTopicsForGrade(student.grade),
     [student.grade]
   )
+  /**
+   * The topic Step 2's scorecard lens is drawn against: whatever the student is
+   * actually working on, else the first topic any evidence was recorded for,
+   * else the first topic in the sequence. Only used for display.
+   */
+  const evidenceLensTopic = useMemo(() => {
+    const evidenceTopicId =
+      student.currentTopicId ??
+      student.questionAttemptEvidence?.[0]?.topicId ??
+      student.parentRequestedTopicId ??
+      student.placementResults[0]?.topicId
+    return (
+      gradeTopics.find((topic) => topic.id === evidenceTopicId) ?? gradeTopics[0]
+    )
+  }, [gradeTopics, student])
   const [setupStep, setSetupStep] = useState(1)
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>(() =>
     getSuggestedTopicIds(
@@ -730,7 +746,13 @@ export default function LearningPlanBuilderPage({
   const [manualOverrideActive, setManualOverrideActive] = useState(false)
   const [plan, setPlan] = useState<GeneratedPlan | null>(null)
   const [planTab, setPlanTab] = useState<
-    "classes" | "topics" | "structure" | "next2weeks" | "mentor" | "methodology"
+    | "classes"
+    | "topics"
+    | "structure"
+    | "next2weeks"
+    | "mentor"
+    | "mastery"
+    | "methodology"
   >("classes")
   const [methodologyOpen, setMethodologyOpen] = useState(false)
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
@@ -1769,7 +1791,11 @@ export default function LearningPlanBuilderPage({
   const methodologyContext: MethodologyContext = plan
     ? planTab === "methodology"
       ? "topics"
-      : planTab
+      : // The personalisation tab explains itself in full, so the rail keeps
+        // showing the student-state rules the mentor view uses.
+        planTab === "mastery"
+        ? "mentor"
+        : planTab
     : buildStage
       ? "building"
       : methodologyContextForSetupStep(setupStep)
@@ -1816,7 +1842,7 @@ export default function LearningPlanBuilderPage({
             aria-pressed={methodologyOpen}
           >
             <HelpCircle size={15} />
-            Why this
+            Methodology
           </button>
           <button
             type="button"
@@ -2313,6 +2339,21 @@ export default function LearningPlanBuilderPage({
                     </div>
                     <span className="lpb-request-pill">Requested start</span>
                   </div>
+                ) : null}
+
+                {/*
+                  The same evidence again, read as the record the
+                  personalisation loop acts on. This is where the two systems
+                  first touch: the builder sizes topics from it, the loop
+                  decides individual sessions from it.
+                */}
+                {evidenceLensTopic ? (
+                  <section className="lpb-evidence-panel lpb-ml-lens-panel">
+                    <MasteryEvidenceLens
+                      student={student}
+                      topic={evidenceLensTopic}
+                    />
+                  </section>
                 ) : null}
 
                 <footer className="lpb-setup-footer">
@@ -3210,6 +3251,17 @@ export default function LearningPlanBuilderPage({
                     </button>
                     <button
                       type="button"
+                      className={
+                        planTab === "mastery"
+                          ? "active lpb-tab-accent"
+                          : "lpb-tab-accent"
+                      }
+                      onClick={() => setPlanTab("mastery")}
+                    >
+                      Personalisation
+                    </button>
+                    <button
+                      type="button"
                       className={planTab === "methodology" ? "active" : ""}
                       onClick={() => setPlanTab("methodology")}
                     >
@@ -3691,6 +3743,12 @@ export default function LearningPlanBuilderPage({
                       </div>
                     </section>
                   </div>
+                ) : planTab === "mastery" ? (
+                  <MasteryView
+                    plan={plan}
+                    student={student}
+                    topics={gradeTopics}
+                  />
                 ) : (
                   <MethodologyView plan={plan} student={student} />
                 )}

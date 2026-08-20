@@ -15,6 +15,7 @@
  */
 
 import type { DemoStudent, GeneratedPlan } from "@/lib/learning-plan/types"
+import { demoStudents, topicById } from "./data"
 import {
   ArrowRight,
   CalendarDays,
@@ -26,6 +27,7 @@ import {
   Repeat,
   ShieldCheck,
   Sparkles,
+  UserPlus,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { useMemo, type ReactNode } from "react"
@@ -88,6 +90,120 @@ const PIPELINE: PipelineStep[] = [
     body: "Faster / on track / needs more time re-sizes the remaining topic on approval.",
   },
 ]
+
+/**
+ * The four demo scenarios read as *history*: what the builder already knows
+ * about a student before it picks a single topic.
+ *
+ * The rule cards below explain each rule once. This block explains why the same
+ * rules produce four different-looking plans — B starts from nothing, C starts
+ * from thirteen taught classes and a checkpoint, and the distance between those
+ * two is the whole point. Everything here is read off `demoStudents`, so it
+ * cannot drift from the students the prototype actually loads.
+ */
+type HistoryDepth = "none" | "evidence" | "taught"
+
+interface ScenarioHistoryRow {
+  scenario: DemoStudent["scenario"]
+  name: string
+  case: string
+  depth: HistoryDepth
+  depthLabel: string
+  /** Fixed set of rows, in the same order on every card, so the four compare. */
+  facts: { label: string; value: string; empty: boolean }[]
+  consequence: string
+  /** True for the student currently loaded in the builder. */
+  current: boolean
+}
+
+const SCENARIO_CASE: Record<DemoStudent["scenario"], string> = {
+  A: "New student · test taken",
+  B: "New student · no test",
+  C: "Returning student · plan update",
+  D: "New student · parent-requested start",
+}
+
+const SCENARIO_CONSEQUENCE: Record<DemoStudent["scenario"], string> = {
+  A: "Scores are the only history there is, so they alone stretch or shorten topics. Nothing is excluded — none of it has been taught yet.",
+  B: "Nothing to read at all. Every topic starts at its ideal length and capacity alone decides what fits.",
+  C: "The full history: taught topics leave the scope, classes already used are subtracted, and checkpoint mastery re-sizes what is left.",
+  D: "No past classes either. The only input is the requested topic, which pulls its unmet prerequisites in front of it as refreshers.",
+}
+
+const DEPTH_LABEL: Record<HistoryDepth, string> = {
+  none: "No history",
+  evidence: "Evidence only · never taught",
+  taught: "Taught history",
+}
+
+function buildScenarioHistory(student: DemoStudent | null): ScenarioHistoryRow[] {
+  return demoStudents.map((demo) => {
+    const taughtClasses =
+      demo.completedTopics.reduce(
+        (total, topic) => total + topic.actualClasses,
+        0
+      ) + (demo.currentTopicClassesUsed ?? 0)
+    const scored = demo.placementResults.length
+    const objectives = demo.objectiveEvidence?.length ?? 0
+    const attempts = demo.questionAttemptEvidence?.length ?? 0
+    const requested = demo.parentRequestedTopicId
+      ? topicById.get(demo.parentRequestedTopicId)
+      : undefined
+    const depth: HistoryDepth =
+      taughtClasses > 0 ? "taught" : scored > 0 ? "evidence" : "none"
+
+    return {
+      scenario: demo.scenario,
+      name: demo.name,
+      case: SCENARIO_CASE[demo.scenario],
+      depth,
+      depthLabel:
+        depth === "taught"
+          ? `${taughtClasses} classes already taught`
+          : DEPTH_LABEL[depth],
+      facts: [
+        {
+          label: "Classes taught",
+          value: taughtClasses > 0 ? `${taughtClasses} classes` : "None",
+          empty: taughtClasses === 0,
+        },
+        {
+          label: "Topics finished",
+          value:
+            demo.completedTopics.length > 0
+              ? `${demo.completedTopics.length} excluded from scope`
+              : "None",
+          empty: demo.completedTopics.length === 0,
+        },
+        {
+          label: "Placement test",
+          value:
+            demo.placementStatus === "completed"
+              ? `${scored} topics scored`
+              : demo.placementStatus === "not-taken"
+                ? "Not taken"
+                : "Not applicable",
+          empty: scored === 0,
+        },
+        {
+          label: "Checkpoint mastery",
+          value:
+            objectives > 0
+              ? `${objectives} objectives · ${attempts} question sets`
+              : "None",
+          empty: objectives === 0,
+        },
+        {
+          label: "Parent request",
+          value: requested ? requested.name : "None",
+          empty: !requested,
+        },
+      ],
+      consequence: SCENARIO_CONSEQUENCE[demo.scenario],
+      current: student?.scenario === demo.scenario,
+    }
+  })
+}
 
 interface MethodologySection {
   id: string
@@ -395,6 +511,7 @@ export function MethodologyView({
   student = null,
 }: MethodologyViewProps) {
   const sections = useMemo(() => buildSections(plan, student), [plan, student])
+  const scenarioHistory = useMemo(() => buildScenarioHistory(student), [student])
 
   return (
     <div className="lpb-methodology">
@@ -422,6 +539,56 @@ export function MethodologyView({
             ) : null}
           </article>
         ))}
+      </section>
+
+      <section className="lpb-methodology-history">
+        <header>
+          <History size={16} />
+          <div>
+            <strong>What history each scenario starts with</strong>
+            <p>
+              The rules are the same for all four. What differs is how much the
+              builder already knows before it starts — from nothing at all, to
+              thirteen classes already taught.
+            </p>
+          </div>
+        </header>
+        <div className="lpb-methodology-history-grid">
+          {scenarioHistory.map((row) => (
+            <article
+              key={row.scenario}
+              className={`lpb-scenario-history depth-${row.depth}${
+                row.current ? " current" : ""
+              }`}
+            >
+              <header>
+                <span className="lpb-scenario-history-badge">
+                  {row.scenario}
+                </span>
+                <div>
+                  <strong>{row.case}</strong>
+                  <span>{row.name}</span>
+                </div>
+                {row.current ? (
+                  <span className="lpb-scenario-history-now">On screen</span>
+                ) : null}
+              </header>
+              <p className="lpb-scenario-history-depth">{row.depthLabel}</p>
+              <dl>
+                {row.facts.map((fact) => (
+                  <div
+                    key={fact.label}
+                    className={fact.empty ? "is-empty" : undefined}
+                  >
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="lpb-scenario-history-note">{row.consequence}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <div className="lpb-methodology-grid">

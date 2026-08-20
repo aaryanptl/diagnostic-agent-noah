@@ -240,6 +240,83 @@ length, and every topic left out carries the reason it was left out.
 
 ---
 
+## Personalisation — what happens inside a class
+
+Everything above decides the *shape* of the teaching: which topics, in what
+order, for how many classes. It does not decide what happens in any individual
+session. That is a second system, and the two now meet in the app.
+
+**The plan sets the budget. The loop spends it.**
+
+A topic is made of two to six learning objectives — one specific skill each,
+like "add fractions with unlike denominators". Every objective carries a score,
+and a separate number saying how much that score can be trusted. Together those
+rows are the *scorecard*, and it is the only thing that survives between
+sessions.
+
+At the start of a session a *router* reads the scorecard, runs down a fixed list
+of eight rules, and picks the single thing that helps this student most right
+now — a survey, a practice set, homework, a check, or a class. The student does
+it, the numbers move, and next session the router reads them again. It stops when
+every objective has been certified.
+
+### The five things it can hand back, and what each is allowed to do
+
+Not every test is the same kind of test, and the difference is the whole design:
+
+- **Topic survey** — the first thing on a new topic, before any teaching. Three
+  questions per objective. It is the only activity that can fill an empty
+  scorecard, and it can never certify.
+- **Homework** — the default. The only activity that both moves an objective and
+  measures it.
+- **Practice** — hints on, unlimited retries. It teaches and it is worth *zero*
+  toward the score, deliberately: a correct answer there is guaranteed by the
+  format.
+- **The LO check** — five fresh questions per objective, timed, no hints.
+  Passing needs the easy question right, at least one hard question right, and
+  12 of 16 points. **This is the only thing on the platform that can finish an
+  objective**, and once finished it does not come back.
+- **A class** — a mentor re-teaches. Writes no score.
+
+### Why the order of the rules matters
+
+Safety first: a student who is drowning, or who has failed the same check three
+times, gets a class or a human rather than another worksheet. Then
+certification, because sign-off is the only thing that ends a topic and it must
+never queue behind ordinary work. Then teaching, because an objective sitting at
+47 does not need another measurement. Then homework as the default. Move
+certification below homework and objectives never get signed off — they just
+keep being practised.
+
+### The part that closes the loop
+
+When every objective in a topic is certified, the topic closes and the classes
+booked for it that were not needed go **back into the package**. The builder
+already had that mechanic — "completed faster returns a class to the pool" — but
+a teacher had to type it. Now it comes from certification evidence instead of an
+estimate, and it runs in both directions: a topic that genuinely needed more
+classes asks for them, with the reason attached, rather than being signed off on
+thinner evidence.
+
+That is the sentence to say out loud:
+
+> The plan decides which topic and how many classes. The loop decides what
+> happens inside each of those classes. And because the loop can say an
+> objective is genuinely finished, the plan stops being a schedule and becomes
+> something that resizes itself as the student proves things.
+
+### Where to find it in the app
+
+- **Step 2** shows the same evidence a second way — as the scorecard the loop
+  reads — and names the rule that would fire if a session started right now.
+- **The Personalisation tab** on the plan board carries the whole thing: the two
+  systems side by side, a map of where every assessment flow sits, what each
+  activity is allowed to do, and a step-through of the loop running on the
+  selected topic from its real starting evidence to the classes handed back.
+- **Checkpoint classes** in the sequence now say what they are for — the first
+  is the survey that fills the scorecard, the later ones are the checks that
+  certify.
+
 ## What is real and what is still prototype
 
 - The **planning rules are real** and are driven by the signed-off Grade 5 workbook.
@@ -250,6 +327,14 @@ length, and every topic left out carries the reason it was left out.
 - **Topic recommendations are computed by the rules**, not by a language model.
 - **AI writes the per-class teaching guides** — the goal, the teaching points, the
   success criteria — with a written fallback if the model is unavailable.
+- **The personalisation loop's starting scorecard is real** — derived from the
+  same placement scores and question attempts the builder already holds. What
+  follows it on the Personalisation tab is a **deterministic simulation**, not a
+  recording of a student: it shows how the rules behave, and it replays
+  identically every time.
+- The mastery flow document is written for topics with 2-3 objectives; the
+  Grade 5 workbook carries 4-6. The rules are unaffected, but survey lengths
+  need re-deriving before this leaves prototype.
 - Student data in the demo is fixed test data, not live student records.
 - The workflow, screens and exact output are prototype decisions, not final
   specifications.
