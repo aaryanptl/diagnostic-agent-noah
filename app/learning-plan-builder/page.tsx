@@ -6,7 +6,9 @@ import {
 } from "./methodology"
 import type { MethodologyContext } from "./methodology"
 import { MethodologySidebar } from "./methodology-sidebar"
-import { MasteryEvidenceLens, MasteryView } from "./mastery-view"
+import { GlanceCarousel } from "./glance-carousel"
+import { StudentProfilePanel } from "./student-profile"
+import { MasteryView } from "./mastery-view"
 import {
   buildClassActivities,
   groupActivitiesByObjective,
@@ -61,6 +63,7 @@ import {
   Target,
   TrendingDown,
   TrendingUp,
+  UserRound,
   UsersRound,
   X,
 } from "lucide-react"
@@ -711,21 +714,6 @@ export default function LearningPlanBuilderPage({
     () => getTopicsForGrade(student.grade),
     [student.grade]
   )
-  /**
-   * The topic Step 2's scorecard lens is drawn against: whatever the student is
-   * actually working on, else the first topic any evidence was recorded for,
-   * else the first topic in the sequence. Only used for display.
-   */
-  const evidenceLensTopic = useMemo(() => {
-    const evidenceTopicId =
-      student.currentTopicId ??
-      student.questionAttemptEvidence?.[0]?.topicId ??
-      student.parentRequestedTopicId ??
-      student.placementResults[0]?.topicId
-    return (
-      gradeTopics.find((topic) => topic.id === evidenceTopicId) ?? gradeTopics[0]
-    )
-  }, [gradeTopics, student])
   const [setupStep, setSetupStep] = useState(1)
   const [selectedTopicIds, setSelectedTopicIds] = useState<number[]>(() =>
     getSuggestedTopicIds(
@@ -745,6 +733,8 @@ export default function LearningPlanBuilderPage({
   )
   const [manualOverrideActive, setManualOverrideActive] = useState(false)
   const [plan, setPlan] = useState<GeneratedPlan | null>(null)
+  /** The full methodology, opened as a dialog from anywhere in the builder. */
+  const [fullMethodologyOpen, setFullMethodologyOpen] = useState(false)
   const [planTab, setPlanTab] = useState<
     | "classes"
     | "topics"
@@ -752,7 +742,6 @@ export default function LearningPlanBuilderPage({
     | "next2weeks"
     | "mentor"
     | "mastery"
-    | "methodology"
   >("classes")
   const [methodologyOpen, setMethodologyOpen] = useState(false)
   const [expandedItemId, setExpandedItemId] = useState<string | null>(null)
@@ -760,6 +749,8 @@ export default function LearningPlanBuilderPage({
   const [editingTopicId, setEditingTopicId] = useState<number | null>(null)
   const [editDraft, setEditDraft] = useState<TopicEditDraft | null>(null)
   const [completedCount, setCompletedCount] = useState(0)
+  /** Demo student whose profile sidebar is open, if any. */
+  const [profileStudent, setProfileStudent] = useState<DemoStudent | null>(null)
   const [outcomeOpen, setOutcomeOpen] = useState(false)
   const [outcome, setOutcome] = useState<ClassOutcome>("on-track")
   const [outcomeNote, setOutcomeNote] = useState("")
@@ -1789,13 +1780,11 @@ export default function LearningPlanBuilderPage({
   // opens on these, so the reference is useful mid-presentation rather than
   // being a wall of rules to scroll.
   const methodologyContext: MethodologyContext = plan
-    ? planTab === "methodology"
-      ? "topics"
-      : // The personalisation tab explains itself in full, so the rail keeps
-        // showing the student-state rules the mentor view uses.
-        planTab === "mastery"
-        ? "mentor"
-        : planTab
+    ? // The personalisation tab explains itself in full, so the rail keeps
+      // showing the student-state rules the mentor view uses.
+      planTab === "mastery"
+      ? "mentor"
+      : planTab
     : buildStage
       ? "building"
       : methodologyContextForSetupStep(setupStep)
@@ -1984,30 +1973,50 @@ export default function LearningPlanBuilderPage({
                     const copy = SCENARIO_COPY[candidate.scenario]
                     const selected = studentSelected && candidate.id === student.id
                     return (
-                      <button
-                        type="button"
+                      <div
                         key={candidate.id}
-                        className={`lpb-student-card${selected ? " selected" : ""}`}
-                        onClick={() => chooseStudent(candidate)}
+                        className={`lpb-student-slot lpb-scenario-${candidate.scenario.toLowerCase()}`}
                       >
-                        <span className="lpb-scenario-tag">
-                          Demo {candidate.scenario}
-                        </span>
-                        <span className="lpb-student-card-top">
-                          <span className="lpb-avatar">
-                            {candidate.initials}
+                        <button
+                          type="button"
+                          className={`lpb-student-card${selected ? " selected" : ""}`}
+                          onClick={() => chooseStudent(candidate)}
+                        >
+                          <span className="lpb-scenario-tag">
+                            Demo {candidate.scenario}
                           </span>
-                          {selected ? (
-                            <span className="lpb-selected-check">
-                              <Check size={14} />
+                          <span className="lpb-student-card-top">
+                            <span className="lpb-avatar">
+                              {candidate.initials}
                             </span>
-                          ) : null}
-                        </span>
-                        <strong>{candidate.name}</strong>
-                        <span className="lpb-card-eyebrow">{copy.eyebrow}</span>
-                        <b>{copy.title}</b>
-                        <p>{copy.description}</p>
-                      </button>
+                            {selected ? (
+                              <span className="lpb-selected-check">
+                                <Check size={14} />
+                              </span>
+                            ) : null}
+                          </span>
+                          <strong>{candidate.name}</strong>
+                          <span className="lpb-card-eyebrow">{copy.eyebrow}</span>
+                          <b>{copy.title}</b>
+                          <p>{copy.description}</p>
+                        </button>
+                        {/*
+                          A sibling, not a child: the card itself is a button and
+                          buttons cannot nest. Opening the profile must not also
+                          select the student, so it stops the click here.
+                        */}
+                        <button
+                          type="button"
+                          className="lpb-student-profile-button"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setProfileStudent(candidate)
+                          }}
+                        >
+                          <UserRound size={13} />
+                          View profile
+                        </button>
+                      </div>
                     )
                   })}
                 </div>
@@ -2080,7 +2089,9 @@ export default function LearningPlanBuilderPage({
                       inferred outside the dummy dataset.
                     </p>
                   </div>
-                  <span className="lpb-count-chip">
+                  <span
+                    className={`lpb-count-chip accent lpb-scenario-${student.scenario.toLowerCase()}`}
+                  >
                     Demo {student.scenario}
                   </span>
                 </header>
@@ -2339,21 +2350,6 @@ export default function LearningPlanBuilderPage({
                     </div>
                     <span className="lpb-request-pill">Requested start</span>
                   </div>
-                ) : null}
-
-                {/*
-                  The same evidence again, read as the record the
-                  personalisation loop acts on. This is where the two systems
-                  first touch: the builder sizes topics from it, the loop
-                  decides individual sessions from it.
-                */}
-                {evidenceLensTopic ? (
-                  <section className="lpb-evidence-panel lpb-ml-lens-panel">
-                    <MasteryEvidenceLens
-                      student={student}
-                      topic={evidenceLensTopic}
-                    />
-                  </section>
                 ) : null}
 
                 <footer className="lpb-setup-footer">
@@ -2934,7 +2930,9 @@ export default function LearningPlanBuilderPage({
         <main className="lpb-plan-shell lpb-plan-minimal">
           <section className="lpb-plan-masthead">
             <div className="lpb-masthead-top">
-            <div className="lpb-plan-student">
+            <div
+              className={`lpb-plan-student lpb-scenario-${student.scenario.toLowerCase()}`}
+            >
               <span className="lpb-avatar">{student.initials}</span>
               <div>
                 <h1>{student.name}</h1>
@@ -2944,8 +2942,14 @@ export default function LearningPlanBuilderPage({
                   <span>
                     {plural(plan.allocations.length, "topic", "topics")}
                   </span>
+                  {/*
+                    The scheduled classes, not the teaching ones: this has to
+                    agree with the Total classes stat and the sequence header,
+                    which both count every placed class. The teaching/structural
+                    split is on the stat card underneath.
+                  */}
                   <span>
-                    {plan.capacity.teaching}/{plan.capacity.available} classes
+                    {liveClassCount}/{plan.capacity.available} classes
                   </span>
                   {plan.capacity.difference > 0 ? (
                     <span className="over">
@@ -2976,14 +2980,6 @@ export default function LearningPlanBuilderPage({
                 onClick={returnToSetup}
               >
                 Edit scope
-              </button>
-              <button
-                type="button"
-                className="lpb-button lpb-button-primary"
-                onClick={() => setOutcomeOpen(true)}
-                disabled={!nextTeachingItem}
-              >
-                Record outcome
               </button>
             </div>
             </div>
@@ -3260,12 +3256,19 @@ export default function LearningPlanBuilderPage({
                     >
                       Personalisation
                     </button>
+                    {/*
+                      Methodology is no longer a tab. It describes the tool
+                      rather than this plan, so it opens as a dialog from the
+                      topbar and from the "Why this" rail instead of sitting at
+                      the end of the report.
+                    */}
                     <button
                       type="button"
-                      className={planTab === "methodology" ? "active" : ""}
-                      onClick={() => setPlanTab("methodology")}
+                      className="lpb-plan-tab-method"
+                      onClick={() => setFullMethodologyOpen(true)}
                     >
-                      Methodology
+                      <BookOpen size={13} />
+                      How this works
                     </button>
                   </div>
                 </header>
@@ -3352,8 +3355,26 @@ export default function LearningPlanBuilderPage({
                               <ChevronRight size={17} />
                             )}
                           </button>
+                          {/*
+                            Grading belongs to the class it grades, so the
+                            action sits on the row rather than in the masthead.
+                            Only the next teaching class can be graded — the
+                            outcome dialog acts on that item.
+                          */}
+                          {item.id === nextTeachingItem?.id ? (
+                            <button
+                              type="button"
+                              className="lpb-class-record"
+                              onClick={() => setOutcomeOpen(true)}
+                              title={`Record how Class ${String(item.classNumber).padStart(2, "0")} went`}
+                            >
+                              <ClipboardCheck size={12} />
+                              Record outcome
+                            </button>
+                          ) : null}
                           {displayStatus === "planned" &&
-                          item.status !== "skipped" ? (
+                          item.status !== "skipped" &&
+                          item.id !== nextTeachingItem?.id ? (
                             <button
                               type="button"
                               className="lpb-class-fastforward"
@@ -3554,7 +3575,25 @@ export default function LearningPlanBuilderPage({
 
                     <section className="lpb-mentor-timeline">
                       <span className="lpb-detail-label">Plan at a glance</span>
-                      <div>
+                      {/*
+                        One scrolling row rather than four wrapped ones: the
+                        strip reads as a sequence, and the block keeps the same
+                        height whatever the topic count. The index handed to the
+                        carousel is the selected topic's position among all the
+                        chips, so selecting a topic scrolls it into view.
+                      */}
+                      <GlanceCarousel
+                        label="Plan at a glance"
+                        activeIndex={
+                          mentorTopic
+                            ? student.completedTopics.length +
+                              plan.allocations.findIndex(
+                                (allocation) =>
+                                  allocation.topicId === mentorTopic.topicId
+                              )
+                            : -1
+                        }
+                      >
                         {student.completedTopics.map((completed) => (
                           <span className="done" key={completed.topicId}>
                             {topicById.get(completed.topicId)?.name}
@@ -3575,7 +3614,7 @@ export default function LearningPlanBuilderPage({
                         {structuralItems.filter((item) => item.kind === "checkpoint").map((item) => (
                           <span className="checkpoint" key={item.id}>{item.title}</span>
                         ))}
-                      </div>
+                      </GlanceCarousel>
                     </section>
 
                     <section className="lpb-mentor-diagnosis">
@@ -3743,14 +3782,12 @@ export default function LearningPlanBuilderPage({
                       </div>
                     </section>
                   </div>
-                ) : planTab === "mastery" ? (
+                ) : (
                   <MasteryView
                     plan={plan}
                     student={student}
                     topics={gradeTopics}
                   />
-                ) : (
-                  <MethodologyView plan={plan} student={student} />
                 )}
               </section>
 
@@ -3792,14 +3829,10 @@ export default function LearningPlanBuilderPage({
         // arithmetic on screen rather than waiting for a build.
         plan={plan ?? reviewPlan}
         selectedTopicIds={selectedTopicIds}
-        onOpenFullMethodology={
-          plan
-            ? () => {
-                setPlanTab("methodology")
-                setMethodologyOpen(false)
-              }
-            : undefined
-        }
+        onOpenFullMethodology={() => {
+          setFullMethodologyOpen(true)
+          setMethodologyOpen(false)
+        }}
       />
 
       {activeEditAllocation && editDraft ? (
@@ -4144,6 +4177,57 @@ export default function LearningPlanBuilderPage({
         </div>
       ) : null}
 
+      {/*
+        The methodology as a dialog: it explains the tool, not the plan on
+        screen, so it is reachable from every step rather than living at the end
+        of the report.
+      */}
+      {fullMethodologyOpen ? (
+        <div
+          className="lpb-overlay lpb-method-overlay"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setFullMethodologyOpen(false)
+            }
+          }}
+        >
+          <section
+            className="lpb-method-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="How the learning plan builder works"
+          >
+            <header>
+              <div>
+                <span className="lpb-kicker">Methodology</span>
+                <h2>How this builder works</h2>
+              </div>
+              <button
+                type="button"
+                className="lpb-icon-button"
+                onClick={() => setFullMethodologyOpen(false)}
+                aria-label="Close methodology"
+              >
+                <X size={18} />
+              </button>
+            </header>
+            <div className="lpb-method-dialog-body">
+              <MethodologyView plan={plan} student={student} />
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {profileStudent ? (
+        <StudentProfilePanel
+          student={profileStudent}
+          topics={getTopicsForGrade(profileStudent.grade)}
+          scenarioTitle={SCENARIO_COPY[profileStudent.scenario].title}
+          onClose={() => setProfileStudent(null)}
+        />
+      ) : null}
+
       {outcomeOpen && nextTeachingItem ? (
         <div
           className="lpb-overlay"
@@ -4328,7 +4412,7 @@ export default function LearningPlanBuilderPage({
                     value={outcomeNote}
                     onChange={(event) => setOutcomeNote(event.target.value)}
                     placeholder="What did the student understand or struggle with?"
-                    rows={4}
+                    rows={3}
                   />
                 </label>
               </>

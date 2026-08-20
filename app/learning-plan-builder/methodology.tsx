@@ -20,14 +20,20 @@ import {
   ArrowRight,
   CalendarDays,
   ClipboardCheck,
+  Compass,
   Gauge,
   History,
   Layers,
+  Lightbulb,
   ListOrdered,
+  PieChart,
   Repeat,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
-  UserPlus,
+  SquareStack,
+  Wand2,
+  Wrench,
 } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import { useMemo, type ReactNode } from "react"
@@ -120,7 +126,7 @@ const SCENARIO_CASE: Record<DemoStudent["scenario"], string> = {
   A: "New student · test taken",
   B: "New student · no test",
   C: "Returning student · plan update",
-  D: "New student · parent-requested start",
+  D: "New student · parent request",
 }
 
 const SCENARIO_CONSEQUENCE: Record<DemoStudent["scenario"], string> = {
@@ -171,7 +177,7 @@ function buildScenarioHistory(student: DemoStudent | null): ScenarioHistoryRow[]
           label: "Topics finished",
           value:
             demo.completedTopics.length > 0
-              ? `${demo.completedTopics.length} excluded from scope`
+              ? `${demo.completedTopics.length} excluded`
               : "None",
           empty: demo.completedTopics.length === 0,
         },
@@ -188,9 +194,7 @@ function buildScenarioHistory(student: DemoStudent | null): ScenarioHistoryRow[]
         {
           label: "Checkpoint mastery",
           value:
-            objectives > 0
-              ? `${objectives} objectives · ${attempts} question sets`
-              : "None",
+            objectives > 0 ? `${objectives} objectives, ${attempts} sets` : "None",
           empty: objectives === 0,
         },
         {
@@ -203,6 +207,526 @@ function buildScenarioHistory(student: DemoStudent | null): ScenarioHistoryRow[]
       current: student?.scenario === demo.scenario,
     }
   })
+}
+
+/* ------------------------------------------------------------------ *
+ * What the tool is, and how a teacher drives it
+ * ------------------------------------------------------------------ */
+
+/**
+ * The opener. Someone reading this tab may never have seen the builder before,
+ * so it answers "what am I looking at" and "what do I do with it" before any
+ * rule is quoted.
+ */
+const WHAT_IT_IS: string[] = [
+  "A planner that turns a student's evidence and their remaining class package into a class-by-class teaching plan for the year.",
+  "It decides three things: which topics are in, how many classes each one gets, and what order they are taught in.",
+  "Every decision carries a written reason. There is no score the teacher cannot see and no rule the plan will not name.",
+  "The teacher stays in charge — every number is editable, and the builder flags an override rather than blocking it.",
+]
+
+interface UseStep {
+  step: string
+  title: string
+  body: string
+  where: string
+}
+
+const HOW_TO_USE: UseStep[] = [
+  {
+    step: "01",
+    title: "Pick the student",
+    body: "Four demo students, each a different starting point. Open View profile to see exactly what evidence is on record before planning.",
+    where: "Setup · Student",
+  },
+  {
+    step: "02",
+    title: "Read the evidence",
+    body: "Placement scores, checkpoint objectives and question attempts, shown as they will be used. Nothing is inferred beyond this.",
+    where: "Setup · Evidence",
+  },
+  {
+    step: "03",
+    title: "Choose the scope",
+    body: "High-priority topics are locked in. Add or remove Medium and Low while the capacity bar shows what still fits.",
+    where: "Setup · Topic scope",
+  },
+  {
+    step: "04",
+    title: "Generate and read the plan",
+    body: "Classes, Topics, Structure and 2 weeks are four views of one plan. Every allocation carries the reasons that produced it.",
+    where: "Plan board",
+  },
+  {
+    step: "05",
+    title: "Teach, then record the outcome",
+    body: "After each class mark faster, on track or needs more time. The change is previewed first and written as a new version only on approval.",
+    where: "Plan board · Record outcome",
+  },
+]
+
+/* ------------------------------------------------------------------ *
+ * Reference tables — the thresholds, in full
+ * ------------------------------------------------------------------ */
+
+/**
+ * The numbers behind the rules, laid out so they can be checked rather than
+ * taken on trust. Every figure here is quoted from `lib/learning-plan/engine.ts`;
+ * when a threshold moves in the engine it has to move here too.
+ */
+interface RefRow {
+  cells: ReactNode[]
+  /** Marks the summed row at the foot of a table. */
+  total?: boolean
+}
+
+interface RefTable {
+  id: string
+  title: string
+  eyebrow: string
+  Icon: LucideIcon
+  intro: string
+  columns: string[]
+  rows: RefRow[]
+  callout?: { title: string; text: string }
+}
+
+function pill(tone: string, label: string) {
+  return <span className={`lpb-mt-pill ${tone}`}>{label}</span>
+}
+
+const REFERENCE_TABLES: RefTable[] = [
+  {
+    id: "bands",
+    title: "Placement score bands",
+    eyebrow: "Evidence · sizing a topic",
+    Icon: Gauge,
+    intro:
+      "A placement score is not read as a mark out of 100. It is read as one of three bands, and the band decides what happens to the topic's class count and to the balance between easier and practice activities.",
+    columns: ["Band", "Reading", "Classes", "Activity split"],
+    rows: [
+      {
+        cells: [
+          pill("low", "Below 40%"),
+          "The topic has not landed",
+          "Full allocation kept",
+          "15 points toward practice",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "40 – 74%"),
+          "Partly there",
+          "Ideal allocation, unchanged",
+          "Curriculum default",
+        ],
+      },
+      {
+        cells: [
+          pill("high", "75% and above"),
+          "Largely secure",
+          "Shortened by 30% of ideal, never under the minimum",
+          "15 points toward easier consolidation",
+        ],
+      },
+    ],
+    callout: {
+      title: "Why a band and not the number",
+      text: "A 76% and an 84% are not different instructions — both mean the same thing: teach this in less time. Bands keep the plan stable against small differences in a single test, and keep the rule explainable to a parent.",
+    },
+  },
+  {
+    id: "signals",
+    title: "Mastery and question-attempt signals",
+    eyebrow: "Evidence · the second read",
+    Icon: ClipboardCheck,
+    intro:
+      "Once a student has been taught, checkpoints and question sets replace the placement test as the evidence. These signals move a topic in both directions, and the extension is capped so one weak topic cannot eat the package.",
+    columns: ["Signal", "Fires when", "Effect on the topic"],
+    rows: [
+      {
+        cells: [
+          pill("high", "Secure at Master"),
+          "2 or more Master objectives secure, and 75% of the topic's objectives",
+          "Shortened by 30% of ideal — never removed, never below the minimum",
+        ],
+      },
+      {
+        cells: [
+          pill("low", "Not secure"),
+          "2 objectives not secure, or half of them on a small topic",
+          "Extended, capped at ideal + 2 classes, with more practice weight",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "Starter strong, Master weak"),
+          "Starter accuracy 75%+ while Master is under 50%",
+          "Full allocation kept — the gap is transfer, not the routine",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "Starter weak, Master strong"),
+          "Starter under 50% while Master is 75%+",
+          "Flagged: repair the core routine before trusting the reasoning",
+        ],
+      },
+    ],
+    callout: {
+      title: "Two accuracies, not one",
+      text: "Starter questions test whether the routine is reliable; Master questions test whether the student knows when to use it. Averaging them into a single score hides the only thing worth teaching next.",
+    },
+  },
+  {
+    id: "budget",
+    title: "Where a full-year package goes",
+    eyebrow: "Capacity · the 79 classes",
+    Icon: PieChart,
+    intro:
+      "Structure is part of the package, not an extra on top of it. Checkpoints and RDP scale with the number of topics; the PTM reserve is held against the package but never placed in the sequence.",
+    columns: ["Component", "Classes", "What it is for", "Can it be shed?"],
+    rows: [
+      {
+        cells: [
+          "Teaching",
+          <b key="v">66</b>,
+          "The topics themselves",
+          pill("mid", "Last resort"),
+        ],
+      },
+      {
+        cells: [
+          "Checkpoints",
+          <b key="v">5</b>,
+          "Produce the mastery evidence every later rule reads",
+          pill("mid", "Only in pairs, min 2"),
+        ],
+      },
+      {
+        cells: [
+          "RDP",
+          <b key="v">5</b>,
+          "Revision, doubts and practice",
+          pill("low", "First to go"),
+        ],
+      },
+      {
+        cells: [
+          "PTM reserve",
+          <b key="v">3</b>,
+          "Parent–teacher meetings, scheduled by ops on a fixed calendar",
+          pill("high", "Never"),
+        ],
+      },
+      {
+        cells: ["Package total", <b key="v">79</b>, "", ""],
+        total: true,
+      },
+    ],
+    callout: {
+      title: "Reserved is not unused",
+      text: "The builder holds the PTM classes against the package but does not place them in the sequence, because ops owns that calendar. They are counted, not scheduled — and the fit ladder cannot take them.",
+    },
+  },
+  {
+    id: "classkinds",
+    title: "The four kinds of class",
+    eyebrow: "Anatomy · what is in the plan",
+    Icon: SquareStack,
+    intro:
+      "Every row in the sequence is one class of one of four kinds. Only teaching classes carry objectives and activities; the other three are structure, and they are budgeted for from the same package.",
+    columns: ["Kind", "Full year", "What happens in it", "Placed by"],
+    rows: [
+      {
+        cells: [
+          pill("high", "Teaching"),
+          <b key="v">66</b>,
+          "Objectives from one topic, plus its Starter and Master activities",
+          "The builder, in sequence order",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "Checkpoint"),
+          <b key="v">5</b>,
+          "Measures objectives and writes the mastery evidence later rules read",
+          "The builder, spaced across the plan",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "RDP"),
+          <b key="v">5</b>,
+          "Revision, doubts and practice on what has been taught so far",
+          "The builder, paired with checkpoints",
+        ],
+      },
+      {
+        cells: [
+          pill("low", "PTM"),
+          <b key="v">3</b>,
+          "Parent–teacher meeting",
+          "Ops, on a fixed calendar — reserved but never placed",
+        ],
+      },
+    ],
+    callout: {
+      title: "Inside one teaching class",
+      text: "A class carries the topic's learning objectives and a set of activities split between easier consolidation and practice. Each activity is a real Starter or Master prompt from the workbook guidelines, and the count is capped by Rule G1 — 7 questions a week for Grade 5, about 3.5 per class — so a long topic cannot quietly become a workload spike.",
+    },
+  },
+  {
+    id: "outcomes",
+    title: "What each class outcome does",
+    eyebrow: "After teaching",
+    Icon: RefreshCw,
+    intro:
+      "Grading a class is the only routine way the plan changes after it is approved. Each outcome moves the remaining allocation by at most one class, and both directions are bounded.",
+    columns: ["Outcome", "Change", "Bounded by", "Then"],
+    rows: [
+      {
+        cells: [
+          pill("high", "Completed faster"),
+          "−1 class",
+          "The topic's minimum",
+          "The class returns to the pool",
+        ],
+      },
+      {
+        cells: [
+          pill("mid", "On track"),
+          "No change",
+          "—",
+          "The approved allocation stands",
+        ],
+      },
+      {
+        cells: [
+          pill("low", "Needs more time"),
+          "+1 class",
+          "Ideal + 2 classes",
+          "Reinforcement is added to the topic",
+        ],
+      },
+    ],
+    callout: {
+      title: "Nothing changes without approval",
+      text: "The outcome produces a preview showing the current plan against the proposed one. A new plan version is written only when the teacher approves it, and a class that is no longer needed keeps its slot as skipped so later classes are not renumbered.",
+    },
+  },
+]
+
+/* ------------------------------------------------------------------ *
+ * A worked example
+ * ------------------------------------------------------------------ */
+
+/**
+ * One topic, sized end to end. The rules above are individually simple and
+ * collectively hard to picture, so this walks a single real allocation from
+ * curriculum ideal to final class count — including the floor that stops it.
+ */
+interface ExampleStep {
+  label: string
+  value: string
+  body: string
+  tone: "base" | "cut" | "floor"
+}
+
+const EXAMPLE_IDEAL = 5
+const EXAMPLE_FINAL = 3
+
+const EXAMPLE_STEPS: ExampleStep[] = [
+  {
+    label: "Curriculum ideal",
+    value: "5 classes",
+    body: "Data Analysis is a 5-class topic in the Grade 5 sequence, with a 3-class minimum.",
+    tone: "base",
+  },
+  {
+    label: "Placement 80%",
+    value: "−2 classes",
+    body: "80% is in the 75%+ band, so the topic is shortened by 30% of the ideal — 30% of 5, rounded up, is 2.",
+    tone: "cut",
+  },
+  {
+    label: "Result",
+    value: "3 classes",
+    body: "The split also shifts 15 points toward easier consolidation, because the student is being reminded rather than taught.",
+    tone: "base",
+  },
+  {
+    label: "Floor check",
+    value: "At the minimum",
+    body: "3 is the topic's minimum, so nothing — not capacity compression, not another strong result — can take it lower automatically.",
+    tone: "floor",
+  },
+]
+
+/* ------------------------------------------------------------------ *
+ * Where AI is used, and where it is not
+ * ------------------------------------------------------------------ */
+
+/**
+ * The question every reviewer asks about a planner like this: how much of it
+ * did a model decide? The honest answer is "none of the structure", and it is
+ * worth stating plainly rather than leaving to be inferred.
+ */
+const RULES_OWN: string[] = [
+  "Which topics are in the plan, and which are dropped",
+  "How many classes each topic gets, and the minimum it may never go under",
+  "Teaching order, including pulling a prerequisite in front of its dependant",
+  "How many checkpoints and RDP classes fit, and what the fit ladder sheds first",
+  "What every class outcome does to the remaining allocation",
+]
+
+const AI_OWNS: string[] = [
+  "The mentor-facing teaching guide for a class: goal, teaching points, practice and success criteria",
+  "The parent-facing explanation of why the plan looks the way it does",
+  "A suggested set of class adjustments, which the rules then clamp and the teacher approves",
+]
+
+interface AiTouchpoint {
+  where: string
+  what: string
+  guard: string
+}
+
+const AI_TOUCHPOINTS: AiTouchpoint[] = [
+  {
+    where: "Teaching guide prose",
+    what: "Structured generation against a fixed schema — one goal, teaching points, a practice line and success criteria per class.",
+    guard:
+      "Structure stays rule-based. If the provider is unavailable the plan falls back to local templates and says which was used.",
+  },
+  {
+    where: "Plan strategy suggestion",
+    what: "Proposes per-topic class adjustments and a short strategy when evidence is applied to the scope.",
+    guard:
+      "Every suggested count is clamped to the topic minimum before it is applied — Rule H1 holds against the model.",
+  },
+  {
+    where: "Parent explanation",
+    what: "Turns the plan's own reasons into a paragraph a parent can read.",
+    guard: "Describes the plan; it cannot change it.",
+  },
+]
+
+function AiSplit() {
+  return (
+    <section className="lpb-methodology-ai">
+      <header>
+        <Wand2 size={16} />
+        <div>
+          <strong>What the AI plans, and what it does not</strong>
+          <p>
+            The plan is produced by a deterministic engine: the same student and
+            the same package always produce the same plan. AI writes the prose
+            around that plan and proposes adjustments a teacher approves — it
+            never decides a class count on its own.
+          </p>
+        </div>
+      </header>
+
+      <div className="lpb-methodology-ai-split">
+        <article className="rules">
+          <span className="lpb-detail-label">Rules decide</span>
+          <ul>
+            {RULES_OWN.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="ai">
+          <span className="lpb-detail-label">AI writes</span>
+          <ul>
+            {AI_OWNS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </article>
+      </div>
+
+      <div className="lpb-methodology-ai-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Where</th>
+              <th>What the model produces</th>
+              <th>What holds it in place</th>
+            </tr>
+          </thead>
+          <tbody>
+            {AI_TOUCHPOINTS.map((touchpoint) => (
+              <tr key={touchpoint.where}>
+                <td>{touchpoint.where}</td>
+                <td>{touchpoint.what}</td>
+                <td>{touchpoint.guard}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="lpb-methodology-callout">
+        <ShieldCheck size={14} />
+        <p>
+          <b>Prototype status:</b> the evidence in this build is the supplied
+          dummy dataset, and AI output falls back to local templates whenever a
+          provider is not configured — so the builder is fully demonstrable with
+          no model connected at all.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+function WorkedExample() {
+  return (
+    <section className="lpb-methodology-example">
+      <header>
+        <Wrench size={16} />
+        <div>
+          <strong>Worked example · one topic, end to end</strong>
+          <p>
+            Each rule is simple on its own. This is what they look like applied
+            in order to a single topic for a student who scored 80% on it.
+          </p>
+        </div>
+      </header>
+
+      <div className="lpb-methodology-example-grid">
+        {EXAMPLE_STEPS.map((step, index) => (
+          <article key={step.label} className={`tone-${step.tone}`}>
+            <span className="lpb-methodology-example-no">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <strong>{step.label}</strong>
+            <b>{step.value}</b>
+            <p>{step.body}</p>
+          </article>
+        ))}
+      </div>
+
+      {/* The same class-square visual the "Why this" panel uses, so the two
+          read as one language. Filled squares survive; hatched ones were cut. */}
+      <div className="lpb-methodology-squares">
+        <span className="lpb-detail-label">Data Analysis</span>
+        <div>
+          {Array.from({ length: EXAMPLE_IDEAL }, (_, index) => (
+            <i
+              key={index}
+              className={index < EXAMPLE_FINAL ? "kept" : "cut"}
+              aria-hidden="true"
+            />
+          ))}
+          <small>
+            5 &rarr; <b>3</b> classes · floor 3
+          </small>
+        </div>
+      </div>
+    </section>
+  )
 }
 
 interface MethodologySection {
@@ -521,10 +1045,50 @@ export function MethodologyView({
         <p>
           The builder does not pick topics by feel. It reads what the student has
           already proven, fits the required teaching into the classes the package
-          actually has left, and keeps a written reason on every decision. The
-          rules below are the ones running behind the screen you are on.
+          actually has left, and keeps a written reason on every decision. This
+          page is the whole method: what the tool does, how a teacher drives it,
+          every threshold it uses, and a worked example of the lot applied to one
+          topic.
         </p>
       </header>
+
+      {/*
+        What the tool is and how it is driven, before any rule is quoted — this
+        tab is read by people who have not used the builder.
+      */}
+      <section className="lpb-methodology-about">
+        <article className="lpb-methodology-what">
+          <header>
+            <Compass size={16} />
+            <strong>What this tool is</strong>
+          </header>
+          <ul>
+            {WHAT_IT_IS.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="lpb-methodology-how">
+          <header>
+            <ListOrdered size={16} />
+            <strong>How to use it</strong>
+          </header>
+          <ol>
+            {HOW_TO_USE.map((step) => (
+              <li key={step.step}>
+                <span className="lpb-methodology-how-no">{step.step}</span>
+                <div>
+                  <strong>{step.title}</strong>
+                  <p>{step.body}</p>
+                  <span className="lpb-methodology-how-where">{step.where}</span>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </article>
+      </section>
+
+      <AiSplit />
 
       <section className="lpb-methodology-pipeline">
         {PIPELINE.map((step, index) => (
@@ -557,21 +1121,21 @@ export function MethodologyView({
           {scenarioHistory.map((row) => (
             <article
               key={row.scenario}
-              className={`lpb-scenario-history depth-${row.depth}${
+              className={`lpb-scenario-history lpb-scenario-${row.scenario.toLowerCase()} depth-${row.depth}${
                 row.current ? " current" : ""
               }`}
             >
+              {row.current ? (
+                <span className="lpb-scenario-history-now">On screen</span>
+              ) : null}
               <header>
                 <span className="lpb-scenario-history-badge">
                   {row.scenario}
                 </span>
                 <div>
-                  <strong>{row.case}</strong>
-                  <span>{row.name}</span>
+                  <strong>{row.name}</strong>
+                  <span>{row.case}</span>
                 </div>
-                {row.current ? (
-                  <span className="lpb-scenario-history-now">On screen</span>
-                ) : null}
               </header>
               <p className="lpb-scenario-history-depth">{row.depthLabel}</p>
               <dl>
@@ -590,6 +1154,52 @@ export function MethodologyView({
           ))}
         </div>
       </section>
+
+      {/* The thresholds in full, so a number can be checked rather than trusted. */}
+      <section className="lpb-methodology-tables">
+        {REFERENCE_TABLES.map((table) => (
+          <article key={table.id} className="lpb-methodology-table-card">
+            <header>
+              <table.Icon size={18} />
+              <div>
+                <strong>{table.title}</strong>
+                <span>{table.eyebrow}</span>
+              </div>
+            </header>
+            <p className="lpb-methodology-table-intro">{table.intro}</p>
+            <div className="lpb-methodology-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    {table.columns.map((column) => (
+                      <th key={column}>{column}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {table.rows.map((row, rowIndex) => (
+                    <tr key={rowIndex} className={row.total ? "total" : undefined}>
+                      {row.cells.map((cell, cellIndex) => (
+                        <td key={cellIndex}>{cell}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {table.callout ? (
+              <div className="lpb-methodology-callout">
+                <Lightbulb size={14} />
+                <p>
+                  <b>{table.callout.title}:</b> {table.callout.text}
+                </p>
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </section>
+
+      <WorkedExample />
 
       <div className="lpb-methodology-grid">
         {sections.map((section) => (

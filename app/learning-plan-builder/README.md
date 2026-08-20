@@ -37,7 +37,7 @@ The workbook supplies topic order, prerequisites, subtopics, and learning object
 The rules below are surfaced in the UI two ways, and both need updating when `lib/learning-plan/engine.ts` changes:
 
 - **“Why this” panel** (`methodology-sidebar.tsx`) — a right-hand panel toggled from the topbar on every screen. One or two lines per rule, computed from the student's own package, placement, mastery and capacity numbers: which rule fired here and what it did. Its notes are keyed by `MethodologyContext`, so a new screen needs a new context and a `buildNotes` case.
-- **Methodology tab** (`methodology.tsx`) — the long-form concept on the plan board, for reading rather than presenting.
+- **Methodology dialog** (`methodology.tsx`) — the long-form concept, opened as a dialog from the plan board (`How this works`) or from the "Why this" rail footer. It is no longer a tab: it describes the tool rather than the plan on screen, so it is reachable from every step. It covers what the builder is and how to drive it, every threshold as a reference table, the four class kinds, a worked example of one topic sized end to end, and which parts are rule-based versus AI-written. It opens with a **scenario history** block — the four demo students side by side on the same five rows (classes taught, topics finished, placement, checkpoint mastery, parent request), so it is obvious that B starts from nothing and C starts from 13 taught classes. That block is derived from `demoStudents`, so adding or editing a demo student updates it automatically.
 
 ### Planning rules
 
@@ -111,11 +111,8 @@ class. The builder decides which topics get taught and how many classes each one
 gets; the loop decides what happens in each session, one activity at a time,
 until every learning objective in the topic has been certified.
 
-It is surfaced in two places, both additive — no existing screen changed shape:
+It is surfaced on the plan board only — no setup screen changed shape:
 
-- **Step 2** gets a scorecard lens (`MasteryEvidenceLens`) under the evidence
-  panels: the same placement scores and question attempts, read as one row per
-  objective, plus the rule the router would fire if a session started now.
 - **The `Personalisation` tab** on the plan board (`MasteryView`) — the two
   systems and how they join, a map of where every assessment flow sits, the
   activity ledger, a steppable run of the loop over the focused topic, and what
@@ -161,6 +158,19 @@ topic; the Grade 5 workbook gives 4–6. The router does not care, but survey
 sizing does — a 6-objective topic needs an 18-question survey, and the static
 materialiser's golden LO rule silently drops objectives it cannot give 3
 questions to. Validate `survey total >= 3 x LOs` before this leaves prototype.
+
+### Colour
+
+The UI is deliberately near-monochrome — deep green on warm paper — with one
+exception: the four demo scenarios. Each carries an accent (A teal, B amber,
+C indigo, D coral) declared once as `--accent` / `--accent-soft` /
+`--accent-line` / `--accent-glow` on `.lpb-scenario-a` … `-d`, and every
+scenario-aware element reads those variables rather than naming a colour.
+
+That means a student is the same colour everywhere they appear — the picker
+card, the `Demo B` chip on Step 2, the plan masthead avatar, the methodology
+scenario-history card. Adding a scenario means adding one four-line block; do
+not hardcode a hex anywhere else.
 
 ### AI in the prototype
 

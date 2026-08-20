@@ -28,7 +28,6 @@ import {
   Play,
   RotateCcw,
   Sparkles,
-  Target,
 } from "lucide-react"
 
 import {
@@ -811,58 +810,3 @@ export function MasteryView({
   )
 }
 
-/**
- * A compact version of the scorecard for Step 2, so the evidence screen can be
- * read either as a teacher's case notes or as the record the loop will act on.
- */
-export function MasteryEvidenceLens({
-  student,
-  topic,
-}: {
-  student: DemoStudent
-  topic: CurriculumTopic
-}) {
-  const card = useMemo(() => buildScorecard(student, topic), [student, topic])
-  const decision = useMemo(() => routeNext(card), [card])
-
-  return (
-    <div className="lpb-ml-lens">
-      <div className="lpb-panel-title">
-        <Target size={18} />
-        <div>
-          <h3>The same evidence, as a scorecard</h3>
-          <p>
-            One row per skill inside {topic.name} — this is the record the personalisation
-            loop reads before every session
-          </p>
-        </div>
-      </div>
-
-      <ul className="lpb-ml-lens-list">
-        {card.rows.map((row) => (
-          <li key={row.id}>
-            <div>
-              <strong>{row.text}</strong>
-              <span className={stateClass(row.state)}>{STATE_COPY[row.state].label}</span>
-            </div>
-            <ScoreBar value={row.score} muted={!row.locked} />
-            <small>
-              {row.score === null
-                ? `No score stated — confidence ${row.confidence.toFixed(2)} is under the ${CONFIDENCE_LOCK} line, and a guess is worse than a blank.`
-                : `Score ${row.score} · confidence ${row.confidence.toFixed(2)} · ${row.provenance}`}
-            </small>
-          </li>
-        ))}
-      </ul>
-
-      <div className="lpb-ml-lens-decision">
-        <span className="lpb-ml-rule-chip">
-          {decision.rule} · {decision.ruleName}
-        </span>
-        <p>
-          <b>If a session started right now:</b> {decision.activityLabel}. {decision.because}
-        </p>
-      </div>
-    </div>
-  )
-}

@@ -80,6 +80,41 @@
   color: #4b5563;
 }
 
+/* ── Scenario accents ────────────────────────────────────────────────────
+   The four demo scenarios are the one thing on this page that is genuinely
+   four different things, so they are the one thing that carries colour. Each
+   sets `--accent` locally and every scenario-aware element reads it, which
+   keeps the palette to a single declaration instead of four copies of every
+   rule. Hues are spaced but held to a similar value and chroma, so the set
+   still sits on warm paper next to deep green without shouting. */
+.lpb-scenario-a {
+  --accent: #1f7169;
+  --accent-soft: rgba(31, 113, 105, 0.1);
+  --accent-line: rgba(31, 113, 105, 0.34);
+  --accent-glow: rgba(31, 113, 105, 0.16);
+}
+
+.lpb-scenario-b {
+  --accent: #a2700f;
+  --accent-soft: rgba(216, 160, 40, 0.14);
+  --accent-line: rgba(190, 140, 32, 0.38);
+  --accent-glow: rgba(190, 140, 32, 0.18);
+}
+
+.lpb-scenario-c {
+  --accent: #4a5bc4;
+  --accent-soft: rgba(74, 91, 196, 0.1);
+  --accent-line: rgba(74, 91, 196, 0.32);
+  --accent-glow: rgba(74, 91, 196, 0.16);
+}
+
+.lpb-scenario-d {
+  --accent: #c8543a;
+  --accent-soft: rgba(224, 108, 78, 0.12);
+  --accent-line: rgba(200, 84, 58, 0.34);
+  --accent-glow: rgba(200, 84, 58, 0.16);
+}
+
 .lpb *,
 .lpb *::before,
 .lpb *::after {
@@ -677,6 +712,38 @@
   gap: 13px;
 }
 
+/* The card and its profile trigger. Two siblings rather than one nested
+   control, because the card itself is a button. */
+.lpb-student-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.lpb-student-slot .lpb-student-card {
+  flex: 1;
+}
+
+.lpb-student-profile-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  color: var(--accent, var(--teal));
+  background: var(--accent-soft, rgba(31, 88, 85, 0.06));
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background 0.14s ease;
+}
+
+.lpb-student-profile-button:hover {
+  border-color: var(--accent-line, var(--line-strong));
+}
+
 .lpb-student-card {
   position: relative;
   min-height: 176px;
@@ -695,6 +762,26 @@
     ease;
 }
 
+/* The card's own colour, carried on a hairline at the top edge rather than a
+   fill — enough to tell the four apart at a glance, not enough to turn a form
+   into a palette. */
+.lpb-student-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent, var(--teal));
+  opacity: 0.55;
+  transition: opacity 0.22s ease;
+}
+
+.lpb-student-card:hover::before,
+.lpb-student-card.selected::before {
+  opacity: 1;
+}
+
 .lpb-student-card::after {
   content: "";
   position: absolute;
@@ -702,30 +789,30 @@
   bottom: -34px;
   width: 90px;
   height: 90px;
-  border: 16px solid rgba(31, 88, 85, 0.035);
+  border: 16px solid var(--accent-soft, rgba(31, 88, 85, 0.035));
   border-radius: 50%;
 }
 
 .lpb-student-card:hover {
   z-index: 1;
   transform: translateY(-3px);
-  border-color: rgba(31, 88, 85, 0.22);
+  border-color: var(--accent-line, rgba(31, 88, 85, 0.22));
   box-shadow: 0 12px 34px rgba(26, 26, 46, 0.09);
 }
 
 .lpb-student-card.selected {
-  background: linear-gradient(145deg, rgba(31, 88, 85, 0.055), transparent 62%),
+  background: linear-gradient(145deg, var(--accent-soft, rgba(31, 88, 85, 0.055)), transparent 62%),
     white;
-  border-color: rgba(31, 88, 85, 0.45);
-  box-shadow: inset 0 0 0 1px rgba(31, 88, 85, 0.08), 0 9px 28px
-    rgba(31, 88, 85, 0.1);
+  border-color: var(--accent-line, rgba(31, 88, 85, 0.45));
+  box-shadow: inset 0 0 0 1px var(--accent-soft, rgba(31, 88, 85, 0.08)), 0 9px 28px
+    var(--accent-glow, rgba(31, 88, 85, 0.1));
 }
 
 .lpb-scenario-tag {
   margin-bottom: 8px;
   padding: 4px 8px;
-  color: #1f7169;
-  background: rgba(37, 135, 124, 0.09);
+  color: var(--accent, #1f7169);
+  background: var(--accent-soft, rgba(37, 135, 124, 0.09));
   border-radius: 50px;
   font-family: "Space Mono", monospace;
   font-size: 0.72rem;
@@ -754,6 +841,14 @@
   box-shadow: 0 5px 15px rgba(31, 88, 85, 0.17);
 }
 
+/* Inside a scenario-tinted card the avatar joins the card's colour instead of
+   holding the global gradient — four identical green discs in a row was the
+   thing making this screen read as one note. */
+.lpb-student-card .lpb-avatar {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 62%, var(--ink)));
+  box-shadow: 0 5px 15px var(--accent-glow);
+}
+
 .lpb-avatar-large {
   width: 54px;
   height: 54px;
@@ -767,7 +862,7 @@
   display: grid;
   place-items: center;
   color: white;
-  background: var(--blue);
+  background: var(--accent, var(--blue));
   border-radius: 50%;
 }
 
@@ -3144,6 +3239,40 @@ a.lpb-status-chip.link:hover {
   background: #eaf5f0;
 }
 
+/* Grading the class from the class. Unlike teach-to-here this is a real plan
+   action, not a demo shortcut, so it stays visible: exactly one row carries it
+   (the next teaching class) and that row is the one the mentor is looking for. */
+.lpb-class-row:has(.lpb-class-record) .lpb-class-summary {
+  padding-right: 178px;
+}
+
+.lpb-class-record {
+  position: absolute;
+  top: 50%;
+  right: 44px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  padding: 6px 12px;
+  color: white;
+  background: var(--green);
+  border: 1px solid var(--green);
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  transition: filter 0.12s ease;
+}
+
+.lpb-class-record:hover {
+  filter: brightness(1.08);
+}
+
+.lpb-class-record:disabled {
+  opacity: 0.45;
+}
+
 .lpb-class-row:first-child {
   border-top: 0;
 }
@@ -3444,15 +3573,88 @@ a.lpb-status-chip.link:hover {
 .lpb-mentor-snapshot b { display: block; margin-top: 6px; color: var(--ink); font-size: 0.95rem; line-height: 1.35; }
 
 .lpb-mentor-timeline { padding: 13px; border-radius: 10px; border: 1px solid var(--line); background: white; }
-.lpb-mentor-timeline > div { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
-.lpb-mentor-timeline span:not(.lpb-detail-label),
-.lpb-mentor-timeline button { padding: 6px 9px; color: #49605a; background: #eef2f0; border: 1px solid #dde5e1; border-radius: 6px; font-size: 0.79rem; }
+/* The chips themselves. Scoped to the carousel track so the scroller's own
+   arrow buttons — also buttons, also inside the timeline — are not styled as
+   chips. */
+.lpb-mentor-timeline .lpb-glance-track > span,
+.lpb-mentor-timeline .lpb-glance-track > button { flex: 0 0 auto; padding: 6px 9px; color: #49605a; background: #eef2f0; border: 1px solid #dde5e1; border-radius: 6px; font-size: 0.79rem; white-space: nowrap; scroll-snap-align: start; }
 /* Topic chips select which topic the diagnosis panel below is showing. */
-.lpb-mentor-timeline button { cursor: pointer; font-weight: 700; transition: background .12s ease, border-color .12s ease; }
-.lpb-mentor-timeline button:hover { background: #dfe9e4; border-color: #b9d3ca; }
+.lpb-mentor-timeline .lpb-glance-track > button { cursor: pointer; font-weight: 700; transition: background .12s ease, border-color .12s ease; }
+.lpb-mentor-timeline .lpb-glance-track > button:hover { background: #dfe9e4; border-color: #b9d3ca; }
 .lpb-mentor-timeline .done { color: #668078 !important; text-decoration: line-through; background: #e2f1e8 !important; }
 .lpb-mentor-timeline .current { color: white !important; background: var(--green) !important; border-color: var(--green) !important; font-weight: 800; }
 .lpb-mentor-timeline .checkpoint { color: #805a12 !important; background: #fff9e9 !important; border-style: dashed !important; }
+
+/* ── "Plan at a glance" carousel ──────────────────────────────────────────
+   One scrolling row instead of a wrapping block: the strip is a sequence, and
+   the panel keeps a fixed height however many topics the plan carries. The
+   arrows are a convenience — the track is scrollable, keyboard-focusable and
+   swipeable without them. */
+.lpb-glance-carousel {
+  position: relative;
+  margin-top: 9px;
+}
+
+.lpb-glance-track {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  /* The scrollbar is replaced by the arrows and the fade, so the row does not
+     change height when it overflows. */
+  -ms-overflow-style: none;
+  outline: none;
+}
+
+.lpb-glance-track::-webkit-scrollbar {
+  display: none;
+}
+
+.lpb-glance-track:focus-visible {
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(31, 88, 85, 0.35);
+}
+
+/* Room for the arrows to sit over the row's ends without covering a chip. */
+.lpb-glance-carousel.has-overflow .lpb-glance-track {
+  padding: 0 30px;
+}
+
+.lpb-glance-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  color: var(--green);
+  background: white;
+  border: 1px solid #cfe0d9;
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(28, 60, 57, 0.12);
+  cursor: pointer;
+  transition: background .12s ease, opacity .12s ease;
+}
+
+.lpb-glance-arrow.start {
+  left: 0;
+}
+
+.lpb-glance-arrow.end {
+  right: 0;
+}
+
+.lpb-glance-arrow:hover:not(:disabled) {
+  background: #eaf5f0;
+}
+
+.lpb-glance-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
 
 .lpb-mentor-diagnosis { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: white; }
 .lpb-mentor-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -4298,7 +4500,7 @@ a.lpb-status-chip.link:hover {
 
 .lpb-outcome-modal > footer {
   margin-top: auto;
-  padding-top: 18px;
+  padding-top: 14px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -4550,25 +4752,46 @@ a.lpb-status-chip.link:hover {
   font-size: 0.77rem;
 }
 
+/* A one-decision dialog: three cards, an optional note, two buttons. It is
+   sized to that content rather than to the drawer it shares header styles
+   with, so the overrides below tighten what those shared rules set. */
 .lpb-outcome-modal {
-  width: min(650px, 100%);
-  padding: 24px;
+  width: min(540px, 100%);
+  padding: 18px 20px;
   background: white;
-  border-radius: 20px;
+  border-radius: 16px;
   box-shadow: var(--shadow-float);
   animation: lpb-modal-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.lpb-outcome-modal > header {
+  gap: 12px;
+}
+
+.lpb-outcome-modal h2 {
+  margin-top: 2px;
+  font-size: 1.15rem;
+}
+
+.lpb-outcome-modal header p {
+  margin: 3px 0 0;
+  font-size: 0.84rem;
+}
+
+.lpb-outcome-modal .lpb-icon-button {
+  width: 28px;
+  height: 28px;
+}
+
 .lpb-outcome-options {
-  margin-top: 22px;
+  margin-top: 14px;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 9px;
+  gap: 8px;
 }
 
 .lpb-outcome-options button {
-  min-height: 128px;
-  padding: 14px;
+  padding: 11px 12px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -4594,30 +4817,31 @@ a.lpb-status-chip.link:hover {
 }
 
 .lpb-outcome-options svg {
-  margin-bottom: 12px;
+  margin-bottom: 7px;
   color: var(--blue);
 }
 
 .lpb-outcome-options strong {
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+  line-height: 1.25;
 }
 
 .lpb-outcome-options span {
-  margin-top: 3px;
+  margin-top: 2px;
   color: var(--ink-muted);
-  font-size: 0.76rem;
-  line-height: 1.4;
+  font-size: 0.74rem;
+  line-height: 1.35;
 }
 
 .lpb-note-field {
-  margin-top: 18px;
+  margin-top: 14px;
   display: block;
 }
 
 .lpb-note-field textarea {
   width: 100%;
-  margin-top: 8px;
-  padding: 11px 12px;
+  margin-top: 6px;
+  padding: 9px 11px;
   resize: vertical;
   color: var(--ink);
   background: white;
@@ -5211,8 +5435,21 @@ a.lpb-status-chip.link:hover {
     grid-template-columns: 1fr;
   }
 
+  /* Stacked, so the icon sits beside the label instead of above it. */
   .lpb-outcome-options button {
-    min-height: 95px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .lpb-outcome-options button svg {
+    margin-bottom: 0;
+  }
+
+  .lpb-outcome-options button span {
+    flex-basis: 100%;
+    margin-top: 0;
   }
 }
 
@@ -5255,6 +5492,12 @@ a.lpb-status-chip.link:hover {
   height: 42px;
   flex: 0 0 auto;
   font-size: 0.8rem;
+}
+
+/* Same student, same colour as the card they were picked from. */
+.lpb-plan-student .lpb-avatar {
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 62%, var(--ink)));
+  box-shadow: 0 5px 15px var(--accent-glow);
 }
 
 .lpb-plan-masthead h1 {
@@ -5636,6 +5879,18 @@ a.lpb-status-chip.link {
   padding-right: 16px;
 }
 
+.lpb-plan-board-minimal .lpb-class-record {
+  right: 40px;
+  padding: 6px 12px;
+  border-radius: 7px;
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.lpb-plan-board-minimal .lpb-class-row:has(.lpb-class-record) .lpb-class-summary {
+  padding-right: 176px;
+}
+
 .lpb-plan-board-minimal
   .lpb-class-row:hover:has(.lpb-class-fastforward)
   .lpb-class-summary {
@@ -5666,6 +5921,19 @@ a.lpb-status-chip.link {
 
   .lpb-plan-board-minimal .lpb-class-fastforward {
     display: none;
+  }
+
+  /* Teach-to-here can go on a narrow screen; grading the class cannot. */
+  .lpb-plan-board-minimal .lpb-class-record {
+    right: 36px;
+    padding: 5px 9px;
+    font-size: 0.7rem;
+  }
+
+  .lpb-plan-board-minimal
+    .lpb-class-row:has(.lpb-class-record)
+    .lpb-class-summary {
+    padding-right: 152px;
   }
 
   .lpb-plan-board-minimal
@@ -5855,6 +6123,14 @@ a.lpb-status-chip.link {
   font-weight: 700;
 }
 
+/* Chips that name the scenario carry its colour, so the same student stays the
+   same colour from the picker through to the plan board. */
+.lpb-count-chip.accent {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+}
+
 /* ── Student cards ───────────────────────────────────────────── */
 .lpb-student-grid {
   gap: 12px;
@@ -5875,24 +6151,25 @@ a.lpb-status-chip.link {
 
 .lpb-student-card:hover {
   transform: none;
-  border-color: var(--line-strong);
+  border-color: var(--accent-line, var(--line-strong));
   box-shadow: 0 4px 14px rgba(28, 60, 57, 0.07);
 }
 
 .lpb-student-card.selected {
-  background: rgba(31, 88, 85, 0.035);
-  border-color: var(--blue);
-  box-shadow: inset 0 0 0 1px var(--blue);
+  background: var(--accent-soft, rgba(31, 88, 85, 0.035));
+  border-color: var(--accent, var(--blue));
+  box-shadow: inset 0 0 0 1px var(--accent, var(--blue));
 }
 
-/* "Demo A" is an index label, not a status — it stays neutral so the
-   scenario eyebrow below it keeps the only accent on the card. */
+/* "Demo A" names which scenario the card is, which is the one thing on this
+   screen that is genuinely four different things — so it carries the colour.
+   Outlined rather than filled: identity, not status. */
 .lpb-scenario-tag {
   margin-bottom: 10px;
   padding: 3px 7px;
-  color: var(--ink-muted);
+  color: var(--accent, var(--ink-muted));
   background: transparent;
-  border: 1px solid var(--line);
+  border: 1px solid var(--accent-line, var(--line));
   border-radius: 6px;
   font-size: 0.72rem;
   letter-spacing: 0.04em;
@@ -5908,7 +6185,7 @@ a.lpb-status-chip.link {
 .lpb-selected-check {
   width: 22px;
   height: 22px;
-  background: var(--blue);
+  background: var(--accent, var(--blue));
 }
 
 .lpb-student-card > strong {
@@ -5923,6 +6200,10 @@ a.lpb-status-chip.link {
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.07em;
+}
+
+.lpb-student-card .lpb-card-eyebrow {
+  color: var(--accent);
 }
 
 .lpb-student-card > b {
@@ -6201,6 +6482,215 @@ p.lpb-methodology-live {
   color: var(--ink-muted);
   font-size: 0.86rem;
   line-height: 1.55;
+}
+
+/* ── Scenario history ────────────────────────────────────────────────────── */
+/* The four demo scenarios side by side, read as "how much does the builder
+   already know". Same five rows on every card, in the same order, so the empty
+   case (B) and the full one (C) can be compared by eye rather than by reading.
+   Rows with nothing in them are greyed rather than hidden — the absence is the
+   point. */
+.lpb-methodology-history {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-history > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-history > header svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.lpb-methodology-history > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lpb-methodology-history > header p {
+  margin: 4px 0 0;
+  max-width: 74ch;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.lpb-methodology-history-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lpb-scenario-history {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-warm);
+}
+
+.lpb-scenario-history.current {
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: white;
+}
+
+.lpb-scenario-history > header {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+}
+
+.lpb-scenario-history-badge {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--accent, var(--ink));
+  color: white;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.lpb-scenario-history > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.86rem;
+  line-height: 1.3;
+}
+
+/* Reserves two lines whether or not this card needs them, so the four headers
+   are the same height and the rows below them line up across the row. */
+.lpb-scenario-history > header > div > span {
+  display: block;
+  min-height: 2.7em;
+  margin-top: 1px;
+  color: var(--ink-muted);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.lpb-scenario-history-now {
+  position: absolute;
+  top: -9px;
+  right: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--accent-line);
+  border-radius: 999px;
+  background: white;
+  color: var(--accent);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* How much history there is, in one line — the card's headline claim. */
+.lpb-scenario-history-depth {
+  margin: 10px 0 0;
+  padding: 6px 9px;
+  border-radius: 7px;
+  font-size: 0.79rem;
+  font-weight: 800;
+}
+
+.lpb-scenario-history.depth-none .lpb-scenario-history-depth {
+  background: #f1f1ef;
+  color: var(--ink-muted);
+}
+
+.lpb-scenario-history.depth-evidence .lpb-scenario-history-depth {
+  background: #fdf3dd;
+  color: #7a5a12;
+}
+
+.lpb-scenario-history.depth-taught .lpb-scenario-history-depth {
+  background: #eef6f3;
+  color: #1f5855;
+}
+
+.lpb-scenario-history dl {
+  margin: 10px 0 0;
+  display: grid;
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lpb-scenario-history dl > div {
+  padding: 6px 9px;
+  background: white;
+}
+
+.lpb-scenario-history dl > div.is-empty {
+  background: #fafaf9;
+}
+
+.lpb-scenario-history dt {
+  color: var(--ink-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.lpb-scenario-history dd {
+  margin: 2px 0 0;
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.lpb-scenario-history dl > div.is-empty dd {
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.lpb-scenario-history-note {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* The depth badge is the card's claim, so it holds the same line across all
+   four even when one of them runs to two lines. */
+.lpb-scenario-history-depth {
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+}
+
+@media (max-width: 1100px) {
+  .lpb-methodology-history-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .lpb-methodology-history-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 1100px) {
@@ -7911,68 +8401,6 @@ p.lpb-methodology-live {
   color: var(--ink);
 }
 
-/* ------------------- Step 2 scorecard lens ------------------- */
-
-.lpb-ml-lens-panel {
-  margin-top: 20px;
-}
-
-.lpb-ml-lens-list {
-  list-style: none;
-  margin: 16px 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.lpb-ml-lens-list > li > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 7px;
-}
-
-.lpb-ml-lens-list strong {
-  font-size: 13.5px;
-  font-weight: 650;
-  color: var(--ink);
-}
-
-.lpb-ml-lens-list small {
-  display: block;
-  margin-top: 6px;
-  font-size: 11.5px;
-  line-height: 1.5;
-  color: var(--ink-muted);
-}
-
-.lpb-ml-lens-decision {
-  margin-top: 18px;
-  padding: 14px 16px;
-  background: rgba(46, 196, 182, 0.08);
-  border: 1px solid rgba(46, 196, 182, 0.4);
-  border-radius: 12px;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.lpb-ml-lens-decision p {
-  margin: 0;
-  flex: 1;
-  min-width: 240px;
-  font-size: 12.8px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-.lpb-ml-lens-decision b {
-  color: var(--ink);
-}
-
 .lpb-ml-hb-track i.empty {
   background: transparent;
   border: 1px dashed var(--line-strong);
@@ -8003,4 +8431,1193 @@ p.lpb-methodology-live {
 
 .lpb-ml-hb-key i:first-child {
   margin-left: 0;
+}
+
+/* ── Student profile sidebar ─────────────────────────────────────────────
+   Docked to the right edge and full height, so it can be opened over the
+   picker during a presentation without losing the screen behind it. Its
+   content is strictly what the student record holds — the empty states are
+   as much the point as the filled ones. */
+.lpb-sp-overlay {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(26, 26, 46, 0.38);
+  backdrop-filter: blur(4px);
+  animation: lpb-fade 0.2s ease both;
+}
+
+.lpb-sp-panel {
+  width: min(470px, 100%);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-warm);
+  border-left: 1px solid var(--line);
+  box-shadow: -24px 0 80px rgba(28, 60, 57, 0.16);
+  animation: lpb-sp-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lpb-sp-in {
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+  }
+}
+
+.lpb-sp-head {
+  flex-shrink: 0;
+  padding: 18px 20px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-sp-identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+.lpb-sp-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 62%, var(--ink)));
+  border-radius: 50%;
+  box-shadow: 0 5px 15px var(--accent-glow);
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.lpb-sp-kicker {
+  display: block;
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lpb-sp-panel h2 {
+  margin: 3px 0 0;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.lpb-sp-chips {
+  margin: 7px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.lpb-sp-chips span {
+  padding: 3px 8px;
+  color: var(--ink-soft);
+  background: var(--surface-muted);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.lpb-sp-chips span.accent {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.lpb-sp-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px 20px 22px;
+  overflow-y: auto;
+}
+
+.lpb-sp-case {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.lpb-sp-stats {
+  margin: 0 0 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lpb-sp-stats > div {
+  padding: 9px 11px;
+  background: white;
+}
+
+.lpb-sp-stats dt {
+  color: var(--ink-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lpb-sp-stats dd {
+  margin: 3px 0 0;
+  color: var(--ink);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+/* A blank is a real answer here, so it is stated rather than shown as zero. */
+.lpb-sp-stats dd.blank {
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.lpb-sp-section {
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.lpb-sp-section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 11px;
+  margin-bottom: 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-sp-section-head > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.lpb-sp-section-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+}
+
+.lpb-sp-section-head > div > span {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.lpb-sp-score {
+  margin-left: auto;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.lpb-sp-score b {
+  display: block;
+  color: var(--accent);
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.lpb-sp-score small {
+  color: var(--ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lpb-sp-scores {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 11px;
+}
+
+.lpb-sp-scores > li > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lpb-sp-scores strong {
+  color: var(--ink);
+  font-size: 0.84rem;
+}
+
+.lpb-sp-scores b {
+  font-family: "Space Mono", monospace;
+  font-size: 0.86rem;
+}
+
+.lpb-sp-scores b.low {
+  color: #c0432c;
+}
+
+.lpb-sp-scores b.mid {
+  color: #a2700f;
+}
+
+.lpb-sp-scores b.high {
+  color: #1f7169;
+}
+
+.lpb-sp-scores small {
+  display: block;
+  margin-top: 5px;
+  color: var(--ink-muted);
+  font-size: 0.73rem;
+  line-height: 1.4;
+}
+
+/* The 0-100 scale with the 40% and 75% decision lines marked, so a score is
+   read against the rule that acts on it rather than on its own. */
+.lpb-sp-meter {
+  position: relative;
+  height: 7px;
+  margin-top: 6px;
+  background: var(--surface-muted);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.lpb-sp-meter .fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+}
+
+.lpb-sp-meter .fill.low {
+  background: #e2795f;
+}
+
+.lpb-sp-meter .fill.mid {
+  background: #e0a828;
+}
+
+.lpb-sp-meter .fill.high {
+  background: #2f8d80;
+}
+
+.lpb-sp-meter i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(28, 60, 57, 0.28);
+}
+
+.lpb-sp-foot {
+  margin: 11px 0 0;
+  color: var(--ink-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+.lpb-sp-foot b {
+  color: var(--ink);
+}
+
+.lpb-sp-history,
+.lpb-sp-objectives {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.lpb-sp-history > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.lpb-sp-history .dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+}
+
+.lpb-sp-history .dot.done {
+  background: #9fb8ae;
+}
+
+.lpb-sp-history .dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.lpb-sp-history strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.84rem;
+}
+
+.lpb-sp-history small,
+.lpb-sp-objectives small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.lpb-sp-history > li > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.lpb-sp-tag {
+  flex-shrink: 0;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.lpb-sp-tag.done {
+  color: #5c7269;
+  background: #eef2f0;
+}
+
+.lpb-sp-tag.active {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.lpb-sp-objectives > li > div {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.lpb-sp-objectives strong {
+  color: var(--ink);
+  font-size: 0.83rem;
+  line-height: 1.35;
+}
+
+.lpb-sp-pill {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lpb-sp-pill.secure {
+  color: #1f7169;
+  background: #e4f2ed;
+}
+
+.lpb-sp-pill.not-secure {
+  color: #c0432c;
+  background: #fbeae5;
+}
+
+.lpb-sp-attempts {
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.lpb-sp-attempts ul {
+  list-style: none;
+  margin: 9px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.lpb-sp-attempts li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.lpb-sp-ratio {
+  flex-shrink: 0;
+  min-width: 40px;
+  padding: 3px 7px;
+  text-align: center;
+  border-radius: 7px;
+  font-family: "Space Mono", monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.lpb-sp-ratio.ok {
+  color: #1f7169;
+  background: #e4f2ed;
+}
+
+.lpb-sp-ratio.weak {
+  color: #c0432c;
+  background: #fbeae5;
+}
+
+.lpb-sp-attempts strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.lpb-sp-attempts small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+}
+
+.lpb-sp-request strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.lpb-sp-request small {
+  display: block;
+  margin-top: 3px;
+  color: var(--ink-muted);
+  font-size: 0.76rem;
+  line-height: 1.5;
+}
+
+/* Stated absence. Reads as a finding, not as a section that failed to load. */
+.lpb-sp-empty {
+  margin: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--ink-muted);
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+.lpb-sp-empty svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.lpb-sp-blank {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 14px;
+  background: var(--accent-soft);
+  border: 1px dashed var(--accent-line);
+  border-radius: 12px;
+}
+
+.lpb-sp-blank svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.lpb-sp-blank strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.88rem;
+}
+
+.lpb-sp-blank p {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.79rem;
+  line-height: 1.55;
+}
+
+.lpb-sp-foot-bar {
+  flex-shrink: 0;
+  padding: 11px 20px;
+  color: var(--ink-muted);
+  background: white;
+  border-top: 1px solid var(--line);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 560px) {
+  .lpb-sp-panel {
+    width: 100%;
+  }
+  .lpb-sp-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Methodology: what it is / how to use it ──────────────────────────────
+   The opener. Read by people who have never driven the builder, so it sits
+   above the pipeline and answers "what am I looking at" first. */
+.lpb-methodology-about {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.lpb-methodology-about > article {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-about > header,
+.lpb-methodology-about article > header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-about article > header svg {
+  flex-shrink: 0;
+  color: var(--teal);
+}
+
+.lpb-methodology-about article > header strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lpb-methodology-what ul {
+  margin: 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 8px;
+}
+
+.lpb-methodology-what li {
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.lpb-methodology-what li::marker {
+  color: var(--green);
+}
+
+.lpb-methodology-how ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 9px;
+}
+
+.lpb-methodology-how li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.lpb-methodology-how-no {
+  color: var(--green);
+  font-family: "Space Mono", monospace;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.lpb-methodology-how li strong {
+  color: var(--ink);
+  font-size: 0.88rem;
+}
+
+.lpb-methodology-how li p {
+  margin: 2px 0 0;
+  color: var(--ink-muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+/* Where in the app the step happens — the link between the method and the UI. */
+.lpb-methodology-how-where {
+  display: inline-block;
+  margin-top: 5px;
+  padding: 2px 7px;
+  color: var(--teal);
+  background: #eef6f3;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* ── Methodology: reference tables ────────────────────────────────────────
+   Every threshold the engine uses, laid out to be checked rather than taken
+   on trust. A table row is the unit here, so the numbers line up down the
+   column instead of being buried in prose. */
+.lpb-methodology-tables {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lpb-methodology-table-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-table-card > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 10px;
+  margin-bottom: 11px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-table-card > header svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.lpb-methodology-table-card > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lpb-methodology-table-card > header span {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.lpb-methodology-table-intro {
+  margin: 0 0 12px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Wide tables scroll inside the card rather than stretching the page. */
+.lpb-methodology-table-wrap {
+  overflow-x: auto;
+}
+
+.lpb-methodology-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lpb-methodology-table-card th {
+  padding: 0 10px 7px 0;
+  color: var(--ink-muted);
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.lpb-methodology-table-card td {
+  padding: 9px 10px 9px 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-table-card td:first-child {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.lpb-methodology-table-card td b {
+  color: var(--ink);
+  font-family: "Space Mono", monospace;
+  font-size: 0.9rem;
+}
+
+.lpb-methodology-table-card tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* The summed row, set apart the way a total is on an invoice. */
+.lpb-methodology-table-card tr.total td {
+  padding-top: 10px;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.lpb-mt-pill {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.lpb-mt-pill.low {
+  color: #c0432c;
+  background: #fbeae5;
+}
+
+.lpb-mt-pill.mid {
+  color: #8a5f0c;
+  background: #fdf3dd;
+}
+
+.lpb-mt-pill.high {
+  color: #1f7169;
+  background: #e4f2ed;
+}
+
+/* The reasoning behind a table, not another rule — kept visually distinct so
+   it is never mistaken for one. */
+.lpb-methodology-callout {
+  margin-top: auto;
+  padding: 10px 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background: #f4f8f6;
+  border: 1px solid #d9e7e1;
+  border-radius: 10px;
+}
+
+.lpb-methodology-callout > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--yellow);
+}
+
+.lpb-methodology-callout p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.lpb-methodology-callout b {
+  color: var(--ink);
+}
+
+/* ── Methodology: worked example ──────────────────────────────────────────
+   The rules are individually simple and collectively hard to picture, so one
+   real allocation is walked from curriculum ideal to final class count. */
+.lpb-methodology-example {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-example > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 11px;
+  margin-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-example > header svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.lpb-methodology-example > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lpb-methodology-example > header p {
+  margin: 4px 0 0;
+  max-width: 76ch;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.lpb-methodology-example-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.lpb-methodology-example-grid article {
+  position: relative;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-warm);
+}
+
+.lpb-methodology-example-grid article.tone-cut {
+  background: #fdf6f3;
+  border-color: #f0d8ce;
+}
+
+.lpb-methodology-example-grid article.tone-floor {
+  background: #f2f7f5;
+  border-color: #cfe0d9;
+}
+
+.lpb-methodology-example-no {
+  color: var(--ink-muted);
+  font-family: "Space Mono", monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
+}
+
+.lpb-methodology-example-grid strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--ink);
+  font-size: 0.82rem;
+}
+
+.lpb-methodology-example-grid b {
+  display: block;
+  margin-top: 3px;
+  color: var(--teal);
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.lpb-methodology-example-grid article.tone-cut b {
+  color: #c0432c;
+}
+
+.lpb-methodology-example-grid p {
+  margin: 6px 0 0;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+/* One square per class of the topic — the same visual the "Why this" panel
+   uses, so the two read as one language. */
+.lpb-methodology-squares {
+  margin-top: 13px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line-strong);
+}
+
+.lpb-methodology-squares > div {
+  margin-top: 7px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.lpb-methodology-squares i {
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+}
+
+.lpb-methodology-squares i.kept {
+  background: var(--green);
+  border: 1px solid #1f9d92;
+}
+
+.lpb-methodology-squares i.cut {
+  background: repeating-linear-gradient(
+    -45deg,
+    #f0ece4,
+    #f0ece4 3px,
+    #e2ddd3 3px,
+    #e2ddd3 6px
+  );
+  border: 1px solid var(--line-strong);
+}
+
+.lpb-methodology-squares small {
+  margin-left: 6px;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+}
+
+.lpb-methodology-squares small b {
+  color: var(--ink);
+}
+
+@media (max-width: 1100px) {
+  .lpb-methodology-about,
+  .lpb-methodology-tables {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lpb-methodology-example-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .lpb-methodology-example-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ── Methodology dialog ───────────────────────────────────────────────────
+   The methodology describes the tool rather than the plan on screen, so it is
+   a dialog reachable from every step instead of a tab at the end of the
+   report. Sized large because it is a document, not a decision. */
+.lpb-method-overlay {
+  padding: 3vh 3vw;
+  align-items: stretch;
+}
+
+.lpb-method-dialog {
+  width: min(1080px, 100%);
+  max-height: 94vh;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 18px;
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+  animation: lpb-modal-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.lpb-method-dialog > header {
+  flex-shrink: 0;
+  padding: 16px 22px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  background: white;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-method-dialog > header h2 {
+  margin: 3px 0 0;
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+}
+
+/* The document scrolls inside the dialog; the header stays put. */
+.lpb-method-dialog-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Inside the dialog the tab's own page framing is redundant. */
+.lpb-method-dialog-body .lpb-methodology {
+  background: var(--paper);
+}
+
+/* The old tab is now a link out to that dialog, so it reads as an action
+   rather than as one more view of the plan. */
+.lpb-plan-tab-method {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 6px;
+  padding: 6px 11px;
+  color: var(--teal);
+  background: transparent;
+  border: 1px dashed var(--line-strong);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+.lpb-plan-tab-method:hover {
+  background: #eef6f3;
+  border-color: #b9d3ca;
+}
+
+/* ── Methodology: the AI split ────────────────────────────────────────────
+   Two columns, deliberately equal weight: what the rules own and what the
+   model writes. The table underneath names each touchpoint and the guard that
+   holds it in place. */
+.lpb-methodology-ai {
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+}
+
+.lpb-methodology-ai > header {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding-bottom: 11px;
+  margin-bottom: 13px;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-ai > header svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--teal);
+}
+
+.lpb-methodology-ai > header strong {
+  display: block;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.lpb-methodology-ai > header p {
+  margin: 4px 0 0;
+  max-width: 82ch;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.lpb-methodology-ai-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lpb-methodology-ai-split article {
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.lpb-methodology-ai-split article.rules {
+  background: #f2f7f5;
+  border-color: #cfe0d9;
+}
+
+.lpb-methodology-ai-split article.ai {
+  background: #f6f4fb;
+  border-color: #ddd6ee;
+}
+
+.lpb-methodology-ai-split ul {
+  margin: 9px 0 0;
+  padding-left: 17px;
+  display: grid;
+  gap: 7px;
+}
+
+.lpb-methodology-ai-split li {
+  color: var(--ink-soft);
+  font-size: 0.83rem;
+  line-height: 1.5;
+}
+
+.lpb-methodology-ai-split article.rules li::marker {
+  color: var(--teal);
+}
+
+.lpb-methodology-ai-split article.ai li::marker {
+  color: #6f5fb8;
+}
+
+.lpb-methodology-ai-table {
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.lpb-methodology-ai-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.lpb-methodology-ai-table th {
+  padding: 0 12px 7px 0;
+  color: var(--ink-muted);
+  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.lpb-methodology-ai-table td {
+  padding: 9px 12px 9px 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+.lpb-methodology-ai-table td:first-child {
+  color: var(--ink);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.lpb-methodology-ai-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.lpb-methodology-ai .lpb-methodology-callout {
+  margin-top: 12px;
+}
+
+@media (max-width: 1100px) {
+  .lpb-methodology-ai-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .lpb-method-overlay {
+    padding: 0;
+  }
+  .lpb-method-dialog {
+    max-height: 100vh;
+    border-radius: 0;
+  }
 }
