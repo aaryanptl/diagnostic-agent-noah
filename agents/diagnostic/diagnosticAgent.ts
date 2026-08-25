@@ -410,8 +410,8 @@ function evaluateQuestion(
   if (question.questionType === "drag_drop") {
     const payload = question.payload as DragDropQuestionPayload | undefined;
     const answerKey = (payload?.answerKey ?? []).map((pair) => ({
-      key: pair.item,
-      expected: pair.target,
+      key: pair.item ?? pair.prompt ?? "",
+      expected: pair.target ?? pair.match ?? "",
     }));
     return evaluateMatchingMap(
       studentAnswer,

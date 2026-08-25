@@ -354,7 +354,9 @@ export function buildDefaultForm(
 }
 
 function getTopicQuestionCountForEntry(entry?: DemoQuizCatalogEntry | null) {
-  return getTopicTestQuestionCount(entry?.learningObjectives.length ?? 0);
+  if (!entry) return 0;
+  const target = getTopicTestQuestionCount(entry.learningObjectives.length);
+  return entry.questionCount > 0 ? Math.min(target, entry.questionCount) : target;
 }
 
 export function getGradeQuestionCountForClass(
@@ -496,15 +498,32 @@ export function buildRandomAnswer(question: DemoQuizQuestion) {
     const payload = question.payload as DragDropQuestionPayload | undefined;
     const draggableItems = payload?.draggableItems ?? [];
     const dropZones = payload?.dropZones ?? [];
+    const answerKey = payload?.answerKey ?? [];
     const answer: Record<string, string> = {};
-    for (const item of draggableItems) {
-      answer[item] = randomItem(dropZones) ?? "";
+    if (answerKey.length > 0) {
+      for (const pair of answerKey) {
+        const item = pair.item || pair.prompt;
+        const target = pair.target || pair.match;
+        if (item && target) answer[item] = target;
+      }
+    } else {
+      for (const item of draggableItems) {
+        answer[item] = randomItem(dropZones) ?? "";
+      }
     }
     return JSON.stringify(answer);
   }
 
   if (question.questionType === "fitb") {
-    return randomItem(["0", "1", "2", "4", "10", "not sure"]) ?? "0";
+    const payload = question.payload as
+      | { answer?: string; blanks?: Array<{ answer?: string }> }
+      | undefined;
+    const candidate =
+      (question as { modelAnswer?: string }).modelAnswer ||
+      payload?.answer ||
+      payload?.blanks?.[0]?.answer;
+    if (candidate) return candidate;
+    return randomItem(["python", "print", "high-level", "script", "0", "not sure"]) ?? "python";
   }
 
   if (question.questionType === "word_problem") {
@@ -874,17 +893,35 @@ function _getMapAnswerState(
   }
 
   if (question.questionType === "fitb") {
-    const payload = question.payload as { answer?: string } | undefined;
-    const expected = normalizeAnswerText(
-      question.modelAnswer ?? payload?.answer ?? "",
-    );
+    const payload = question.payload as
+      | { answer?: string; blanks?: Array<{ answer?: string; acceptedAnswers?: string[] }> }
+      | undefined;
+    const rawAnswers: string[] = [];
+    if (question.modelAnswer) rawAnswers.push(question.modelAnswer);
+    if (payload?.answer) rawAnswers.push(payload.answer);
+    if (Array.isArray(payload?.blanks)) {
+      for (const b of payload.blanks) {
+        if (b.answer) rawAnswers.push(b.answer);
+        if (Array.isArray(b.acceptedAnswers)) {
+          for (const acc of b.acceptedAnswers) rawAnswers.push(acc);
+        }
+      }
+    }
     const actual = normalizeAnswerText(answer);
-    if (!expected) return "answered";
-    return actual === expected ||
-      actual.includes(expected) ||
-      expected.includes(actual)
-      ? "correct"
-      : "incorrect";
+    if (!actual) return "answered";
+    if (rawAnswers.length === 0) return "answered";
+
+    const isCorrect = rawAnswers.some((exp) => {
+      const expected = normalizeAnswerText(exp);
+      if (!expected) return false;
+      return (
+        actual === expected ||
+        actual.includes(expected) ||
+        expected.includes(actual)
+      );
+    });
+
+    return isCorrect ? "correct" : "incorrect";
   }
 
   if (
@@ -1441,13 +1478,9 @@ function MultiTopicSetupScreen({
     [classLevel, quizCatalog.entries],
   );
   const subjects = useMemo(() => {
-    const available = Array.from(
+    return Array.from(
       new Set(entriesForGrade.map((entry) => entry.subject)),
     ).sort();
-    const mathsAndEnglish = available.filter(
-      (subject) => subject === "Maths" || subject === "English",
-    );
-    return mathsAndEnglish.length > 0 ? mathsAndEnglish : available;
   }, [entriesForGrade]);
   const [selectedSubject, setSelectedSubject] = useState<
     CreateSessionInput["subject"]
@@ -2298,6 +2331,32 @@ function GradeStartScreen({
         )}
       </div>
     </div>
+  );
+}
+
+function renderFormattedQuestionText(text: string) {
+  if (!text || !text.includes("{{")) {
+    return text;
+  }
+  const parts = text.split(/(\{\{\d+\}\})/g);
+  return (
+    <span>
+      {parts.map((part, idx) => {
+        const match = part.match(/^\{\{(\d+)\}\}$/);
+        if (match) {
+          const num = match[1];
+          return (
+            <span
+              key={`blank-${idx}`}
+              className="mx-1.5 inline-flex items-center rounded-md border-2 border-dashed border-[#F5A623] bg-[#FFF8E7] px-2.5 py-0.5 font-mono text-[14px] font-bold text-[#C68213]"
+            >
+              [ Blank {num} ]
+            </span>
+          );
+        }
+        return <span key={`text-${idx}`}>{part}</span>;
+      })}
+    </span>
   );
 }
 
@@ -5735,7 +5794,7 @@ export function DiagnosticDemo({
                     )}
 
                     <h3 className="text-[17px] font-semibold leading-normal text-[#1a1a1a]">
-                      {currentQuestion.question}
+                      {renderFormattedQuestionText(currentQuestion.question)}
                     </h3>
                   </div>
                 </div>

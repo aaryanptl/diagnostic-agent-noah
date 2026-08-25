@@ -1,6 +1,7 @@
 import "server-only";
 
 import { query } from "@/lib/db";
+import { getCodingData } from "@/lib/csv-coding-loader";
 import type {
   DemoQuizCatalog,
   DemoQuizCatalogEntry,
@@ -166,6 +167,8 @@ function toSubject(value: string | null | undefined): Subject {
   if (normalized === "science") return "Science";
   if (normalized === "english") return "English";
   if (normalized === "social studies") return "Social Studies";
+  if (normalized === "coding-python" || normalized === "coding - python" || normalized === "python") return "coding-python";
+  if (normalized === "coding-webdev" || normalized === "coding - webdev" || normalized === "webdev" || normalized === "web development") return "coding-webdev";
   return "Maths";
 }
 
@@ -375,11 +378,24 @@ function buildQuestion(row: ContentQuestionRow): QuestionBankQuestion {
       normalizeText(tfPayload.explanation ?? "") || explanationFromColumn;
     typedPayload = { ...tfPayload, ...(questionSvg ? { questionSvg } : {}) };
   } else if (questionType === "fitb") {
-    const fitbPayload = payload as unknown as FitbQuestionPayload;
-    modelAnswer = normalizeText(fitbPayload.answer ?? "");
+    const fitbPayload = payload as unknown as FitbQuestionPayload & {
+      blanks?: Array<{ answer?: string; text?: string }>;
+    };
+    let fitbAns = normalizeText(fitbPayload.answer ?? "");
+    if (!fitbAns && Array.isArray(fitbPayload.blanks)) {
+      fitbAns = fitbPayload.blanks
+        .map((b) => normalizeText(b.answer || b.text || ""))
+        .filter(Boolean)
+        .join(", ");
+    }
+    modelAnswer = fitbAns;
     explanation =
       normalizeText(fitbPayload.hint ?? "") || explanationFromColumn;
-    typedPayload = { ...fitbPayload, ...(questionSvg ? { questionSvg } : {}) };
+    typedPayload = {
+      ...fitbPayload,
+      answer: fitbAns,
+      ...(questionSvg ? { questionSvg } : {}),
+    };
   } else if (questionType === "matching") {
     const matchingPayload = payload as any;
 
@@ -398,7 +414,30 @@ function buildQuestion(row: ContentQuestionRow): QuestionBankQuestion {
     }
 
     let answerKey: any[] = matchingPayload.answerKey ?? [];
-    if (answerKey.length > 0 && answerKey[0].itemId) {
+    if (answerKey.length === 0 && Array.isArray(matchingPayload.targets)) {
+      const itemMap = new Map(
+        (matchingPayload.items || []).map((i: any) => [
+          i.id,
+          i.label || i.text || "",
+        ]),
+      );
+      const builtKey: any[] = [];
+      for (const t of matchingPayload.targets) {
+        if (t.correctItemId) {
+          const itemLabel = itemMap.get(t.correctItemId) || t.correctItemId;
+          const targetLabel = t.label || t.text || "";
+          if (itemLabel && targetLabel) {
+            builtKey.push({
+              prompt: itemLabel,
+              match: targetLabel,
+            });
+          }
+        }
+      }
+      if (builtKey.length > 0) {
+        answerKey = builtKey;
+      }
+    } else if (answerKey.length > 0 && answerKey[0].itemId) {
       answerKey = answerKey.map((ans: any) => {
         const itemObj = (matchingPayload.items || []).find(
           (i: any) => i.id === ans.itemId,
@@ -446,7 +485,30 @@ function buildQuestion(row: ContentQuestionRow): QuestionBankQuestion {
     }
 
     let answerKey: any[] = dragDropPayload.answerKey ?? [];
-    if (answerKey.length > 0 && answerKey[0].itemId) {
+    if (answerKey.length === 0 && Array.isArray(dragDropPayload.targets)) {
+      const itemMap = new Map(
+        (dragDropPayload.items || []).map((i: any) => [
+          i.id,
+          i.label || i.text || "",
+        ]),
+      );
+      const builtKey: any[] = [];
+      for (const t of dragDropPayload.targets) {
+        if (t.correctItemId) {
+          const itemLabel = itemMap.get(t.correctItemId) || t.correctItemId;
+          const targetLabel = t.label || t.text || "";
+          if (itemLabel && targetLabel) {
+            builtKey.push({
+              item: itemLabel,
+              target: targetLabel,
+            });
+          }
+        }
+      }
+      if (builtKey.length > 0) {
+        answerKey = builtKey;
+      }
+    } else if (answerKey.length > 0 && answerKey[0].itemId) {
       // Map itemId/targetId pointers back to actual string labels
       answerKey = answerKey.map((ans: any) => {
         const itemObj = (dragDropPayload.items || []).find(
@@ -665,46 +727,56 @@ function shuffleQuestionQueues(grouped: Map<string, QuestionBankQuestion[]>) {
 }
 
 async function loadDiagnosticQuizCatalog(): Promise<DemoQuizCatalog> {
-  const result = await query(`
-    SELECT
-      subject,
-      grade,
-      topic,
-      array_agg(DISTINCT learning_objective) FILTER (
-        WHERE learning_objective IS NOT NULL AND btrim(learning_objective) <> ''
-      ) AS learning_objectives,
-      count(*)::int AS question_count
-    FROM ${DIAGNOSTIC_BANK_CTE} AS final_content_questions_1
-    WHERE question_text IS NOT NULL
-      AND question_type IS NOT NULL
-      ${QUESTION_VISUAL_MODE_TYPE_FILTER}
-      AND subject IS NOT NULL
-      AND grade IS NOT NULL
-      AND topic IS NOT NULL
-    GROUP BY subject, grade, topic
-    ORDER BY subject, grade, topic
-  `);
+  const codingData = getCodingData();
+  let dbRows: any[] = [];
+  try {
+    const result = await query(`
+      SELECT
+        subject,
+        grade,
+        topic,
+        array_agg(DISTINCT learning_objective) FILTER (
+          WHERE learning_objective IS NOT NULL AND btrim(learning_objective) <> ''
+        ) AS learning_objectives,
+        count(*)::int AS question_count
+      FROM ${DIAGNOSTIC_BANK_CTE} AS final_content_questions_1
+      WHERE question_text IS NOT NULL
+        AND question_type IS NOT NULL
+        ${QUESTION_VISUAL_MODE_TYPE_FILTER}
+        AND subject IS NOT NULL
+        AND grade IS NOT NULL
+        AND topic IS NOT NULL
+      GROUP BY subject, grade, topic
+      ORDER BY subject, grade, topic
+    `);
+    dbRows = result.rows;
+  } catch (err) {
+    console.warn("Database query failed in loadDiagnosticQuizCatalog, using CSV data:", err);
+  }
 
-  const rawEntries = result.rows.map(
-    (row: {
-      subject: string;
-      grade: string;
-      topic: string;
-      learning_objectives: string[] | null;
-      question_count: number;
-    }): DemoQuizCatalogEntry => {
-      const classLevel = toClassLevel(row.grade);
-      return {
-        subject: toSubject(row.subject),
-        classLevel,
-        topic: getStandardizedTopicName(classLevel, row.topic),
-        learningObjectives: (row.learning_objectives ?? [])
-          .map(normalizeText)
-          .filter(Boolean),
-        questionCount: row.question_count,
-      };
-    },
-  );
+  const rawEntries = [
+    ...dbRows.map(
+      (row: {
+        subject: string;
+        grade: string;
+        topic: string;
+        learning_objectives: string[] | null;
+        question_count: number;
+      }): DemoQuizCatalogEntry => {
+        const classLevel = toClassLevel(row.grade);
+        return {
+          subject: toSubject(row.subject),
+          classLevel,
+          topic: getStandardizedTopicName(classLevel, row.topic),
+          learningObjectives: (row.learning_objectives ?? [])
+            .map(normalizeText)
+            .filter(Boolean),
+          questionCount: row.question_count,
+        };
+      },
+    ),
+    ...codingData.catalogEntries,
+  ];
 
   // Merge duplicates resolving to same subject, classLevel, and topic
   const mergedMap = new Map<string, DemoQuizCatalogEntry>();
@@ -747,6 +819,26 @@ async function loadTopicQuestions(input: {
   topic: string;
   region: DiagnosticRegion;
 }) {
+  if (
+    input.subject === "coding-python" ||
+    input.subject === "coding-webdev" ||
+    input.subject === "Python" ||
+    input.subject === "WebDev"
+  ) {
+    const codingData = getCodingData();
+    const questions = codingData.questions.filter(
+      (q) =>
+        (q.subject === input.subject ||
+          (input.subject.includes("python") && q.subject?.includes("python")) ||
+          (input.subject.includes("web") && q.subject?.includes("web"))) &&
+        q.topic.toLowerCase() === input.topic.toLowerCase(),
+    );
+    for (const q of questions) {
+      q.topic = input.topic;
+    }
+    return questions;
+  }
+
   const rawTopics = getRawTopicNames(input.classLevel, input.topic);
   const result = await query(
     `
@@ -775,6 +867,21 @@ async function loadGradeQuestions(input: {
   classLevel: ClassLevel;
   region: DiagnosticRegion;
 }) {
+  if (
+    input.subject === "coding-python" ||
+    input.subject === "coding-webdev" ||
+    input.subject === "Python" ||
+    input.subject === "WebDev"
+  ) {
+    const codingData = getCodingData();
+    return codingData.questions.filter(
+      (q) =>
+        q.subject === input.subject ||
+        (input.subject.includes("python") && q.subject?.includes("python")) ||
+        (input.subject.includes("web") && q.subject?.includes("web")),
+    );
+  }
+
   const targets = getGradeTestPlan(input.classLevel).difficultyTargets;
   const perTopicCandidateLimit = Math.max(
     targets.easy,
@@ -859,6 +966,23 @@ async function loadMultiTopicQuestions(input: {
   topics: string[];
   region: DiagnosticRegion;
 }) {
+  if (
+    input.subject === "coding-python" ||
+    input.subject === "coding-webdev" ||
+    input.subject === "Python" ||
+    input.subject === "WebDev"
+  ) {
+    const codingData = getCodingData();
+    const topicSet = new Set(input.topics.map((t) => t.toLowerCase()));
+    return codingData.questions.filter(
+      (q) =>
+        (q.subject === input.subject ||
+          (input.subject.includes("python") && q.subject?.includes("python")) ||
+          (input.subject.includes("web") && q.subject?.includes("web"))) &&
+        topicSet.has(q.topic.toLowerCase()),
+    );
+  }
+
   const selectedTopicByRawTopic = new Map<string, string>();
 
   for (const topic of input.topics) {
@@ -1903,17 +2027,47 @@ export async function getQuizQuestionsByIds(input: {
     };
   }
 
+  if (
+    input.subject === "coding-python" ||
+    input.subject === "coding-webdev" ||
+    input.subject === "Python" ||
+    input.subject === "WebDev"
+  ) {
+    const codingData = getCodingData();
+    const questionsById = new Map(codingData.questions.map((q) => [q.id, q]));
+    const questions = questionIds.flatMap((id) => {
+      const q = questionsById.get(id);
+      return q ? [q] : [];
+    });
+    const expectedLearningObjectives = Array.from(
+      new Set(questions.map((q) => q.learningObjective).filter(Boolean)),
+    ) as string[];
+    const missingCount = questionIds.length - questions.length;
+
+    return {
+      subject: input.subject,
+      classLevel: input.classLevel,
+      topic: input.topic ? normalizeText(input.topic) : null,
+      expectedLearningObjectives,
+      questions,
+      coverageWarnings:
+        missingCount > 0
+          ? [`${missingCount} submitted questions could not be found.`]
+          : undefined,
+    };
+  }
+
   const result = await query(
     `
       ${CONTENT_QUESTION_SELECT}
-      WHERE id = ANY($1::uuid[])
+      WHERE id::text = ANY($1::text[])
         AND subject = $2
         AND grade = $3
         AND ($4::text IS NULL OR topic = $4)
         AND question_text IS NOT NULL
         AND question_type IS NOT NULL
         ${QUESTION_VISUAL_MODE_TYPE_FILTER}
-      ORDER BY array_position($1::uuid[], id)
+      ORDER BY array_position($1::text[], id::text)
     `,
     [
       questionIds,
@@ -2415,6 +2569,31 @@ export async function getPlacementQuestionsByIds(input: {
     };
   }
 
+  if (
+    input.subject === "coding-python" ||
+    input.subject === "coding-webdev" ||
+    input.subject === "Python" ||
+    input.subject === "WebDev"
+  ) {
+    const codingData = getCodingData();
+    const questionsById = new Map(codingData.questions.map((q) => [q.id, q]));
+    const questions = questionIds.flatMap((id) => {
+      const q = questionsById.get(id);
+      return q ? [q] : [];
+    });
+    const expectedLearningObjectives = Array.from(
+      new Set(questions.map((q) => q.learningObjective).filter(Boolean)),
+    ) as string[];
+
+    return {
+      subject: input.subject,
+      classLevel: input.classLevel,
+      topic: "Placement Test",
+      expectedLearningObjectives,
+      questions,
+    };
+  }
+
   const result = await query(
     `
       SELECT
@@ -2434,10 +2613,10 @@ export async function getPlacementQuestionsByIds(input: {
         explanation,
         generation_metadata
       FROM placement_test_questions_v2
-      WHERE id = ANY($1::uuid[])
+      WHERE id::text = ANY($1::text[])
         AND subject = $2
         AND grade = $3
-      ORDER BY array_position($1::uuid[], id)
+      ORDER BY array_position($1::text[], id::text)
     `,
     [questionIds, input.subject, toDbGrade(input.classLevel)],
   );
@@ -2710,10 +2889,10 @@ function buildQuestionFilters(filters: ServeQuestionsFilters): {
   }
 
   if (filters.ids?.length) {
-    conditions.push(`id = ANY(${bind(filters.ids)}::uuid[])`);
+    conditions.push(`id::text = ANY(${bind(filters.ids)}::text[])`);
   }
   if (filters.excludeIds?.length) {
-    conditions.push(`id <> ALL(${bind(filters.excludeIds)}::uuid[])`);
+    conditions.push(`id::text <> ALL(${bind(filters.excludeIds)}::text[])`);
   }
 
   // Region + visual-mode filters only exist on the diagnostic bank.

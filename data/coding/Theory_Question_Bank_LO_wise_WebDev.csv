@@ -1,0 +1,111 @@
+﻿S.No,Module,Topic,Learning Objective (Sub Topic),Full Learning Objective,Bloom's Level,No. of Questions
+1,HTML Foundations,Introduction to Web Development,What is HTML?,Define HTML as the standard markup language used to structure content on web pages.,Remembering,2
+2,HTML Foundations,Introduction to Web Development,Basic document structure of HTML,"Describe the role of <!DOCTYPE>, <html>, <head>, and <body> in the basic structure of an HTML document.",Understanding,2
+3,HTML Foundations,Introduction to Web Development,Anatomy of HTML elements,"Differentiate between an HTML tag, attribute, and element using labelled examples.",Understanding,2
+4,HTML Foundations,Introduction to Web Development,Headings and their types in HTML,Identify the six heading levels (h1–h6) and their visual hierarchy on a webpage.,Remembering,2
+5,HTML Foundations,Introduction to Web Development,How to create paragraphs,"Code a webpage that uses paragraph (<p>), line break (<br>), and horizontal rule (<hr>) tags correctly.",Applying,3
+6,HTML Foundations,Introduction to Web Development,Styling in HTML,"Apply basic inline style attributes to HTML elements to change colour, size, and alignment.",Applying,3
+7,HTML Foundations,HTML Formatting,"Bold, Italic, Underlined text formatting","Apply <b>, <i>, and <u> tags to format selected portions of text on a webpage.",Applying,3
+8,HTML Foundations,HTML Formatting,"Strikethrough, Superscript, Subscript text","Use <s>, <sup>, and <sub> tags to render strikethrough, superscript, and subscript text correctly.",Applying,2
+9,HTML Foundations,HTML Formatting,Inserted and Deleted text,Differentiate the meaning conveyed by <ins> and <del> tags compared to plain underlined text.,Understanding,2
+10,HTML Foundations,HTML Formatting,Monospace font,Apply the <code> or <pre> tag to render text in a monospace font for code snippets.,Applying,3
+11,HTML Foundations,HTML Text,Strong text and text abbreviation,Describe how <strong> conveys importance and how <abbr> defines an abbreviation with an expanded title.,Understanding,2
+12,HTML Foundations,HTML Text,Acronym element and text direction,Configure text direction using the dir attribute for right-to-left and left-to-right languages.,Applying,3
+13,HTML Foundations,HTML Text,Special terms and quoting text,"Apply <dfn>, <q>, and <blockquote> tags to mark special terms and quoted text on a webpage.",Applying,3
+14,HTML Foundations,HTML Text,Short quotations and text citations,Use <q> for short inline quotations and <cite> to cite the title of a referenced work.,Applying,3
+15,HTML Foundations,HTML Phrase Tags,Larger text and smaller text,Identify the <big> and <small> tags as legacy methods for resizing inline text.,Remembering,2
+16,HTML Foundations,HTML Phrase Tags,Emphasized text,Explain how <em> emphasises text both visually and semantically for screen readers.,Understanding,2
+17,HTML Foundations,HTML Phrase Tags,Marked text,Apply the <mark> tag to highlight portions of text that are relevant to the reader.,Applying,3
+18,HTML Foundations,HTML Phrase Tags,Grouping content,Use <div> and <span> tags to group block-level and inline content respectively.,Applying,3
+19,HTML Foundations,HTML Images and Lists,Inserting images and setting image width/height,"Code an HTML page that inserts images using <img> with appropriate src, alt, width, and height attributes.",Applying,3
+20,HTML Foundations,HTML Images and Lists,Links,Build internal and external hyperlinks using the <a> tag with href and target attributes.,Applying,3
+21,HTML Foundations,HTML Images and Lists,"Tables, lists, and marquee","Apply ordered, unordered, and description list tags to organise content on a webpage.",Applying,3
+22,HTML Foundations,HTML Images and Lists,Background images,Configure a background image on an HTML element using the appropriate CSS background-image property.,Applying,2
+23,HTML Foundations,HTML Tables,Tables and table borders,"Build an HTML table using <table>, <tr>, <th>, and <td> tags with visible borders.",Applying,3
+24,HTML Foundations,HTML Tables,Styling table borders,"Apply CSS border-style, border-collapse, and border-color properties to style table borders.",Applying,3
+25,HTML Foundations,HTML Tables,Rowspan and colspan,Use the rowspan and colspan attributes to merge cells across rows and columns in a table.,Applying,3
+26,HTML Foundations,HTML Tables,Cell padding,Configure cell padding and cell spacing to improve the readability of an HTML table.,Applying,2
+27,CSS Essentials,Introduction to CSS,Overview of CSS,Define CSS as a stylesheet language used to describe the presentation of HTML documents.,Remembering,2
+28,CSS Essentials,Introduction to CSS,CSS syntax,"Describe the structure of a CSS rule including selector, property, and value.",Understanding,2
+29,CSS Essentials,Introduction to CSS,Inline styling,Apply inline CSS using the style attribute to style individual HTML elements.,Applying,3
+30,CSS Essentials,Introduction to CSS,Internal CSS,Code internal CSS rules inside the <style> tag of an HTML document's head section.,Applying,3
+31,CSS Essentials,Introduction to CSS,External CSS,Connect an external .css stylesheet to an HTML document using the <link> tag.,Applying,3
+32,CSS Essentials,Introduction to CSS,Imported CSS,Use the @import rule to include one CSS file inside another stylesheet.,Applying,2
+33,CSS Essentials,More with CSS,Type selectors and descendant selectors,Differentiate between type selectors and descendant selectors based on their targeting scope.,Understanding,2
+34,CSS Essentials,More with CSS,Universal selectors,Apply the universal selector (*) to reset or style all elements within an HTML document.,Applying,2
+35,CSS Essentials,More with CSS,Class selectors and ID selectors,Use class (.) and ID (#) selectors to target specific elements and explain when each is appropriate.,Applying,3
+36,CSS Essentials,More with CSS,Attribute selectors and child selectors,Configure attribute selectors and child selectors to apply styles based on element attributes and hierarchy.,Applying,3
+37,CSS Essentials,Exploring CSS,CSS color and background properties,"Apply CSS color and background-color properties using named colours, hex codes, and RGB values.",Applying,3
+38,CSS Essentials,Exploring CSS,Gradient and text font properties,"Code CSS rules using linear-gradient and font-family, font-size, and font-weight properties.",Applying,3
+39,CSS Essentials,Exploring CSS,Column rule property,Use the column-rule property to add styled separators between CSS multi-column layouts.,Applying,3
+40,CSS Essentials,Exploring CSS,Box model — margin and padding,"Describe how margin, border, padding, and content interact in the CSS box model.",Understanding,2
+41,HTML Forms,Introduction to HTML Forms,Input element and checkbox,"Build a form section using <input type=""text""> and <input type=""checkbox""> with proper labels.",Applying,3
+42,HTML Forms,Introduction to HTML Forms,Combobox and text input,Code a combobox using <select> with multiple <option> elements alongside a text input field.,Applying,3
+43,HTML Forms,Introduction to HTML Forms,"Button types — radio, submit, rounded","Use radio, submit, and styled rounded buttons appropriately within a form.",Applying,3
+44,HTML Forms,More with HTML Forms,Form attribute,Describe the purpose of the form attribute and how it associates inputs with their parent form.,Understanding,2
+45,HTML Forms,More with HTML Forms,Action attribute,Configure the action attribute to specify the URL where form data is sent on submission.,Applying,3
+46,HTML Forms,More with HTML Forms,Target attribute,Apply the target attribute to control whether form responses open in the same or a new browser tab.,Applying,3
+47,HTML Forms,More with HTML Forms,Method attribute (GET / POST),Differentiate between the GET and POST methods of form submission and the use case of each.,Understanding,2
+48,HTML Forms,Exploring HTML Forms,Buttons and placeholder,Apply the placeholder attribute to input fields and create accessible button elements.,Applying,3
+49,HTML Forms,Exploring HTML Forms,Name attribute,Use the name attribute on form controls so submitted data can be identified server-side.,Applying,2
+50,HTML Forms,Exploring HTML Forms,Grouping form data with fieldset,Build a structured form using <fieldset> and <legend> to group related form controls.,Applying,3
+51,Advanced Layout & Styling,Website Layout,Creating a Website Layout Model,"Build a complete webpage layout containing header, navigation, main content, sidebar, and footer regions.",Applying,3
+52,Advanced Layout & Styling,Flexbox,CSS Flexbox Layout Module,"Apply Flexbox properties (display:flex, justify-content, align-items, flex-direction) to align and distribute layout items.",Applying,3
+53,Advanced Layout & Styling,Icons & Favicon,Using icons,"Use an icon library (e.g., Font Awesome) to embed scalable icons inside webpage elements.",Applying,3
+54,Advanced Layout & Styling,Icons & Favicon,Adding favicon,"Configure a favicon for a website using the <link rel=""icon""> tag in the document head.",Applying,2
+55,Advanced Layout & Styling,Iframes & Opacity,IFrames — setting width & height,"Code an <iframe> embed with appropriate src, width, and height attributes.",Applying,3
+56,Advanced Layout & Styling,Iframes & Opacity,Adding YouTube videos via IFrames,Apply the iframe embed code to display a YouTube video inside a webpage.,Applying,3
+57,Advanced Layout & Styling,Iframes & Opacity,Opacity property,Use the CSS opacity property to control the transparency of an element.,Applying,2
+58,Advanced Layout & Styling,"Display, Positioning & Floating",Display and visibility properties,Differentiate between the display:none and visibility:hidden properties and their effect on layout.,Understanding,2
+59,Advanced Layout & Styling,"Display, Positioning & Floating",Working with elements,"Apply display values (block, inline, inline-block, none) to control how elements render.",Applying,3
+60,Advanced Layout & Styling,"Display, Positioning & Floating",Fixing positions of elements,"Use CSS position values (static, relative, absolute, fixed, sticky) to position elements precisely.",Applying,3
+61,Advanced Layout & Styling,CSS Pseudo Classes & Elements,Pseudo classes,"Apply pseudo-classes such as :hover, :focus, :nth-child, and :first-child to style elements by state.",Applying,3
+62,Advanced Layout & Styling,CSS Pseudo Classes & Elements,Pseudo elements,"Use pseudo-elements such as ::before, ::after, and ::first-letter to style specific parts of an element.",Applying,3
+63,Advanced Layout & Styling,CSS Pseudo Classes & Elements,Difference between pseudo classes and elements,Differentiate pseudo-classes from pseudo-elements based on the colon syntax (: vs ::) and their purpose.,Understanding,2
+64,Graphics & Media,HTML Graphics & CSS Animations,Creating canvas,Build an HTML5 <canvas> element and draw basic shapes using the JavaScript canvas API.,Applying,3
+65,Graphics & Media,HTML Graphics & CSS Animations,Scalable Vector Graphics (SVG),"Code basic SVG shapes (rect, circle, line, path) directly in HTML.",Applying,3
+66,Graphics & Media,HTML Graphics & CSS Animations,CSS animations,Apply CSS @keyframes and animation properties to animate the appearance of webpage elements.,Applying,3
+67,Graphics & Media,HTML Media & HTML Maps,HTML media — audio and video,"Apply <audio> and <video> tags with appropriate source, controls, and fallback content.",Applying,3
+68,Graphics & Media,HTML Media & HTML Maps,Geolocation (GPS),Use the HTML5 Geolocation API to retrieve and display the user's current location.,Applying,3
+69,Graphics & Media,HTML Media & HTML Maps,Drag and drop,"Implement HTML5 drag-and-drop using draggable, ondragstart, ondragover, and ondrop events.",Applying,3
+70,Graphics & Media,HTML Media & HTML Maps,Web storage,Use localStorage and sessionStorage to save and retrieve key-value data on the client.,Applying,3
+71,Graphics & Media,Debugging & Image Maps,Code debugging,Debug a given HTML/CSS code segment by identifying and fixing syntax and rendering issues.,Evaluating,4
+72,Graphics & Media,Debugging & Image Maps,"Syntax errors, code errors and logic errors","Detect syntax errors, code errors, and logic errors in sample HTML, CSS, or JavaScript snippets.",Analyzing,4
+73,Graphics & Media,Debugging & Image Maps,Working with image maps,"Build an interactive image map using <map>, <area>, and the usemap attribute.",Applying,3
+74,JavaScript Basics,Browser and DOM,Working with the Window object,Describe the Window object as the top-level object representing the browser window in JavaScript.,Understanding,2
+75,JavaScript Basics,Browser and DOM,Using console.log,"Use console.log() to print messages, variables, and computation results to the browser console.",Applying,3
+76,JavaScript Basics,Browser and DOM,"Changing, adding or deleting HTML elements via the DOM","Code JavaScript that adds, modifies, and removes HTML elements using DOM methods like createElement, appendChild, and removeChild.",Applying,3
+77,JavaScript Basics,Overview of JavaScript,Incorporating JavaScript in the head and body elements,Differentiate between placing <script> tags in the head versus the body and the impact on page load.,Understanding,2
+78,JavaScript Basics,Overview of JavaScript,Using an external JavaScript file,"Connect an external .js file to an HTML page using <script src=""...""></script>.",Applying,3
+79,JavaScript Basics,JavaScript Variables & JS Comments,"JavaScript variables — var, LET, CONST","Differentiate the scope and reassignment behaviour of var, let, and const declarations.",Understanding,2
+80,JavaScript Basics,JavaScript Variables & JS Comments,JavaScript comments,Comment a JavaScript program effectively using single-line (//) and multi-line (/* */) comments.,Applying,3
+81,JavaScript Basics,JavaScript Operators,Arithmetic operators,"Calculate numeric results using JavaScript arithmetic operators (+, -, *, /, %, **).",Applying,3
+82,JavaScript Basics,JavaScript Operators,Assignment operators,"Apply assignment operators (=, +=, -=, *=, /=) to update variable values.",Applying,3
+83,JavaScript Basics,JavaScript Operators,Comparison operators,"Use comparison operators (==, ===, !=, !==, <, >, <=, >=) to evaluate Boolean expressions.",Applying,3
+84,JavaScript Basics,JavaScript Operators,Logical operators,"Apply logical operators (&&, ||, !) to combine and negate Boolean conditions.",Applying,3
+85,JavaScript Basics,JavaScript Functions and Events,Working with functions,Code reusable JavaScript functions using the function keyword and arrow function syntax.,Applying,3
+86,JavaScript Basics,JavaScript Functions and Events,"Working with onclick, onload, mouse and onsubmit events","Apply event handlers (onclick, onload, onmouseover, onsubmit) to make webpages interactive.",Applying,3
+87,JavaScript Basics,JS Objects and JS Boxes,Templates of an Object,Build JavaScript objects using literal syntax with key-value pairs for properties and methods.,Applying,3
+88,JavaScript Basics,JS Objects and JS Boxes,"Alert, prompt and confirm boxes","Use alert(), prompt(), and confirm() to display dialogs and capture user input.",Applying,3
+89,JavaScript Basics,JS Objects and JS Boxes,If-else statement,"Apply if, else if, and else statements to control program flow based on conditions.",Applying,3
+90,JavaScript Basics,More with JS Objects,"Number, boolean and string objects","Describe the built-in Number, Boolean, and String objects and the methods each provides.",Understanding,2
+91,JavaScript Basics,More with JS Objects,Arrays,"Use array methods (push, pop, shift, unshift, slice, splice) to manipulate ordered collections.",Applying,3
+92,JavaScript Basics,More with JS Objects,FOR loop,Iterate through an array using a JavaScript for loop to access each element.,Applying,3
+93,JavaScript Basics,More with JS Objects,JS Date and JS Math,"Apply Date and Math object methods to obtain dates, generate random numbers, and perform calculations.",Applying,3
+94,JS Control Flow,Loops and Conditionals,String search,"Use string methods (indexOf, includes, search, match) to search within a string.",Applying,3
+95,JS Control Flow,Loops and Conditionals,Date object and its properties,"Apply Date methods (getDate, getMonth, getFullYear, toISOString) to format and read date values.",Applying,3
+96,JS Control Flow,Advanced Loops,Control statements and if-else,Apply if-else conditional statements to make decisions in a JavaScript program.,Applying,3
+97,JS Control Flow,Advanced Loops,FOR loop,Iterate using a for loop with a known number of repetitions to process data.,Applying,3
+98,JS Control Flow,Advanced Loops,WHILE loop and DO WHILE loop,Differentiate while and do-while loops based on when their condition is evaluated.,Understanding,2
+99,JS Control Flow,Problem Solving 1,Advanced FOR loop,Use the for...of loop to iterate over iterable values such as arrays and strings.,Applying,3
+100,JS Control Flow,Problem Solving 1,FOR IN loop,Apply the for...in loop to iterate over the enumerable properties of an object.,Applying,3
+101,JS Control Flow,Problem Solving 1,SWITCH statement,Code a switch statement to handle multiple discrete case values cleanly.,Applying,3
+102,JS Control Flow,Problem Solving 1,break and default keywords,Explain the role of the break statement in switch and the default case as a fallback.,Understanding,2
+103,JS Control Flow,Problem Solving 2,Problem solving with JavaScript loops and conditionals,"Trace and solve programming problems that combine loops, conditionals, and array operations.",Analyzing,4
+104,JS Advanced,"Validation, Errors and Debugging",Code debugging,"Debug JavaScript programs using browser DevTools, breakpoints, and console output.",Evaluating,4
+105,JS Advanced,"Validation, Errors and Debugging",Validating forms,"Implement client-side form validation using JavaScript to check required fields, formats, and lengths.",Applying,3
+106,JS Advanced,JS String and Date,JavaScript string methods,"Apply string methods (slice, substring, toUpperCase, toLowerCase, replace, split) to transform text.",Applying,3
+107,JS Advanced,JS String and Date,JavaScript Date object and properties,Use Date object properties and methods to compute durations and format calendar dates.,Applying,3
+108,Deployment,Web Hosting,Hosting the webpage,Deploy a static website to a hosting platform so it is accessible at a public URL.,Applying,3
+109,Deployment,Web Hosting,Basics of a server,"Describe the role of a web server in serving HTML, CSS, and JavaScript files to a browser over HTTP.",Understanding,2
+,,,,,TOTAL,300

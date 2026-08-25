@@ -1,4 +1,14 @@
-export type Subject = "Maths" | "Science" | "English" | "Social Studies";
+export type Subject =
+  | "Maths"
+  | "Science"
+  | "English"
+  | "Social Studies"
+  | "Python"
+  | "WebDev"
+  | "coding-python"
+  | "coding-webdev";
+
+
 export type ClassLevel =
   | "classKG"
   | "class1"
@@ -69,6 +79,8 @@ export interface MatchingPair {
 export interface DragDropPair {
   item: string;
   target: string;
+  prompt?: string;
+  match?: string;
 }
 
 export interface McqQuestionPayload {

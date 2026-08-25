@@ -1,0 +1,294 @@
+﻿S.No,Module (Topic),LO (Subtopic),Full Learning Objective,Bloom Level,No. of Questions
+1,Introduction to Python,What Python is and where it runs,"Define Python as a high-level, interpreted, general-purpose programming language.",Remembering,2
+2,Introduction to Python,What Python is and where it runs,"Recall three areas where Python is widely used (web, data, automation, AI).",Remembering,2
+3,Introduction to Python,What Python is and where it runs,Identify the file extension .py and what it signifies.,Remembering,2
+4,Introduction to Python,What Python is and where it runs,Differentiate between Python the language and CPython the interpreter.,Understanding,2
+5,Introduction to Python,Running a Python program,Identify the Python REPL (interactive shell) and a saved script as two ways to run code.,Remembering,2
+6,Introduction to Python,Running a Python program,Apply the print() function to display a message to the console.,Applying,3
+7,Introduction to Python,Running a Python program,Use the # symbol to add a single-line comment to a script.,Applying,3
+8,Introduction to Python,Running a Python program,Differentiate a syntax error from a runtime error using a small misspelled-print example.,Understanding,2
+9,Introduction to Python,First variables and data types,"List the four core built-in data types: int, float, str, bool.",Remembering,2
+10,Introduction to Python,First variables and data types,Apply the assignment operator = to bind a value to a variable name.,Applying,3
+11,Introduction to Python,First variables and data types,Use type() to check the data type of a value at runtime.,Applying,3
+12,Introduction to Python,First variables and data types,"Predict the type Python infers for a literal such as 3, 3.0, '3', True.",Analyzing,4
+13,Operators of Python,Arithmetic operators,"List the seven arithmetic operators: +, -, *, /, //, %, **.",Remembering,2
+14,Operators of Python,Arithmetic operators,"Apply +, -, * and / to integers and floats and observe the result type.",Applying,3
+15,Operators of Python,Arithmetic operators,Differentiate / (true division) from // (floor division) on positive and negative numbers.,Understanding,2
+16,Operators of Python,Arithmetic operators,Use ** to compute powers and predict the result of 2**10.,Applying,3
+17,Operators of Python,Arithmetic operators,Predict the output of a mixed-precedence expression such as 2 + 3 * 4.,Analyzing,4
+18,Operators of Python,Assignment and compound operators,"Identify =, +=, -=, *=, /=, //=, %=, **= and what each does.",Remembering,2
+19,Operators of Python,Assignment and compound operators,Apply += to update a counter variable inside a small loop.,Applying,3
+20,Operators of Python,Assignment and compound operators,Use *= to repeatedly double a variable.,Applying,3
+21,Operators of Python,Relational operators,"Recognize the six relational operators ==, !=, >, <, >=, <=.",Remembering,2
+22,Operators of Python,Relational operators,Apply relational operators to compare two values and produce a boolean.,Applying,3
+23,Operators of Python,Relational operators,Predict the boolean output of a chained comparison such as 0 < x <= 10.,Analyzing,4
+24,Operators of Python,Logical operators,"Define the operators and, or, not and identify their truth-table behaviour.",Remembering,2
+25,Operators of Python,Logical operators,Apply and / or / not to combine three relational expressions.,Applying,3
+26,Operators of Python,Logical operators,Differentiate short-circuit evaluation in 'and' from full evaluation.,Understanding,2
+27,Operators of Python,Logical operators,Construct a single boolean expression that captures 'between 18 and 65 and not retired'.,Creating,4
+28,Strings — manipulating and formatting,String basics,Define a string as a sequence of characters delimited by quotes.,Remembering,2
+29,Strings — manipulating and formatting,String basics,"Identify the syntax for single, double and triple-quoted strings.",Remembering,2
+30,Strings — manipulating and formatting,String basics,Use the + operator to concatenate two strings.,Applying,3
+31,Strings — manipulating and formatting,String basics,Apply the * operator to repeat a string n times.,Applying,3
+32,Strings — manipulating and formatting,String basics,Predict the result of mixing a string and a number with + and explain the TypeError.,Analyzing,4
+33,Strings — manipulating and formatting,Indexing and slicing,Recall that Python uses zero-based indexing.,Remembering,2
+34,Strings — manipulating and formatting,Indexing and slicing,Apply positive and negative indexing to access individual characters.,Applying,3
+35,Strings — manipulating and formatting,Indexing and slicing,"Use [start:stop:step] slicing to extract substrings, including step = -1 for reverse.",Applying,3
+36,Strings — manipulating and formatting,Indexing and slicing,Predict the substring produced by s[2:8:2] for a given string.,Analyzing,4
+37,Strings — manipulating and formatting,String methods,"List five common string methods: upper, lower, strip, replace, split.",Remembering,2
+38,Strings — manipulating and formatting,String methods,Apply .upper() and .lower() to normalise input.,Applying,3
+39,Strings — manipulating and formatting,String methods,Use .strip() to remove leading and trailing whitespace.,Applying,3
+40,Strings — manipulating and formatting,String methods,"Use .split(',') to break a CSV line into a list of fields.",Applying,3
+41,Strings — manipulating and formatting,String methods,"Apply .replace(old, new) to perform substitution.",Applying,3
+42,Strings — manipulating and formatting,String formatting,"Identify three ways to interpolate variables into a string: %, .format(), f-strings.",Remembering,2
+43,Strings — manipulating and formatting,String formatting,Apply f-strings to embed expressions and format numbers (e.g. f'{x:.2f}').,Applying,3
+44,Strings — manipulating and formatting,String formatting,Differentiate between f-strings and .format() in readability.,Understanding,2
+45,Strings — manipulating and formatting,String formatting,Compose a multi-line formatted output combining variables and literal text.,Creating,4
+46,Lists,Creating and accessing lists,"Define a list as an ordered, mutable collection that can hold mixed types.",Remembering,2
+47,Lists,Creating and accessing lists,Identify the [] literal syntax and the list() constructor.,Remembering,2
+48,Lists,Creating and accessing lists,Apply indexing and negative indexing on a list.,Applying,3
+49,Lists,Creating and accessing lists,Use slicing to copy or reverse a portion of a list.,Applying,3
+50,Lists,Modifying lists,"List four mutation methods: append, insert, extend, remove.",Remembering,2
+51,Lists,Modifying lists,Apply append() vs extend() and observe the difference on the same input.,Applying,3
+52,Lists,Modifying lists,Use pop() and del to remove an item by position.,Applying,3
+53,Lists,Modifying lists,Differentiate between .remove(value) (first match) and del list[i] (by index).,Understanding,2
+54,Lists,List operations,"Apply len(), max(), min(), sum() to a numeric list.",Applying,3
+55,Lists,List operations,Use the in operator to test for membership.,Applying,3
+56,Lists,List operations,Differentiate list.sort() (in place) from sorted(list) (returns new).,Understanding,2
+57,Lists,Iterating over lists,Apply a for loop to walk through every item in a list.,Applying,3
+58,Lists,Iterating over lists,Construct a small list comprehension that squares every number in a source list.,Creating,4
+59,Lists,Iterating over lists,Predict the output of a comprehension with an if filter such as [x for x in nums if x > 0].,Analyzing,4
+60,Tuples,Tuple basics,"Define a tuple as an ordered, immutable sequence with parenthesis syntax.",Remembering,2
+61,Tuples,Tuple basics,Identify the syntax for a single-element tuple (note the trailing comma).,Remembering,2
+62,Tuples,Tuple basics,Apply indexing and slicing on a tuple just as for a list.,Applying,3
+63,Tuples,Tuple basics,Predict whether a given tuple operation will mutate the tuple (it won't) or fail.,Analyzing,4
+64,Tuples,Tuple use cases,Apply tuple packing and unpacking to swap two variables in one line.,Applying,3
+65,Tuples,Tuple use cases,Use a tuple to return multiple values from a function.,Applying,3
+66,Tuples,Tuple use cases,"Differentiate when a tuple is preferred over a list (immutability, hashability, structure).",Understanding,2
+67,Tuples,Tuple use cases,"Construct a list of (name, score) tuples representing a leaderboard.",Creating,4
+68,Sets and Dictionaries,Set basics,Define a set as an unordered collection of unique values.,Remembering,2
+69,Sets and Dictionaries,Set basics,"Identify the {} literal vs set() (since {} is an empty dict, not a set).",Remembering,2
+70,Sets and Dictionaries,Set basics,Apply add() and discard() to mutate a set.,Applying,3
+71,Sets and Dictionaries,Set basics,Use the in operator on a set and reason about its O(1) lookup advantage.,Applying,3
+72,Sets and Dictionaries,Set operations,"Apply union, intersection, difference and symmetric_difference on two sets.",Applying,3
+73,Sets and Dictionaries,Set operations,Use a set to deduplicate a list while losing order.,Applying,3
+74,Sets and Dictionaries,Set operations,"Differentiate when to use a set vs a list (membership tests, deduplication).",Understanding,2
+75,Sets and Dictionaries,Dictionary basics,Define a dictionary as an unordered collection of key-value pairs.,Remembering,2
+76,Sets and Dictionaries,Dictionary basics,Identify the syntax {key: value} and the dict() constructor.,Remembering,2
+77,Sets and Dictionaries,Dictionary basics,Apply [] and .get() to retrieve a value safely from a dictionary.,Applying,3
+78,Sets and Dictionaries,Dictionary basics,"Use update(), pop() and del to mutate a dictionary.",Applying,3
+79,Sets and Dictionaries,Iterating over dictionaries,"Apply .keys(), .values() and .items() to iterate.",Applying,3
+80,Sets and Dictionaries,Iterating over dictionaries,"Predict whether iterating in dict order is guaranteed (yes, since Python 3.7).",Analyzing,4
+81,Sets and Dictionaries,Iterating over dictionaries,Construct a dictionary that counts the frequency of each character in a string.,Creating,4
+82,Control flow — if and else,Boolean conditions,"Identify what counts as truthy and falsy in Python (0, '', [], None vs everything else).",Remembering,2
+83,Control flow — if and else,Boolean conditions,Predict whether a given expression evaluates to True or False.,Analyzing,4
+84,Control flow — if and else,Boolean conditions,Apply bool() to coerce a value to its boolean equivalent.,Applying,3
+85,Control flow — if and else,if statement,Define the if statement and identify the role of the colon and indentation.,Remembering,2
+86,Control flow — if and else,if statement,Apply a single if to print a message when a condition is true.,Applying,3
+87,Control flow — if and else,if statement,Use indentation correctly so that the right statements belong to the branch.,Applying,3
+88,Control flow — if and else,if-else,Apply if-else for a binary decision (e.g. positive vs non-positive).,Applying,3
+89,Control flow — if and else,if-else,Predict the path of execution through an if-else for a given input.,Analyzing,4
+90,Control flow — if and else,if-elif-else,Apply if-elif-else for a multi-way decision such as letter grading.,Applying,3
+91,Control flow — if and else,if-elif-else,Trace execution through a 4-branch decision and report the output.,Analyzing,4
+92,Control flow — if and else,if-elif-else,Construct an if-elif-else chain that maps numeric grades to A/B/C/F.,Creating,4
+93,Control flow — if and else,if-elif-else,Debug an off-by-one error at a grade boundary in an existing if-elif chain.,Evaluating,5
+94,Control flow — if and else,Boolean operator precedence,Identify the precedence order: not > and > or.,Remembering,2
+95,Control flow — if and else,Boolean operator precedence,Predict the result of 'True or False and False' without using parentheses.,Analyzing,4
+96,Problem solving 1,Decomposing a problem,"Outline a problem statement into inputs, decisions and outputs.",Analyzing,4
+97,Problem solving 1,Decomposing a problem,"Identify the data types each input should be (int, float, string).",Remembering,2
+98,Problem solving 1,Decomposing a problem,"Apply if-else logic to solve at least three small problems (grading, even/odd, leap year).",Applying,3
+99,Problem solving 1,Decomposing a problem,Debug a buggy if-elif chain that fails on a boundary input.,Evaluating,4
+100,Problem solving 1,Decomposing a problem,Compose a 5-line plan in pseudocode before writing the actual Python code.,Creating,4
+101,Control flow — for and while,for loop fundamentals,Define a for loop as iteration over a sequence and identify its syntax.,Remembering,2
+102,Control flow — for and while,for loop fundamentals,Apply for + range(n) to iterate exactly n times.,Applying,3
+103,Control flow — for and while,for loop fundamentals,"Use range(start, stop, step) to iterate over an arithmetic progression.",Applying,3
+104,Control flow — for and while,for loop fundamentals,"Predict the values produced by range(2, 12, 3).",Analyzing,4
+105,Control flow — for and while,for over collections,Apply a for loop to walk through every element of a list and accumulate a sum.,Applying,3
+106,Control flow — for and while,for over collections,Use enumerate() to access both index and value while iterating.,Applying,3
+107,Control flow — for and while,for over collections,Use zip() to iterate over two lists in parallel.,Applying,3
+108,Control flow — for and while,while loop,Define a while loop and identify when it should be preferred over a for loop.,Remembering,2
+109,Control flow — for and while,while loop,Apply a while loop to read input until the user types 'quit'.,Applying,3
+110,Control flow — for and while,while loop,Predict whether a given while condition will eventually terminate.,Analyzing,4
+111,Control flow — for and while,Loop control,Apply break to exit a loop early when a target is found.,Applying,3
+112,Control flow — for and while,Loop control,Apply continue to skip the rest of the current iteration.,Applying,3
+113,Control flow — for and while,Loop control,Differentiate between break and continue using a small example.,Understanding,2
+114,Control flow — for and while,Looping idioms,"Apply a loop that produces a list of (index, item) pairs.",Applying,3
+115,Control flow — for and while,Looping idioms,Construct a loop that flips a dict (values become keys).,Creating,4
+116,Nested loops,Nesting basics,"Identify when nesting one loop inside another is required (e.g. grids, pairs).",Remembering,2
+117,Nested loops,Nesting basics,Apply nested for loops to iterate over rows and columns of a 2D grid.,Applying,3
+118,Nested loops,Nesting basics,Trace the iteration count of a nested loop and predict total inner-body executions.,Analyzing,4
+119,Nested loops,Common patterns,Build a nested-loop program that prints a multiplication table.,Applying,3
+120,Nested loops,Common patterns,"Apply nested loops to print every (i, j) pair where i < j.",Applying,3
+121,Nested loops,Common patterns,Use a nested loop to find the maximum element in a 2D list.,Applying,3
+122,Nested loops,Performance awareness,Predict the time complexity of a doubly-nested loop over n elements.,Analyzing,4
+123,Nested loops,Performance awareness,Critique a nested-loop solution where a single loop with a set lookup would be faster.,Evaluating,5
+124,Control flow — more with loops,Loops + conditionals,Apply a loop with an inner if-else to filter items as you iterate.,Applying,3
+125,Control flow — more with loops,Loops + conditionals,Use a sentinel value to terminate a while loop on demand.,Applying,3
+126,Control flow — more with loops,Loops + conditionals,Compose a loop-and-conditional that finds the first match in a list and stops.,Creating,4
+127,Control flow — more with loops,else on loops,Identify the for...else and while...else construct and when the else block runs.,Remembering,2
+128,Control flow — more with loops,else on loops,Apply for-else to detect that no element satisfied a condition.,Applying,3
+129,Control flow — more with loops,Common loop idioms,Apply a running-min/running-max loop pattern.,Applying,3
+130,Control flow — more with loops,Common loop idioms,Apply an accumulator pattern to count items satisfying a condition.,Applying,3
+131,Control flow — more with loops,Common loop idioms,Construct a loop that builds a new list by transforming an old one.,Creating,4
+132,Understanding patterns,Pattern decomposition,"Identify the row-and-column structure of common patterns (square, triangle, pyramid, diamond).",Remembering,2
+133,Understanding patterns,Pattern decomposition,"Outline the relationship between row index, column index, and what is printed.",Analyzing,4
+134,Understanding patterns,Triangles and squares,Apply nested loops to print a right-angled triangle of stars.,Applying,3
+135,Understanding patterns,Triangles and squares,Apply nested loops to print a hollow square.,Applying,3
+136,Understanding patterns,Triangles and squares,Predict the output of a small pattern program before running it.,Analyzing,4
+137,Understanding patterns,Diamond and pyramid,Construct a hollow-square pattern that depends on row and column position.,Creating,4
+138,Understanding patterns,Diamond and pyramid,Construct a diamond pattern of stars from two triangles.,Creating,4
+139,Understanding patterns,Diamond and pyramid,"Apply a number-pyramid pattern (rows of 1, 12, 123, ...).",Applying,3
+140,Problem solving 2,Loops + patterns problems,"Apply nested-loop pattern logic to draw a diamond, hourglass or pyramid of numbers.",Applying,3
+141,Problem solving 2,Loops + patterns problems,Debug a near-correct pattern program where the inner loop bound is off by one.,Evaluating,4
+142,Problem solving 2,Loops + patterns problems,Compose a brand-new pattern of the learner's own design and explain its row formula.,Creating,4
+143,Problem solving 2,Loops + patterns problems,Predict the output of a pattern that uses both i and j in the print formula.,Analyzing,4
+144,Functions,Defining a function,"Define a function and identify the parts: name, parameters, body, return.",Remembering,2
+145,Functions,Defining a function,"Identify the keyword def, the parentheses for parameters, and the colon ending the header.",Remembering,2
+146,Functions,Defining a function,Apply def to write a one-parameter function that returns x squared.,Applying,3
+147,Functions,Calling functions,Apply a function call with positional arguments to compute a result.,Applying,3
+148,Functions,Calling functions,Use keyword arguments to make a call self-documenting.,Applying,3
+149,Functions,Calling functions,Differentiate between a function that returns a value and one that only prints.,Understanding,2
+150,Functions,Parameters,Apply default parameter values to make a function flexible.,Applying,3
+151,Functions,Parameters,Use *args to accept a variable number of positional arguments.,Applying,3
+152,Functions,Parameters,Use **kwargs to accept a variable number of keyword arguments.,Applying,3
+153,Functions,Return values,Apply a function that returns a tuple of multiple values.,Applying,3
+154,Functions,Return values,Construct a function that takes a list and returns the largest element.,Creating,4
+155,Functions,Function design,Identify the single-responsibility principle for functions.,Remembering,2
+156,Functions,Function design,Critique a function that does five unrelated things.,Evaluating,4
+157,Local and global variables,Scope rules,Define local scope and global scope and identify which scope a name lives in.,Remembering,2
+158,Local and global variables,Scope rules,"Identify the LEGB rule (Local, Enclosing, Global, Built-in) for name resolution.",Remembering,2
+159,Local and global variables,Scope rules,Predict the printed value when the same name is used inside and outside a function.,Analyzing,4
+160,Local and global variables,global and nonlocal,Apply the global keyword to mutate a module-level variable from inside a function.,Applying,3
+161,Local and global variables,global and nonlocal,Apply nonlocal inside a nested function to mutate the enclosing scope's variable.,Applying,3
+162,Local and global variables,global and nonlocal,Critique an example where reliance on globals makes a program hard to test.,Evaluating,4
+163,Local and global variables,Pure vs impure functions,Differentiate between a pure function and one with side effects.,Understanding,2
+164,Local and global variables,Pure vs impure functions,Construct a pure version of a function that previously printed a global counter.,Creating,4
+165,Problem solving 3,Function-based problem solving,Apply functions to factor a long script into reusable pieces.,Applying,3
+166,Problem solving 3,Function-based problem solving,"Build at least three small utility functions (factorial, is_prime, reverse_string).",Applying,3
+167,Problem solving 3,Function-based problem solving,Test each function against three different inputs to confirm correctness.,Evaluating,4
+168,Problem solving 3,Function-based problem solving,Debug a function that fails on the empty-input edge case.,Evaluating,4
+169,Problem solving 3,Function-based problem solving,Compose a top-level main() that orchestrates the smaller functions.,Creating,4
+170,Recursive functions,Recursion fundamentals,Define recursion as a function that calls itself with a smaller subproblem.,Remembering,2
+171,Recursive functions,Recursion fundamentals,Identify the base case and the recursive case in a worked example.,Remembering,2
+172,Recursive functions,Recursion fundamentals,Differentiate between a base case and an infinite recursion.,Understanding,2
+173,Recursive functions,Classic recursive examples,Apply recursion to compute factorial(n).,Applying,3
+174,Recursive functions,Classic recursive examples,Apply recursion to compute the n-th Fibonacci number.,Applying,3
+175,Recursive functions,Classic recursive examples,Use recursion to reverse a string without using slicing.,Applying,3
+176,Recursive functions,Tracing recursion,Trace the call stack of a recursive function and predict the order of returns.,Analyzing,4
+177,Recursive functions,Tracing recursion,Predict the output of factorial(4) by drawing the call tree.,Analyzing,4
+178,Recursive functions,Tracing recursion,Critique a recursion that recomputes the same subproblems many times.,Evaluating,5
+179,File handling,File modes,"Identify the modes 'r', 'w', 'a' and 'r+' for opening a file.",Remembering,2
+180,File handling,File modes,Differentiate between 'w' (overwrite) and 'a' (append) on an existing file.,Understanding,2
+181,File handling,Reading files,"Apply with open(path, 'r') as f to read all lines from a text file.",Applying,3
+182,File handling,Reading files,"Use f.read(), f.readline() and f.readlines() and differentiate the three.",Applying,3
+183,File handling,Reading files,Apply iteration directly over the file object to read line by line.,Applying,3
+184,File handling,Writing files,Use file.write() and file.writelines() to save data back to disk.,Applying,3
+185,File handling,Writing files,Apply 'a' mode to append to an existing log file without truncation.,Applying,3
+186,File handling,Robust file work,Use the with statement to guarantee files are closed.,Applying,3
+187,File handling,Robust file work,Construct a small program that reads a CSV-like file and writes a transformed copy.,Creating,4
+188,File handling,CSV with the csv module,Apply csv.reader() to parse a comma-separated file.,Applying,3
+189,File handling,CSV with the csv module,Apply csv.DictReader() to read rows as dictionaries.,Applying,3
+190,Errors and exceptions,Common error types,"List five common Python exceptions: NameError, TypeError, ValueError, IndexError, KeyError.",Remembering,2
+191,Errors and exceptions,Common error types,Differentiate a syntax error (parse time) from an exception (runtime).,Understanding,2
+192,Errors and exceptions,Common error types,Identify ZeroDivisionError and FileNotFoundError as common runtime errors.,Remembering,2
+193,Errors and exceptions,try / except,Apply try-except to handle ValueError when converting user input to int.,Applying,3
+194,Errors and exceptions,try / except,Use try-except-else-finally to structure cleanup code.,Applying,3
+195,Errors and exceptions,try / except,Apply except with a specific exception type rather than a bare except.,Applying,3
+196,Errors and exceptions,Raising exceptions,Apply raise to throw a custom error message.,Applying,3
+197,Errors and exceptions,Raising exceptions,Construct a guard clause that raises ValueError when an argument is out of range.,Creating,4
+198,Errors and exceptions,Raising exceptions,Debug a program that crashes on bad input by adding the right exception handler.,Evaluating,4
+199,Errors and exceptions,Custom exceptions,Apply class MyError(Exception) to define a custom exception.,Applying,3
+200,Errors and exceptions,Custom exceptions,Use a custom exception to signal a domain-specific error.,Applying,3
+201,Modules and packages,Importing the standard library,Define a module as a .py file that can be imported into other programs.,Remembering,2
+202,Modules and packages,Importing the standard library,"Identify the difference between import math, from math import sqrt, and import math as m.",Remembering,2
+203,Modules and packages,Importing the standard library,"Apply import math, random, datetime in small examples.",Applying,3
+204,Modules and packages,Common standard-library modules,"Use math.sqrt(), math.pi, math.floor() in a small example.",Applying,3
+205,Modules and packages,Common standard-library modules,Use random.randint() and random.choice() to generate random data.,Applying,3
+206,Modules and packages,Common standard-library modules,Use datetime.datetime.now() and timedelta to do small date arithmetic.,Applying,3
+207,Modules and packages,Custom modules and packages,Define a package as a folder with an __init__.py file.,Remembering,2
+208,Modules and packages,Custom modules and packages,Construct a small custom module and import a function from it into another file.,Creating,4
+209,Object-oriented programming 1,Classes and objects,Define a class as a blueprint and an object as an instance of that class.,Remembering,2
+210,Object-oriented programming 1,Classes and objects,Identify the keyword class and the role of __init__.,Remembering,2
+211,Object-oriented programming 1,Classes and objects,Apply class syntax to define a class with __init__ and one method.,Applying,3
+212,Object-oriented programming 1,self and attributes,Identify the role of self as the reference to the instance being acted on.,Remembering,2
+213,Object-oriented programming 1,self and attributes,Differentiate between class attributes and instance attributes.,Understanding,2
+214,Object-oriented programming 1,self and attributes,Apply self.attr = value inside __init__ to set instance state.,Applying,3
+215,Object-oriented programming 1,Methods,Define an instance method and identify how it's called via dot notation.,Remembering,2
+216,Object-oriented programming 1,Methods,"Construct a Student class with name, age and a greet() method, then create two students.",Creating,4
+217,Object-oriented programming 1,Methods,Use the @staticmethod decorator to attach a function to the class without self.,Applying,3
+218,Object-oriented programming 1,OOP design,Differentiate composition from inheritance with a small example.,Understanding,2
+219,Object-oriented programming 1,OOP design,Identify the 'has-a' vs 'is-a' rule for choosing composition vs inheritance.,Remembering,2
+220,Object-oriented programming 2,Inheritance basics,Define inheritance and identify the syntax class Child(Parent).,Remembering,2
+221,Object-oriented programming 2,Inheritance basics,Apply super() to call a parent's __init__ from a child class.,Applying,3
+222,Object-oriented programming 2,Inheritance varieties,"Differentiate between single, multilevel, hierarchical and multiple inheritance.",Understanding,2
+223,Object-oriented programming 2,Inheritance varieties,Identify the method resolution order (MRO) on a small inheritance graph.,Remembering,2
+224,Object-oriented programming 2,Method override and polymorphism,Apply method override to specialise behaviour in a child class.,Applying,3
+225,Object-oriented programming 2,Method override and polymorphism,"Construct a small class hierarchy (Vehicle → Car, Bike) demonstrating override.",Creating,4
+226,Object-oriented programming 2,Method override and polymorphism,Predict which method runs when a child object calls an inherited method.,Analyzing,4
+227,Object-oriented programming 2,Encapsulation hints,Identify the convention that an underscore prefix marks a non-public attribute.,Remembering,2
+228,Object-oriented programming 2,Encapsulation hints,Apply a property using @property to expose a computed attribute.,Applying,3
+229,Turtle graphics,Turtle setup,Identify the turtle library as a graphics module bundled with Python.,Remembering,2
+230,Turtle graphics,Turtle setup,Recall the steps to create a turtle screen and a turtle object.,Remembering,2
+231,Turtle graphics,Turtle setup,Apply turtle.Screen() and turtle.Turtle() to set up a basic drawing window.,Applying,3
+232,Turtle graphics,Drawing primitives,"Apply turtle.forward(), turtle.left(), turtle.right() to draw simple shapes.",Applying,3
+233,Turtle graphics,Drawing primitives,Use turtle.penup() and turtle.pendown() to move without drawing.,Applying,3
+234,Turtle graphics,Drawing primitives,Use turtle.color() and turtle.pensize() to style the drawing.,Applying,3
+235,Turtle graphics,Procedural drawings,Construct a procedure that draws a regular polygon of n sides.,Creating,4
+236,Turtle graphics,Procedural drawings,Construct a procedure that draws a flower pattern by rotating and repeating.,Creating,4
+237,Introduction to GUI programming,GUI fundamentals,Define a GUI as a graphical interface built from widgets in a window.,Remembering,2
+238,Introduction to GUI programming,GUI fundamentals,Differentiate a GUI program from a console program by event-driven flow.,Understanding,2
+239,Introduction to GUI programming,Tkinter basics,"Identify the role of root = Tk(), root.mainloop() and the geometry() method.",Remembering,2
+240,Introduction to GUI programming,Tkinter basics,Apply Tk() and Label() to create a window with one piece of text.,Applying,3
+241,Introduction to GUI programming,Tkinter basics,Use root.title() and root.geometry() to set the window title and size.,Applying,3
+242,Configuring themed Tkinter widgets,ttk widgets,Differentiate between tkinter widgets and tkinter.ttk themed widgets.,Understanding,2
+243,Configuring themed Tkinter widgets,ttk widgets,"Identify three common ttk widgets: ttk.Button, ttk.Label, ttk.Entry.",Remembering,2
+244,Configuring themed Tkinter widgets,Theming with Style,Apply ttk.Style() to change the appearance of a button or label.,Applying,3
+245,Configuring themed Tkinter widgets,Theming with Style,Use the configure() method to update widget options after creation.,Applying,3
+246,Configuring themed Tkinter widgets,Theming with Style,Construct a small theme that changes the default font for every label in the app.,Creating,4
+247,Basic widgets,"Label, Button, Entry","Identify the purpose of Label, Button and Entry.",Remembering,2
+248,Basic widgets,"Label, Button, Entry",Apply Label() to display read-only text.,Applying,3
+249,Basic widgets,"Label, Button, Entry",Apply Entry() to capture single-line text input.,Applying,3
+250,Basic widgets,"Label, Button, Entry",Use a callback function on a Button's command= argument.,Applying,3
+251,Basic widgets,Geometry managers,"Differentiate between pack(), grid() and place() as layout strategies.",Understanding,2
+252,Basic widgets,Geometry managers,Apply grid() with row and column to lay out a small form.,Applying,3
+253,Basic widgets,Geometry managers,"Build a simple form with a label, text entry and submit button.",Applying,3
+254,Basic widgets 2,Checkbox and Radiobutton,Identify the purpose of Checkbutton and Radiobutton.,Remembering,2
+255,Basic widgets 2,Checkbox and Radiobutton,Apply IntVar() and StringVar() to track widget state.,Applying,3
+256,Basic widgets 2,Checkbox and Radiobutton,Differentiate Checkbutton (multi-select) from Radiobutton (single-select).,Understanding,2
+257,Basic widgets 2,Scale,Identify the purpose of the Scale widget for numeric input.,Remembering,2
+258,Basic widgets 2,Scale,"Apply Scale() with from_, to, and orient to make a slider.",Applying,3
+259,Basic widgets 2,Scale,"Construct a small preferences pane with a Scale, a Checkbutton and a Radiobutton group.",Creating,4
+260,Advanced widgets,Listbox and Combobox,Identify the purpose of Listbox and Combobox.,Remembering,2
+261,Advanced widgets,Listbox and Combobox,Apply Listbox.insert() to populate a list of items.,Applying,3
+262,Advanced widgets,Listbox and Combobox,Apply Combobox to provide a drop-down of choices to the user.,Applying,3
+263,Advanced widgets,Spinbox and Progressbar,Identify the purpose of Spinbox and Progressbar.,Remembering,2
+264,Advanced widgets,Spinbox and Progressbar,"Use Spinbox with from_, to and increment to set numeric input.",Applying,3
+265,Advanced widgets,Spinbox and Progressbar,Use Progressbar to show progress of a long-running operation.,Applying,3
+266,Pop-up dialog boxes,Message dialogs,"Identify the purpose of messagebox.showinfo, askyesno, showwarning, showerror.",Remembering,2
+267,Pop-up dialog boxes,Message dialogs,Apply messagebox.askyesno to confirm a destructive action.,Applying,3
+268,Pop-up dialog boxes,File and color dialogs,Identify the purpose of filedialog.askopenfilename and filedialog.asksaveasfilename.,Remembering,2
+269,Pop-up dialog boxes,File and color dialogs,Use filedialog.askopenfilename to let the user pick a file from disk.,Applying,3
+270,Pop-up dialog boxes,File and color dialogs,Use colorchooser.askcolor to let the user pick a colour.,Applying,3
+271,Organisational widgets,Frame and LabelFrame,Identify Frame and LabelFrame as containers for grouping widgets.,Remembering,2
+272,Organisational widgets,Frame and LabelFrame,Apply Frame to organise a row of related widgets together.,Applying,3
+273,Organisational widgets,"Toplevel, Notebook, PanedWindow","Differentiate Toplevel (new window), Notebook (tabs), PanedWindow (resizable split).",Understanding,2
+274,Organisational widgets,"Toplevel, Notebook, PanedWindow",Apply Notebook to create a tabbed interface.,Applying,3
+275,Organisational widgets,"Toplevel, Notebook, PanedWindow",Construct a layout with a Frame on the left and Notebook on the right.,Creating,4
+276,Event-driven programming,Events in GUIs,"Define an event in the GUI sense (mouse click, key press, focus, resize).",Remembering,2
+277,Event-driven programming,Events in GUIs,"Identify three event types: <Button-1>, <KeyPress>, <FocusIn>.",Remembering,2
+278,Event-driven programming,Binding handlers,"Apply widget.bind('<Button-1>', handler) to react to a left mouse click.",Applying,3
+279,Event-driven programming,Binding handlers,Use lambda inside command= to pass arguments to a callback.,Applying,3
+280,Event-driven programming,Binding handlers,Predict the order in which several bound handlers will fire for a single event.,Analyzing,4
+281,Event-driven programming,Event objects,"Identify common event attributes: event.x, event.y, event.keysym.",Remembering,2
+282,Event-driven programming,Event objects,Construct a callback that uses event.x and event.y to draw at the click location.,Creating,4
+283,Event-driven programming,Drag and drop,"Apply <ButtonPress>, <B1-Motion>, <ButtonRelease> to implement drag.",Applying,3
+284,Event-driven programming,Drag and drop,Construct a small drag-and-drop demo on a Canvas.,Creating,4
+285,Tkinter Canvas,Canvas basics,Identify the Canvas widget as a 2D drawing surface.,Remembering,2
+286,Tkinter Canvas,Canvas basics,Apply create_line and create_rectangle to draw simple shapes.,Applying,3
+287,Tkinter Canvas,More shapes,"Apply create_oval, create_arc and create_polygon to draw curved shapes.",Applying,3
+288,Tkinter Canvas,More shapes,Use create_text to add labels on the canvas.,Applying,3
+289,Tkinter Canvas,More shapes,Use create_image to display a PNG inside the canvas.,Applying,3
+290,Tkinter Canvas,Manipulating canvas items,Use itemconfig() and coords() to update an existing shape's properties.,Applying,3
+291,Tkinter Canvas,Manipulating canvas items,Apply tag_bind() to attach an event handler to a specific shape.,Applying,3
+292,Tkinter Canvas,Manipulating canvas items,"Construct a small interactive canvas (drag-to-draw, click-to-add-shape).",Creating,4
+,,,,TOTAL,850
